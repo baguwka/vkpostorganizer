@@ -4,7 +4,6 @@ using System.Windows;
 using System.Windows.Navigation;
 using JetBrains.Annotations;
 using vk.Models;
-using vk.ViewModels;
 
 namespace vk.Views {
    /// <summary>
