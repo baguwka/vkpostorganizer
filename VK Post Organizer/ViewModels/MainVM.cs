@@ -35,9 +35,6 @@ namespace vk.ViewModels {
          MessageBox.Show("This function is not implemented yet", "FYI", MessageBoxButton.OK, MessageBoxImage.Hand);
       }
 
-
-      //https://vk.com/testingchamber
-
       private void authorizeCommandExecute() {
          var token = new AccessToken();
          var authWindow = new AuthView(token);

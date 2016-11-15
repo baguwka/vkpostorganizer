@@ -12,7 +12,6 @@ namespace vk.Views {
    public partial class AuthView : Window {
       private readonly AccessToken _token;
 
-
       public AuthView([NotNull] AccessToken token) {
          _token = token;
          InitializeComponent();
