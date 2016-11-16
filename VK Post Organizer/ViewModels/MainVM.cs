@@ -10,12 +10,14 @@ using vk.Models;
 using vk.Views;
 
 namespace vk.ViewModels {
-
    class MainVM : BindableBase, IVM {
 
       private string _content;
       private ImageSource _profilePhoto;
       private bool _isAuthorized;
+
+      private const string DEFAULT_AVATAR =
+         "pack://application:,,,/VKPostOrganizer;component/Resources/default_avatar.png";
 
       public ICommand ConfigureContentCommand { get; set; }
       public ICommand UploadCommand { get; set; }
@@ -37,13 +39,14 @@ namespace vk.ViewModels {
          get { return _isAuthorized; }
          set { SetProperty(ref _isAuthorized, value); }
       }
-
+      
       public MainVM() {
          ConfigureContentCommand = new DelegateCommand(configureContentCommandExecute);
          UploadCommand = new DelegateCommand(uploadCommandExecute);
          AuthorizeCommand = new DelegateCommand(authorizeCommandExecute);
 
          LogOutCommand = new DelegateCommand(logOutCommandExecute);
+         SetUpAvatar(DEFAULT_AVATAR);
       }
 
       private void configureContentCommandExecute() {
@@ -63,7 +66,7 @@ namespace vk.ViewModels {
          var methodUsersGet = new VkApiUsersGet(token.Token);
          var user = methodUsersGet.Get().Users.First();
 
-         Content = $"{user.FirstName} {user.LastName}";
+         Content = $"You logged as\n{user.FirstName} {user.LastName}";
          SetUpAvatar(user.UserPhotoUri);
 
          IsAuthorized = true;
@@ -79,11 +82,18 @@ namespace vk.ViewModels {
          ProfilePhoto = bitmap;
       }
 
-
       private void logOutCommandExecute() {
-         MessageBox.Show("Let's pretend we're loggining out ;)");
+         var result = MessageBox.Show("Are you sure you want to log out?", "Logging out", MessageBoxButton.YesNo);
 
-         IsAuthorized = false;
+         if (result == MessageBoxResult.Yes) {
+            IsAuthorized = false;
+            Content = "";
+            SetUpAvatar(DEFAULT_AVATAR);
+
+            var expiration = DateTime.UtcNow - TimeSpan.FromDays(1);
+            string cookie = $"remixsid=; expires={expiration.ToString("R")}; path=/; domain=.vk.com";
+            Application.SetCookie(new Uri("https://www.vk.com"), cookie);
+         }
       }
 
       public void OnLoad() {

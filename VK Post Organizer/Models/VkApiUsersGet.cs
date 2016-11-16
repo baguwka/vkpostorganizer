@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Windows;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 
@@ -10,7 +9,6 @@ namespace vk.Models {
 
       public VkApiUsersGetResponse Get() {
          var response = ExecuteMethod("users.get", "fields=first_name,last_name,photo_50");
-         MessageBox.Show(response);
          return JsonConvert.DeserializeObject<VkApiUsersGetResponse>(response);
       }
    }
