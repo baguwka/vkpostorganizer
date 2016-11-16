@@ -11,14 +11,23 @@
     </Window.DataContext>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition/>
+            <RowDefinition Height="50"/>
             <RowDefinition/>
             <RowDefinition/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <Label Grid.Row="0" Content="{Binding Content}"></Label>
+        <Grid Grid.Row="0" Height="50">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="50"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="100"/>
+            </Grid.ColumnDefinitions>
+            <Image Grid.Column="0" Source="{Binding ProfilePhoto, UpdateSourceTrigger=PropertyChanged}" Name="ProfilePhotoSource"></Image>
+            <Label Grid.Column="1" Content="{Binding Content, UpdateSourceTrigger=PropertyChanged}"></Label>
+            <Button Grid.Column="2" Content="Log out" Height="20" Style="{StaticResource ButtonDanger}" Command="{Binding LogOutCommand}" Visibility="{Binding IsAuthorized, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}"/>
+            <Button Grid.Column="2" Content="Authorize" Height="20" Style="{StaticResource ButtonSuccess}" Command="{Binding AuthorizeCommand}" Visibility="{Binding IsAuthorized, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityNegativeConverter}}"/>
+        </Grid>
         <Button Grid.Row="1" Content="configure content" Command="{Binding ConfigureContentCommand}"></Button>
         <Button Grid.Row="2" Content="upload" Command="{Binding UploadCommand}"></Button>
-        <Button Grid.Row="3" Content="Authorize" Command="{Binding AuthorizeCommand}"></Button>
     </Grid>
 </Window>

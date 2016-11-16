@@ -1,5 +1,6 @@
 namespace vk.Models {
    public class AccessToken {
-      public string Code { get; set; }
+      public string Token { get; set; }
+      public int UserID { get; set; }
    }
 }
