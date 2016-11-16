@@ -1,30 +1,49 @@
 ﻿using System;
-using System.Net;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
-using Newtonsoft.Json.Linq;
 using vk.Models;
 using vk.Views;
 
 namespace vk.ViewModels {
+
    class MainVM : BindableBase, IVM {
 
       private string _content;
+      private ImageSource _profilePhoto;
+      private bool _isAuthorized;
+
       public ICommand ConfigureContentCommand { get; set; }
       public ICommand UploadCommand { get; set; }
       public ICommand AuthorizeCommand { get; set; }
+
+      public ICommand LogOutCommand { get; set; }
 
       public string Content {
          get { return _content; }
          set { SetProperty(ref _content, value); }
       }
 
+      public ImageSource ProfilePhoto {
+         get { return _profilePhoto; }
+         set { SetProperty(ref _profilePhoto, value); }
+      }
+
+      public bool IsAuthorized {
+         get { return _isAuthorized; }
+         set { SetProperty(ref _isAuthorized, value); }
+      }
+
       public MainVM() {
          ConfigureContentCommand = new DelegateCommand(configureContentCommandExecute);
          UploadCommand = new DelegateCommand(uploadCommandExecute);
          AuthorizeCommand = new DelegateCommand(authorizeCommandExecute);
+
+         LogOutCommand = new DelegateCommand(logOutCommandExecute);
       }
 
       private void configureContentCommandExecute() {
@@ -41,13 +60,30 @@ namespace vk.ViewModels {
          var authWindow = new AuthView(token);
          authWindow.ShowDialog();
 
-         var method = "https://api.vk.com/method/account.getProfileInfo";
-         var parameters = "?first_name,last_name";
-         var webClient = new WebClient() {Encoding = System.Text.Encoding.UTF8};
-         var downloadedString = webClient.DownloadString(method + parameters + "&access_token=" + token.Token);
-         var json = JObject.Parse(downloadedString);
+         var methodUsersGet = new VkApiUsersGet(token.Token);
+         var user = methodUsersGet.Get().Users.First();
 
-         MessageBox.Show(json.ToString());
+         Content = $"{user.FirstName} {user.LastName}";
+         SetUpAvatar(user.UserPhotoUri);
+
+         IsAuthorized = true;
+      }
+
+
+      public void SetUpAvatar(string url) {
+         var bitmap = new BitmapImage();
+         bitmap.BeginInit();
+         bitmap.UriSource = new Uri(url, UriKind.Absolute);
+         bitmap.EndInit();
+
+         ProfilePhoto = bitmap;
+      }
+
+
+      private void logOutCommandExecute() {
+         MessageBox.Show("Let's pretend we're loggining out ;)");
+
+         IsAuthorized = false;
       }
 
       public void OnLoad() {

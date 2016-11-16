@@ -8,7 +8,7 @@
         WindowStartupLocation="CenterScreen"
         Title="AuthView" Height="500" Width="800">
     <Grid>
-        <WebBrowser Name="WebBrowser"
+        <WebBrowser Name="InternalWebBrowser"
                     Navigated="WebBrowser_OnNavigated"
                     Navigating="WebBrowser_OnNavigating">
             
