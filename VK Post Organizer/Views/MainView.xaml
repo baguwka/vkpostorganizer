@@ -16,7 +16,7 @@
             <RowDefinition/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <Label Grid.Row="0" Content="{Binding Content}"></Label>
+        <Label Grid.Row="0" Content="{Binding Content, UpdateSourceTrigger=PropertyChanged}"></Label>
         <Button Grid.Row="1" Content="configure content" Command="{Binding ConfigureContentCommand}"></Button>
         <Button Grid.Row="2" Content="upload" Command="{Binding UploadCommand}"></Button>
         <Button Grid.Row="3" Content="Authorize" Command="{Binding AuthorizeCommand}"></Button>

@@ -1,14 +1,15 @@
 ﻿using System;
+using System.Net;
 using System.Windows;
 using System.Windows.Input;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
+using Newtonsoft.Json.Linq;
 using vk.Models;
 using vk.Views;
 
 namespace vk.ViewModels {
    class MainVM : BindableBase, IVM {
-
 
       private string _content;
       public ICommand ConfigureContentCommand { get; set; }
@@ -40,9 +41,14 @@ namespace vk.ViewModels {
          var authWindow = new AuthView(token);
          authWindow.ShowDialog();
 
-         MessageBox.Show(token.Code);
-      }
+         var method = "https://api.vk.com/method/account.getProfileInfo";
+         var parameters = "?first_name,last_name";
+         var webClient = new WebClient() {Encoding = System.Text.Encoding.UTF8};
+         var downloadedString = webClient.DownloadString(method + parameters + "&access_token=" + token.Token);
+         var json = JObject.Parse(downloadedString);
 
+         MessageBox.Show(json.ToString());
+      }
 
       public void OnLoad() {
          throw new NotImplementedException();

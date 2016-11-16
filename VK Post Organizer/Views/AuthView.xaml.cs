@@ -19,7 +19,7 @@ namespace vk.Views {
             WebBrowser.MessageHook += webBrowserOnMessageHook;
             deleteCookies();
             var destinationURL =
-               $"https://oauth.vk.com/authorize?client_id=5730368?display=page?response_type=token?redirect_uri=oauth.vk.com/blank.html";
+               $"https://oauth.vk.com/authorize?client_id=5730368&display=page&response_type=token&v=5.60&redirect_uri=oauth.vk.com/blank.html";
             WebBrowser.Navigate(destinationURL);
          };
       }
@@ -39,9 +39,10 @@ namespace vk.Views {
 
       private void WebBrowser_OnNavigated(object sender, NavigationEventArgs e) {
          var url = e.Uri.Fragment;
-         if (url.Contains("code") && url.Contains("#")) {
-            var code = url.Split('=').Last();
-            _token.Code = code;
+         if (url.Contains("access_token") && url.Contains("#")) {
+            var response = url.Split('=', '&');
+            _token.Token = response[1];
+            _token.UserID = Int32.Parse(response[5]);
             DialogResult = true;
             this.Close();
          }
