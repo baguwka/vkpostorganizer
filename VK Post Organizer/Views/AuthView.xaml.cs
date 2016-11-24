@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Navigation;
 using JetBrains.Annotations;
 using vk.Models;
+using vk.Models.VkApi;
 
 namespace vk.Views {
    /// <summary>

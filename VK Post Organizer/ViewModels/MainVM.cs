@@ -7,6 +7,7 @@ using System.Windows.Media.Imaging;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
 using vk.Models;
+using vk.Models.VkApi;
 using vk.Views;
 
 namespace vk.ViewModels {
@@ -46,7 +47,6 @@ namespace vk.ViewModels {
          AuthorizeCommand = new DelegateCommand(authorizeCommandExecute);
 
          LogOutCommand = new DelegateCommand(logOutCommandExecute);
-         SetUpAvatar(DEFAULT_AVATAR);
       }
 
       private void configureContentCommandExecute() {
@@ -58,12 +58,24 @@ namespace vk.ViewModels {
          MessageBox.Show("This function is not implemented yet", "FYI", MessageBoxButton.OK, MessageBoxImage.Hand);
       }
 
-      private void authorizeCommandExecute() {
+      private void authorizeIfAlreadyLoggined() {
+         var cookies = Application.GetCookie(new Uri("https://www.vk.com"));
+         if (!string.IsNullOrEmpty(cookies)) {
+            var values = cookies.Split(';');
+
+            foreach (var s in values.Where(s => s.IndexOf('=') > 0).Where(s => s.Substring(0, s.IndexOf('=')).Trim() == "remixsid")) {
+               //todo: hidden authorize (without popup)
+               Authorize();
+            }
+         }
+      }
+
+      public void Authorize() {
          var token = new AccessToken();
          var authWindow = new AuthView(token);
          authWindow.ShowDialog();
 
-         var methodUsersGet = new VkApiUsersGet(token.Token);
+         var methodUsersGet = new UsersGet(token.Token);
          var user = methodUsersGet.Get().Users.First();
 
          Content = $"You logged as\n{user.FirstName} {user.LastName}";
@@ -82,6 +94,10 @@ namespace vk.ViewModels {
          ProfilePhoto = bitmap;
       }
 
+      private void authorizeCommandExecute() {
+         Authorize();
+      }
+
       private void logOutCommandExecute() {
          var result = MessageBox.Show("Are you sure you want to log out?", "Logging out", MessageBoxButton.YesNo);
 
@@ -97,7 +113,9 @@ namespace vk.ViewModels {
       }
 
       public void OnLoad() {
-         throw new NotImplementedException();
+         SetUpAvatar(DEFAULT_AVATAR);
+
+         authorizeIfAlreadyLoggined();
       }
 
       public void OnClosing() {

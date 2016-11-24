@@ -2,25 +2,25 @@
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 
-namespace vk.Models {
-   public class VkApiUsersGet : VkApiBase {
-      public VkApiUsersGet(string token) : base(token) {
+namespace vk.Models.VkApi {
+   public class UsersGet : VkApiBase {
+      public UsersGet(string token) : base(token) {
       }
 
-      public VkApiUsersGetResponse Get() {
+      public UsersGetResponse Get() {
          var response = ExecuteMethod("users.get", "fields=first_name,last_name,photo_50");
-         return JsonConvert.DeserializeObject<VkApiUsersGetResponse>(response);
+         return JsonConvert.DeserializeObject<UsersGetResponse>(response);
       }
    }
 
    [UsedImplicitly]
-   public class VkApiUsersGetResponse {
+   public class UsersGetResponse {
       [JsonProperty(PropertyName = "response")]
-      public List<VkApiUser> Users { get; set; }
+      public List<User> Users { get; set; }
    }
 
    [UsedImplicitly]
-   public class VkApiUser {
+   public class User {
       [JsonProperty(PropertyName = "first_name")]
       public string FirstName { get; set; }
 

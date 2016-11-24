@@ -35,6 +35,10 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>
+    </StartupObject>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="JetBrains.Annotations, Version=10.2.1.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <HintPath>..\packages\JetBrains.Annotations.10.2.1\lib\net\JetBrains.Annotations.dll</HintPath>
@@ -103,9 +107,9 @@
     </ApplicationDefinition>
     <Compile Include="Converter\BoolToVisibilityConverter.cs" />
     <Compile Include="Models\Timeline.cs" />
-    <Compile Include="Models\AccessToken.cs" />
-    <Compile Include="Models\VkApiBase.cs" />
-    <Compile Include="Models\VkApiUsersGet.cs" />
+    <Compile Include="Models\VkApi\AccessToken.cs" />
+    <Compile Include="Models\VkApi\VkApiBase.cs" />
+    <Compile Include="Models\VkApi\UsersGet.cs" />
     <Compile Include="ViewModels\IVM.cs" />
     <Compile Include="ViewModels\MainVM.cs" />
     <Compile Include="Views\AuthView.xaml.cs">

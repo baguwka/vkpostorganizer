@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Text;
 
-namespace vk.Models {
+namespace vk.Models.VkApi {
    public abstract class VkApiBase {
       protected string token { get; }
 
