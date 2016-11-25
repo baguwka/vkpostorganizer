@@ -1,19 +1,17 @@
-﻿using System.Net;
-using System.Text;
+﻿using JetBrains.Annotations;
 
 namespace vk.Models.VkApi {
    public abstract class VkApiBase {
-      protected string token { get; }
+      private readonly IWebClient _webClient;
+      protected AccessToken token { get; }
 
-      public VkApiBase(string token) {
+      public VkApiBase([NotNull] AccessToken token, [NotNull] IWebClient webClient) {
+         _webClient = webClient;
          this.token = token;
       }
 
       public string ExecuteMethod(string method, string parameters) {
-         using (var wc = new WebClient()) {
-            wc.Encoding = Encoding.UTF8;
-            return wc.DownloadString($"https://api.vk.com/method/{method}?{parameters}&access_token={token}");
-         }
+         return _webClient.DownloadString($"https://api.vk.com/method/{method}?{parameters}&access_token={token.Token}&v=5.60");
       }
    }
 }

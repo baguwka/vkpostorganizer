@@ -108,6 +108,9 @@
     <Compile Include="Converter\BoolToVisibilityConverter.cs" />
     <Compile Include="Models\Timeline.cs" />
     <Compile Include="Models\VkApi\AccessToken.cs" />
+    <Compile Include="Models\DefaultWebClient.cs" />
+    <Compile Include="Models\VkApi\GroupsGet.cs" />
+    <Compile Include="Models\IWebClient.cs" />
     <Compile Include="Models\VkApi\VkApiBase.cs" />
     <Compile Include="Models\VkApi\UsersGet.cs" />
     <Compile Include="ViewModels\IVM.cs" />

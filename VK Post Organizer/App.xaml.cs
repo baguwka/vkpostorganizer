@@ -17,6 +17,8 @@ namespace vk {
       private void CompositionRoot(object sender, StartupEventArgs e) {
          Container = new UnityContainer();
 
+         Container.RegisterType<IWebClient, DefaultWebClient>();
+
          var window = new MainView();
          window.Show();
       }

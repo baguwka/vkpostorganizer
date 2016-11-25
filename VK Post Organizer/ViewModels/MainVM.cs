@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Linq;
+using System.Text;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
+using Microsoft.Practices.Unity;
 using vk.Models;
 using vk.Models.VkApi;
 using vk.Views;
@@ -55,7 +57,18 @@ namespace vk.ViewModels {
       }
 
       private void uploadCommandExecute() {
-         MessageBox.Show("This function is not implemented yet", "FYI", MessageBoxButton.OK, MessageBoxImage.Hand);
+         var methodGroupsGet = App.Container.Resolve<GroupsGet>();//new GroupsGet(accessToken.Token);
+         var groups = methodGroupsGet.Get().Response;
+         if (groups == null) {
+            MessageBox.Show("Groups null");
+         }
+         var sb = new StringBuilder();
+         if (groups != null) {
+            foreach (var group in groups.Groups) {
+               sb.AppendLine(@group.Name);
+            }
+         }
+         MessageBox.Show(sb.ToString());
       }
 
       private void authorizeIfAlreadyLoggined() {
@@ -71,11 +84,12 @@ namespace vk.ViewModels {
       }
 
       public void Authorize() {
-         var token = new AccessToken();
-         var authWindow = new AuthView(token);
+         var accessToken = new AccessToken();
+         App.Container.RegisterInstance(accessToken);
+         var authWindow = new AuthView(accessToken);
          authWindow.ShowDialog();
 
-         var methodUsersGet = new UsersGet(token.Token);
+         var methodUsersGet = App.Container.Resolve<UsersGet>();
          var user = methodUsersGet.Get().Users.First();
 
          Content = $"You logged as\n{user.FirstName} {user.LastName}";

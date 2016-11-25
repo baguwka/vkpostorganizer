@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace vk.Models.VkApi {
    public class UsersGet : VkApiBase {
-      public UsersGet(string token) : base(token) {
+      public UsersGet(AccessToken token, IWebClient webClient) : base(token, webClient) {
       }
 
       public UsersGetResponse Get() {
