@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -18,12 +19,15 @@ namespace vk.ViewModels {
       private string _content;
       private ImageSource _profilePhoto;
       private bool _isAuthorized;
+      private bool _isGroupSelected;
+
+      public GroupCollection GroupCollection { get; }
 
       private const string DEFAULT_AVATAR =
          "pack://application:,,,/VKPostOrganizer;component/Resources/default_avatar.png";
 
       public ICommand ConfigureContentCommand { get; set; }
-      public ICommand UploadCommand { get; set; }
+      public ICommand BackCommand { get; set; }
       public ICommand AuthorizeCommand { get; set; }
 
       public ICommand LogOutCommand { get; set; }
@@ -42,13 +46,27 @@ namespace vk.ViewModels {
          get { return _isAuthorized; }
          set { SetProperty(ref _isAuthorized, value); }
       }
-      
+
+      public bool IsGroupSelected {
+         get { return _isGroupSelected; }
+         set { SetProperty(ref _isGroupSelected, value); }
+      }
+
       public MainVM() {
          ConfigureContentCommand = new DelegateCommand(configureContentCommandExecute);
-         UploadCommand = new DelegateCommand(uploadCommandExecute);
+         BackCommand = new DelegateCommand(backCommandExecute);
          AuthorizeCommand = new DelegateCommand(authorizeCommandExecute);
 
          LogOutCommand = new DelegateCommand(logOutCommandExecute);
+
+         GroupCollection = App.Container.Resolve<GroupCollection>();
+
+         GroupCollection.ItemClicked += onGroupItemClicked;
+      }
+
+      private void onGroupItemClicked(object sender, GroupItem groupItem) {
+         //MessageBox.Show($"item [{groupItem.ID}] clicked. It's {groupItem.Content}");
+         IsGroupSelected = true;
       }
 
       private void configureContentCommandExecute() {
@@ -56,19 +74,23 @@ namespace vk.ViewModels {
          configureContentView.ShowDialog();
       }
 
-      private void uploadCommandExecute() {
+      private void fillGroupCollection() {
          var methodGroupsGet = App.Container.Resolve<GroupsGet>();//new GroupsGet(accessToken.Token);
          var groups = methodGroupsGet.Get().Response;
          if (groups == null) {
             MessageBox.Show("Groups null");
+            return;
          }
-         var sb = new StringBuilder();
-         if (groups != null) {
-            foreach (var group in groups.Groups) {
-               sb.AppendLine(@group.Name);
-            }
+
+         GroupCollection.Clear();
+
+         foreach (var group in groups.Groups) {
+            GroupCollection.Add(GroupCollection.InstantiateItem(group.ID, group.Name));
          }
-         MessageBox.Show(sb.ToString());
+      }
+
+      private void backCommandExecute() {
+         IsGroupSelected = false;
       }
 
       private void authorizeIfAlreadyLoggined() {
@@ -76,8 +98,7 @@ namespace vk.ViewModels {
          if (!string.IsNullOrEmpty(cookies)) {
             var values = cookies.Split(';');
 
-            foreach (var s in values.Where(s => s.IndexOf('=') > 0).Where(s => s.Substring(0, s.IndexOf('=')).Trim() == "remixsid")) {
-               //todo: hidden authorize (without popup)
+            if (values.Where(s => s.IndexOf('=') > 0).Any(s => s.Substring(0, s.IndexOf('=')).Trim() == "remixsid")) {
                Authorize();
             }
          }
@@ -96,6 +117,19 @@ namespace vk.ViewModels {
          SetUpAvatar(user.UserPhotoUri);
 
          IsAuthorized = true;
+
+         fillGroupCollection();
+      }
+
+      public void Deauthorize() {
+         GroupCollection.Clear();
+         IsAuthorized = false;
+         Content = "";
+         SetUpAvatar(DEFAULT_AVATAR);
+
+         var expiration = DateTime.UtcNow - TimeSpan.FromDays(1);
+         string cookie = $"remixsid=; expires={expiration.ToString("R")}; path=/; domain=.vk.com";
+         Application.SetCookie(new Uri("https://www.vk.com"), cookie);
       }
 
 
@@ -116,13 +150,7 @@ namespace vk.ViewModels {
          var result = MessageBox.Show("Are you sure you want to log out?", "Logging out", MessageBoxButton.YesNo);
 
          if (result == MessageBoxResult.Yes) {
-            IsAuthorized = false;
-            Content = "";
-            SetUpAvatar(DEFAULT_AVATAR);
-
-            var expiration = DateTime.UtcNow - TimeSpan.FromDays(1);
-            string cookie = $"remixsid=; expires={expiration.ToString("R")}; path=/; domain=.vk.com";
-            Application.SetCookie(new Uri("https://www.vk.com"), cookie);
+            Deauthorize();
          }
       }
 

@@ -3,15 +3,15 @@
 namespace vk.Models.VkApi {
    public abstract class VkApiBase {
       private readonly IWebClient _webClient;
-      protected AccessToken token { get; }
+      private readonly AccessToken _token;
 
       public VkApiBase([NotNull] AccessToken token, [NotNull] IWebClient webClient) {
          _webClient = webClient;
-         this.token = token;
+         _token = token;
       }
 
       public string ExecuteMethod(string method, string parameters) {
-         return _webClient.DownloadString($"https://api.vk.com/method/{method}?{parameters}&access_token={token.Token}&v=5.60");
+         return _webClient.DownloadString($"https://api.vk.com/method/{method}?{parameters}&access_token={_token.Token}&v=5.60");
       }
    }
 }

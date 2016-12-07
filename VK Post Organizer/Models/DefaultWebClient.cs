@@ -1,8 +1,10 @@
 using System;
 using System.Net;
 using System.Text;
+using JetBrains.Annotations;
 
 namespace vk.Models {
+   [UsedImplicitly]
    public class DefaultWebClient : IWebClient {
       public string DownloadString(Uri address) {
          using (var wc = new WebClient()) {

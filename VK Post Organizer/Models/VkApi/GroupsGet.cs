@@ -3,6 +3,7 @@ using JetBrains.Annotations;
 using Newtonsoft.Json;
 
 namespace vk.Models.VkApi {
+   [UsedImplicitly]
    public class GroupsGet : VkApiBase {
       public GroupsGet(AccessToken token, IWebClient webClient) : base(token, webClient) {
       }
@@ -29,7 +30,7 @@ namespace vk.Models.VkApi {
 
    [UsedImplicitly]
    public class Group {
-      [JsonProperty(PropertyName = "gid")]
+      [JsonProperty(PropertyName = "id")]
       public int ID { get; set; }
 
       [JsonProperty(PropertyName = "name")]

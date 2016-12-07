@@ -3,6 +3,7 @@ using JetBrains.Annotations;
 using Newtonsoft.Json;
 
 namespace vk.Models.VkApi {
+   [UsedImplicitly]
    public class UsersGet : VkApiBase {
       public UsersGet(AccessToken token, IWebClient webClient) : base(token, webClient) {
       }

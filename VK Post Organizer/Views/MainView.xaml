@@ -6,7 +6,9 @@
         xmlns:vm="clr-namespace:vk.ViewModels"
         mc:Ignorable="d"
         Loaded="onLoaded"
-        Title="MainWindow" Height="350" Width="525" WindowStartupLocation="CenterScreen">
+        MinHeight="350" MinWidth="525"
+        Height="350" Width="525"
+        Title="MainWindow" WindowStartupLocation="CenterScreen">
     <Window.DataContext>
         <vm:MainVM/>
     </Window.DataContext>
@@ -14,8 +16,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
             <RowDefinition/>
-            <RowDefinition/>
-            <RowDefinition/>
+            <RowDefinition Height="25"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0" Height="50">
             <Grid.ColumnDefinitions>
@@ -25,12 +26,83 @@
             </Grid.ColumnDefinitions>
             <Image Grid.Column="0" Source="{Binding ProfilePhoto, UpdateSourceTrigger=PropertyChanged}" Name="ProfilePhotoSource"></Image>
             <Label Grid.Column="1" Content="{Binding Content, UpdateSourceTrigger=PropertyChanged}"></Label>
-            <Button Grid.Column="2" Content="Log out" Height="20" Style="{StaticResource ButtonDanger}" Command="{Binding LogOutCommand}" Visibility="{Binding IsAuthorized, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}"/>
-            <Button Grid.Column="2" Content="Authorize" Height="20" Style="{StaticResource ButtonSuccess}" Command="{Binding AuthorizeCommand}" Visibility="{Binding IsAuthorized, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityNegativeConverter}}"/>
+            <Button Grid.Column="2" Content="Log out" Height="20" Style="{StaticResource ButtonDanger}" Command="{Binding LogOutCommand}" 
+                    Visibility="{Binding IsAuthorized, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}"/>
+            <Button Grid.Column="2" Content="Authorize" Height="20" Style="{StaticResource ButtonSuccess}" Command="{Binding AuthorizeCommand}" 
+                    Visibility="{Binding IsAuthorized, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityNegativeConverter}}"/>
         </Grid>
-        
-        <!--<Button Grid.Row="1" Content="configure content" Command="{Binding ConfigureContentCommand}"></Button>
-        <Button Grid.Row="2" Content="upload" Command="{Binding UploadCommand}"></Button>-->
-        <Button Grid.Row="2" Content="my groups" Command="{Binding UploadCommand}"></Button>
+
+        <!-- Group workspace -->
+        <Grid Grid.Row="1" Visibility="{Binding IsGroupSelected, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="125"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            
+            <!-- Left block -->
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="25"/>
+                    <RowDefinition Height="125"/>
+                    <RowDefinition Height="25"/>
+                </Grid.RowDefinitions>
+                <Label Grid.Row="0" Content="{Binding GroupName, UpdateSourceTrigger=PropertyChanged}"/>
+                <Image Grid.Row="1" Source="{Binding GroupImage, UpdateSourceTrigger=PropertyChanged}"/>
+            </Grid>
+            
+            <!-- Group content -->
+            <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
+                <ItemsControl BorderThickness="0" Background="Transparent" VerticalAlignment="Top"
+                          ItemsSource="{Binding GroupPosts, UpdateSourceTrigger=PropertyChanged}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel VerticalAlignment="Bottom"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="45"/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Label Grid.Column="0"  Width="45" Height="25" Content="{Binding Time}"></Label>
+                                <Label Grid.Column="1" Height="25" Content="{Binding Content}"></Label>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Grid>
+
+        <!-- Group selection -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Visibility="{Binding IsGroupSelected, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityNegativeConverter}}">
+            <ItemsControl BorderThickness="0" Background="Transparent" VerticalAlignment="Top"
+                          ItemsSource="{Binding GroupCollection.Items, UpdateSourceTrigger=PropertyChanged}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel VerticalAlignment="Bottom"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Width="200" Height="25" 
+                                Content="{Binding Content}" Command="{Binding ClickCommand}"></Button>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Button Content="Back" Style="{StaticResource ButtonWarning}" Command="{Binding BackCommand}"
+                    Visibility="{Binding IsGroupSelected, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}"></Button>
+        </Grid>
     </Grid>
 </Window>
