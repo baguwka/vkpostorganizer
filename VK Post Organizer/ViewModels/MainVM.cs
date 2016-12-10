@@ -15,13 +15,13 @@ using vk.Views;
 
 namespace vk.ViewModels {
    class MainVM : BindableBase, IVM {
-
       private string _content;
       private ImageSource _profilePhoto;
       private bool _isAuthorized;
       private bool _isGroupSelected;
 
       public GroupCollection GroupCollection { get; }
+      public GroupItem GroupInfo { get; }
 
       private const string DEFAULT_AVATAR =
          "pack://application:,,,/VKPostOrganizer;component/Resources/default_avatar.png";
@@ -60,6 +60,7 @@ namespace vk.ViewModels {
          LogOutCommand = new DelegateCommand(logOutCommandExecute);
 
          GroupCollection = App.Container.Resolve<GroupCollection>();
+         GroupInfo = App.Container.Resolve<GroupItem>();
 
          GroupCollection.ItemClicked += onGroupItemClicked;
       }
@@ -67,6 +68,7 @@ namespace vk.ViewModels {
       private void onGroupItemClicked(object sender, GroupItem groupItem) {
          //MessageBox.Show($"item [{groupItem.ID}] clicked. It's {groupItem.Content}");
          IsGroupSelected = true;
+         GroupInfo.Load(groupItem.GroupRef);
       }
 
       private void configureContentCommandExecute() {
@@ -75,8 +77,8 @@ namespace vk.ViewModels {
       }
 
       private void fillGroupCollection() {
-         var methodGroupsGet = App.Container.Resolve<GroupsGet>();//new GroupsGet(accessToken.Token);
-         var groups = methodGroupsGet.Get().Response;
+         var methodGroupsGet = App.Container.Resolve<GroupsGet>();
+         var groups = methodGroupsGet.Get().Collection;
          if (groups == null) {
             MessageBox.Show("Groups null");
             return;
@@ -85,7 +87,7 @@ namespace vk.ViewModels {
          GroupCollection.Clear();
 
          foreach (var group in groups.Groups) {
-            GroupCollection.Add(GroupCollection.InstantiateItem(group.ID, group.Name));
+            GroupCollection.Add(GroupCollection.InstantiateItem(group));
          }
       }
 

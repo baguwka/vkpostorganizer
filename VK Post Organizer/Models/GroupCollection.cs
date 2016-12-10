@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using Microsoft.Practices.Prism.Mvvm;
+using vk.Models.VkApi;
+using vk.Models.VkApi.Entities;
 
 namespace vk.Models {
    [UsedImplicitly]
@@ -32,8 +34,8 @@ namespace vk.Models {
          _items.Clear();
       }
 
-      public GroupItem InstantiateItem(int id, string content) {
-         return new GroupItem(id, content) {
+      public GroupItem InstantiateItem(Group group) {
+         return new GroupItem(group) {
             ClickHandler = OnItemClicked
       };
    }

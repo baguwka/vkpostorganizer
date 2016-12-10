@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
+using vk.Models.VkApi.Entities;
 
 namespace vk.Models.VkApi {
    [UsedImplicitly]
@@ -17,29 +18,14 @@ namespace vk.Models.VkApi {
    [UsedImplicitly]
    public class GroupsGetResponse {
       [JsonProperty(PropertyName = "response")]
-      public GroupGetResponseResponse Response { get; set; }
+      public GroupGetCollection Collection { get; set; }
    }
 
    [UsedImplicitly]
-   public class GroupGetResponseResponse {
+   public class GroupGetCollection {
       [JsonProperty(PropertyName = "count")]
       public int Count { get; set; }
       [JsonProperty(PropertyName = "items")]
       public List<Group> Groups { get; set; }
-   }
-
-   [UsedImplicitly]
-   public class Group {
-      [JsonProperty(PropertyName = "id")]
-      public int ID { get; set; }
-
-      [JsonProperty(PropertyName = "name")]
-      public string Name { get; set; }
-
-      [JsonProperty(PropertyName = "photo_50")]
-      public string Photo50 { get; set; }
-
-      [JsonProperty(PropertyName = "photo_200")]
-      public string Photo200 { get; set; }
    }
 }

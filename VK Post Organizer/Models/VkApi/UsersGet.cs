@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
+using vk.Models.VkApi.Entities;
 
 namespace vk.Models.VkApi {
    [UsedImplicitly]
@@ -18,17 +19,5 @@ namespace vk.Models.VkApi {
    public class UsersGetResponse {
       [JsonProperty(PropertyName = "response")]
       public List<User> Users { get; set; }
-   }
-
-   [UsedImplicitly]
-   public class User {
-      [JsonProperty(PropertyName = "first_name")]
-      public string FirstName { get; set; }
-
-      [JsonProperty(PropertyName = "last_name")]
-      public string LastName { get; set; }
-
-      [JsonProperty(PropertyName = "photo_50")]
-      public string UserPhotoUri { get; set; }
    }
 }

@@ -6,13 +6,13 @@
         xmlns:vm="clr-namespace:vk.ViewModels"
         mc:Ignorable="d"
         Loaded="onLoaded"
-        MinHeight="350" MinWidth="525"
-        Height="350" Width="525"
+        MinHeight="450" MinWidth="750"
+        Height="450" Width="750"
         Title="MainWindow" WindowStartupLocation="CenterScreen">
     <Window.DataContext>
         <vm:MainVM/>
     </Window.DataContext>
-    <Grid>
+    <Grid Margin="3">
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
             <RowDefinition/>
@@ -35,7 +35,7 @@
         <!-- Group workspace -->
         <Grid Grid.Row="1" Visibility="{Binding IsGroupSelected, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="125"/>
+                <ColumnDefinition Width="200"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             
@@ -43,17 +43,17 @@
             <Grid Grid.Column="0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="25"/>
-                    <RowDefinition Height="125"/>
+                    <RowDefinition Height="200"/>
                     <RowDefinition Height="25"/>
                 </Grid.RowDefinitions>
-                <Label Grid.Row="0" Content="{Binding GroupName, UpdateSourceTrigger=PropertyChanged}"/>
-                <Image Grid.Row="1" Source="{Binding GroupImage, UpdateSourceTrigger=PropertyChanged}"/>
+                <Label Grid.Row="0" Content="{Binding GroupInfo.GroupRef.Name, UpdateSourceTrigger=PropertyChanged}" FontWeight="DemiBold"/>
+                <Image Grid.Row="1" Source="{Binding GroupInfo.GroupRef.Photo200, UpdateSourceTrigger=PropertyChanged}"/>
             </Grid>
             
             <!-- Group content -->
             <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
                 <ItemsControl BorderThickness="0" Background="Transparent" VerticalAlignment="Top"
-                          ItemsSource="{Binding GroupPosts, UpdateSourceTrigger=PropertyChanged}">
+                          ItemsSource="{Binding GroupInfo.Items, UpdateSourceTrigger=PropertyChanged}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <VirtualizingStackPanel VerticalAlignment="Bottom"/>
@@ -64,11 +64,11 @@
                         <DataTemplate>
                             <Grid>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="45"/>
+                                    <ColumnDefinition Width="120"/>
                                     <ColumnDefinition/>
                                 </Grid.ColumnDefinitions>
-                                <Label Grid.Column="0"  Width="45" Height="25" Content="{Binding Time}"></Label>
-                                <Label Grid.Column="1" Height="25" Content="{Binding Content}"></Label>
+                                <Label Grid.Column="0"  Width="120" Height="25" Content="{Binding Date}"></Label>
+                                <Label Grid.Column="1" Height="25" Content="{Binding Text}"></Label>
                             </Grid>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
@@ -89,17 +89,17 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Button Width="200" Height="25" 
-                                Content="{Binding Content}" Command="{Binding ClickCommand}"></Button>
+                                Content="{Binding GroupRef.Name}" Command="{Binding ClickCommand}"></Button>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </ScrollViewer>
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
+                <ColumnDefinition Width="175"/>
+                <ColumnDefinition Width="175"/>
+                <ColumnDefinition Width="175"/>
+                <ColumnDefinition Width="175"/>
             </Grid.ColumnDefinitions>
             <Button Content="Back" Style="{StaticResource ButtonWarning}" Command="{Binding BackCommand}"
                     Visibility="{Binding IsGroupSelected, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}"></Button>
