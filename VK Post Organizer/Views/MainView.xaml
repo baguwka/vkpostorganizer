@@ -5,16 +5,18 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:vk.ViewModels"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525" WindowStartupLocation="CenterScreen">
+        Loaded="onLoaded"
+        MinHeight="450" MinWidth="750"
+        Height="450" Width="750"
+        Title="MainWindow" WindowStartupLocation="CenterScreen">
     <Window.DataContext>
         <vm:MainVM/>
     </Window.DataContext>
-    <Grid>
+    <Grid Margin="3">
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
             <RowDefinition/>
-            <RowDefinition/>
-            <RowDefinition/>
+            <RowDefinition Height="25"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0" Height="50">
             <Grid.ColumnDefinitions>
@@ -24,10 +26,105 @@
             </Grid.ColumnDefinitions>
             <Image Grid.Column="0" Source="{Binding ProfilePhoto, UpdateSourceTrigger=PropertyChanged}" Name="ProfilePhotoSource"></Image>
             <Label Grid.Column="1" Content="{Binding Content, UpdateSourceTrigger=PropertyChanged}"></Label>
-            <Button Grid.Column="2" Content="Log out" Height="20" Style="{StaticResource ButtonDanger}" Command="{Binding LogOutCommand}" Visibility="{Binding IsAuthorized, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}"/>
-            <Button Grid.Column="2" Content="Authorize" Height="20" Style="{StaticResource ButtonSuccess}" Command="{Binding AuthorizeCommand}" Visibility="{Binding IsAuthorized, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityNegativeConverter}}"/>
+            <Button Grid.Column="2" Content="Log out" Height="20" Style="{StaticResource ButtonDanger}" Command="{Binding LogOutCommand}" 
+                    Visibility="{Binding IsAuthorized, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}"/>
+            <Button Grid.Column="2" Content="Authorize" Height="20" Style="{StaticResource ButtonSuccess}" Command="{Binding AuthorizeCommand}" 
+                    Visibility="{Binding IsAuthorized, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityNegativeConverter}}"/>
         </Grid>
-        <Button Grid.Row="1" Content="configure content" Command="{Binding ConfigureContentCommand}"></Button>
-        <Button Grid.Row="2" Content="upload" Command="{Binding UploadCommand}"></Button>
+
+        <!-- Group workspace -->
+        <Grid Grid.Row="1" Visibility="{Binding IsGroupSelected, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            
+            <!-- Left block -->
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="25"/>
+                    <RowDefinition Height="200"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Label Grid.Row="0" Content="{Binding WallInfo.WallHolder.Name, UpdateSourceTrigger=PropertyChanged}" FontWeight="DemiBold"/>
+                <Image Grid.Row="1" Source="{Binding WallInfo.WallHolder.Photo200, UpdateSourceTrigger=PropertyChanged}"/>
+                <StackPanel Grid.Row="2" Orientation="Vertical">
+                    <CheckBox Margin="0,5,0,0" Content="Show photos" IsChecked="{Binding WallInfo.ShowPhotos, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"></CheckBox>
+                    <ComboBox Margin="0,5,0,0" SelectedIndex="0">
+                        <ComboBoxItem Content="All"></ComboBoxItem>
+                        <ComboBoxItem Content="Posts only"></ComboBoxItem>
+                        <ComboBoxItem Content="Reposts only"></ComboBoxItem>
+                    </ComboBox>
+                </StackPanel>
+            </Grid>
+            
+            <!-- Group content -->
+            <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" Margin="5">
+                <ItemsControl BorderThickness="0" Background="Transparent" VerticalAlignment="Top"
+                          ItemsSource="{Binding WallInfo.Items, UpdateSourceTrigger=PropertyChanged}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel VerticalAlignment="Bottom"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border BorderThickness="1" BorderBrush="Bisque">
+                                <StackPanel Orientation="Vertical">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="120"/>
+                                            <ColumnDefinition/>
+                                        </Grid.ColumnDefinitions>
+                                        <Label Grid.Column="0"  Width="120" Height="25" Content="{Binding PostRef.Date}"></Label>
+                                        <Label Grid.Column="1" Height="25" Content="{Binding PostRef.Text}"></Label>
+                                    </Grid>
+                                    <Image HorizontalAlignment="Left" Width="400" Source="{Binding Photo, IsAsync=True}"
+                                           Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, 
+                                            Path=DataContext.WallInfo.ShowPhotos, Converter={StaticResource BoolToVisibilityConverter}}"></Image>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Grid>
+
+        <!-- Group selection -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Visibility="{Binding IsGroupSelected, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityNegativeConverter}}">
+            <ItemsControl BorderThickness="0" Background="Transparent" VerticalAlignment="Top" Margin="10"
+                          ItemsSource="{Binding WallList.Items, UpdateSourceTrigger=PropertyChanged}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel VerticalAlignment="Bottom"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Width="300" Height="50" Command="{Binding ClickCommand}" Margin="0,0,0,5" Background="White" BorderBrush="White" HorizontalContentAlignment="Left">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                <Image Source="{Binding WallHolder.Photo50, UpdateSourceTrigger=PropertyChanged}" 
+                                       Width="50" Height="50" HorizontalAlignment="Left"></Image>
+                                <TextBlock  Text="{Binding WallHolder.Name, UpdateSourceTrigger=PropertyChanged}" Margin="5,1,1,1" 
+                                            FontFamily="Roboto" Foreground="#2A5885" FontWeight="Bold" FontSize="12"
+                                            Width="250" Height="50" HorizontalAlignment="Left" VerticalAlignment="Top" TextWrapping="WrapWithOverflow"></TextBlock>
+                            </StackPanel>
+                        </Button>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="175"/>
+                <ColumnDefinition Width="175"/>
+                <ColumnDefinition Width="175"/>
+                <ColumnDefinition Width="175"/>
+            </Grid.ColumnDefinitions>
+            <Button Content="Back" Style="{StaticResource ButtonWarning}" Command="{Binding BackCommand}"
+                    Visibility="{Binding IsGroupSelected, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}"></Button>
+        </Grid>
     </Grid>
 </Window>

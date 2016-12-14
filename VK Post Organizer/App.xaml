@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:converters="clr-namespace:vk.Converter"
              xmlns:local="clr-namespace:vk"
-             StartupUri="Views/MainView.xaml">
+             Startup="CompositionRoot">
     <Application.Resources>
 
         <converters:BoolToVisibilityHiddenConverter x:Key="BoolToVisibilityConverterHide"/>
