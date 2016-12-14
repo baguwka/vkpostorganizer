@@ -98,8 +98,16 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Converter\BoolToVisibilityConverter.cs" />
-    <Compile Include="Models\GroupItem.cs" />
-    <Compile Include="Models\GroupCollection.cs" />
+    <Compile Include="Models\IWallHolder.cs" />
+    <Compile Include="Models\EmptyWallHolder.cs" />
+    <Compile Include="Models\VkApi\Entities\Error.cs" />
+    <Compile Include="Models\VkApi\Entities\RequiestParam.cs" />
+    <Compile Include="Models\VkApi\Entities\VkException.cs" />
+    <Compile Include="ViewModels\WallInfo.cs" />
+    <Compile Include="Models\WallItem.cs" />
+    <Compile Include="Models\WallList.cs" />
+    <Compile Include="ViewModels\PostItem.cs" />
+    <Compile Include="Models\PostType.cs" />
     <Compile Include="Models\SmartCollection.cs" />
     <Compile Include="Models\Timeline.cs" />
     <Compile Include="Models\VkApi\AccessToken.cs" />

@@ -2,30 +2,28 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using Microsoft.Practices.Prism.Mvvm;
-using vk.Models.VkApi;
-using vk.Models.VkApi.Entities;
 
 namespace vk.Models {
    [UsedImplicitly]
-   public class GroupCollection : BindableBase {
-      private SmartCollection<GroupItem> _items;
-      public event EventHandler<GroupItem> ItemClicked;
+   public class WallList : BindableBase {
+      private SmartCollection<WallItem> _items;
+      public event EventHandler<WallItem> ItemClicked;
 
-      public SmartCollection<GroupItem> Items {
+      public SmartCollection<WallItem> Items {
          get { return _items; }
          set { SetProperty(ref _items, value); }
       }
 
-      public GroupCollection() {
-         Items = new SmartCollection<GroupItem>();
+      public WallList() {
+         Items = new SmartCollection<WallItem>();
          Items.CollectionChanged += (sender, args) => OnPropertyChanged(nameof(Items));
       }
 
-      public void Add(GroupItem item) {
+      public void Add(WallItem item) {
          _items.Add(item);
       }
 
-      public void Fill(IEnumerable<GroupItem> items) {
+      public void Fill(IEnumerable<WallItem> items) {
          _items.Clear();
          _items.AddRange(items);
       }
@@ -34,13 +32,13 @@ namespace vk.Models {
          _items.Clear();
       }
 
-      public GroupItem InstantiateItem(Group group) {
-         return new GroupItem(group) {
+      public WallItem InstantiateItem(IWallHolder wallHolder) {
+         return new WallItem(wallHolder) {
             ClickHandler = OnItemClicked
       };
    }
 
-      protected void OnItemClicked(GroupItem e) {
+      protected void OnItemClicked(WallItem e) {
          ItemClicked?.Invoke(this, e);
       }
    }

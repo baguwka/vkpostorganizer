@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace vk.Models.VkApi.Entities {
    [UsedImplicitly]
-   public class Group : BindableBase {
+   public class Group : BindableBase, IWallHolder {
       private int _id;
       private string _photo200;
       private string _name;

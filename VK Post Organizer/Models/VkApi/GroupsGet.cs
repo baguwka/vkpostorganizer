@@ -11,6 +11,7 @@ namespace vk.Models.VkApi {
 
       public GroupsGetResponse Get() {
          var response = ExecuteMethod("groups.get", "extended=1&filter=editor");
+         checkForErrors(response);
          return JsonConvert.DeserializeObject<GroupsGetResponse>(response);
       }
    }

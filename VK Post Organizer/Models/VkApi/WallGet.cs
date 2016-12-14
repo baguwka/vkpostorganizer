@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Windows;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using vk.Models.VkApi.Entities;
@@ -11,6 +13,9 @@ namespace vk.Models.VkApi {
 
       public WallGetResponse Get(int id, int count = 100, int offset = 0) {
          var response = ExecuteMethod("wall.get", $"owner_id=-{id}&filter=postponed&offset={offset}&count={count}");
+
+         checkForErrors(response);
+
          return JsonConvert.DeserializeObject<WallGetResponse>(response);
       }
    }

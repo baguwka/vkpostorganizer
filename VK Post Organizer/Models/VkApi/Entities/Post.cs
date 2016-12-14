@@ -36,7 +36,7 @@ namespace vk.Models.VkApi.Entities {
          get { return _dateUnix; }
          set {
             SetProperty(ref _dateUnix, value);
-            Date = new DateTime(1970, 1, 1, 3, 0, 0, 0, DateTimeKind.Utc).AddSeconds(_dateUnix).ToString("dd:mm:yy HH:mm", CultureInfo.CurrentCulture);
+            Date = new DateTime(1970, 1, 1, 3, 0, 0, 0, DateTimeKind.Utc).AddSeconds(_dateUnix).ToString("dd.mm.yy HH:mm", CultureInfo.CurrentCulture);
          }
       }
 
@@ -54,14 +54,7 @@ namespace vk.Models.VkApi.Entities {
       [JsonProperty(PropertyName = "copy_history", Required = Required.Default)]
       public SmartCollection<Post> CopyHistory {
          get { return _copyHistory; }
-         set {
-            _copyHistory = value;
-            var prev = _copyHistory.FirstOrDefault();
-            if (prev == null) return;
-            ID = prev.ID;
-            Text = prev.Text;
-            Attachments = prev.Attachments;
-         }
+         set { SetProperty(ref _copyHistory, value); }
       }
    }
 }

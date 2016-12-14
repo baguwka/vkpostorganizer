@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -11,6 +9,7 @@ using Microsoft.Practices.Prism.Mvvm;
 using Microsoft.Practices.Unity;
 using vk.Models;
 using vk.Models.VkApi;
+using vk.Models.VkApi.Entities;
 using vk.Views;
 
 namespace vk.ViewModels {
@@ -20,8 +19,8 @@ namespace vk.ViewModels {
       private bool _isAuthorized;
       private bool _isGroupSelected;
 
-      public GroupCollection GroupCollection { get; }
-      public GroupItem GroupInfo { get; }
+      public WallList WallList { get; }
+      public WallInfo WallInfo { get; }
 
       private const string DEFAULT_AVATAR =
          "pack://application:,,,/VKPostOrganizer;component/Resources/default_avatar.png";
@@ -59,16 +58,21 @@ namespace vk.ViewModels {
 
          LogOutCommand = new DelegateCommand(logOutCommandExecute);
 
-         GroupCollection = App.Container.Resolve<GroupCollection>();
-         GroupInfo = App.Container.Resolve<GroupItem>();
+         WallList = App.Container.Resolve<WallList>();
+         WallInfo = App.Container.Resolve<WallInfo>();
 
-         GroupCollection.ItemClicked += onGroupItemClicked;
+         WallList.ItemClicked += onGroupItemClicked;
       }
 
-      private void onGroupItemClicked(object sender, GroupItem groupItem) {
-         //MessageBox.Show($"item [{groupItem.ID}] clicked. It's {groupItem.Content}");
+      private void onGroupItemClicked(object sender, WallItem wallItem) {
          IsGroupSelected = true;
-         GroupInfo.Load(groupItem.GroupRef);
+         try {
+            WallInfo.Load(wallItem.WallHolder);
+         }
+         catch (VkException ex) {
+            IsGroupSelected = false;
+            MessageBox.Show(ex.Message, "Error occured", MessageBoxButton.OK, MessageBoxImage.Error);
+         }
       }
 
       private void configureContentCommandExecute() {
@@ -84,15 +88,21 @@ namespace vk.ViewModels {
             return;
          }
 
-         GroupCollection.Clear();
+         WallList.Clear();
+
+         var userget = App.Container.Resolve<UsersGet>();
+         var user = userget.Get();
+         
+         WallList.Add(WallList.InstantiateItem(user.Users[0]));
 
          foreach (var group in groups.Groups) {
-            GroupCollection.Add(GroupCollection.InstantiateItem(group));
+            WallList.Add(WallList.InstantiateItem(group));
          }
       }
 
       private void backCommandExecute() {
          IsGroupSelected = false;
+         WallInfo.Clear();
       }
 
       private void authorizeIfAlreadyLoggined() {
@@ -116,7 +126,7 @@ namespace vk.ViewModels {
          var user = methodUsersGet.Get().Users.First();
 
          Content = $"You logged as\n{user.FirstName} {user.LastName}";
-         SetUpAvatar(user.UserPhotoUri);
+         SetUpAvatar(user.Photo50);
 
          IsAuthorized = true;
 
@@ -124,7 +134,7 @@ namespace vk.ViewModels {
       }
 
       public void Deauthorize() {
-         GroupCollection.Clear();
+         WallList.Clear();
          IsAuthorized = false;
          Content = "";
          SetUpAvatar(DEFAULT_AVATAR);

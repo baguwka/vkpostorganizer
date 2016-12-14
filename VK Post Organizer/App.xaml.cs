@@ -2,6 +2,7 @@
 using System.Windows;
 using Microsoft.Practices.Unity;
 using vk.Models;
+using vk.ViewModels;
 using vk.Views;
 
 namespace vk {
@@ -18,6 +19,7 @@ namespace vk {
          Container = new UnityContainer();
 
          Container.RegisterType<IWebClient, DefaultWebClient>();
+         Container.RegisterInstance(new EmptyWallHolder());
 
          var window = new MainView();
          window.Show();
