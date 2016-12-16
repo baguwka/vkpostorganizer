@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -7,9 +9,12 @@ using System.Windows.Media.Imaging;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
 using Microsoft.Practices.Unity;
+using Utilities;
 using vk.Models;
+using vk.Models.Filter;
 using vk.Models.VkApi;
 using vk.Models.VkApi.Entities;
+using vk.Utils;
 using vk.Views;
 
 namespace vk.ViewModels {
@@ -17,19 +22,31 @@ namespace vk.ViewModels {
       private string _content;
       private ImageSource _profilePhoto;
       private bool _isAuthorized;
-      private bool _isGroupSelected;
+      private bool _isWallShowing;
+      private PostType _currentPostTypeFilter;
 
       public WallList WallList { get; }
-      public WallInfo WallInfo { get; }
+      public WallVM Wall { get; }
 
       private const string DEFAULT_AVATAR =
          "pack://application:,,,/VKPostOrganizer;component/Resources/default_avatar.png";
 
       public ICommand ConfigureContentCommand { get; set; }
       public ICommand BackCommand { get; set; }
+      public ICommand RefreshCommand { get; set; }
       public ICommand AuthorizeCommand { get; set; }
 
       public ICommand LogOutCommand { get; set; }
+
+      public IEnumerable<ValueDescription> PostTypes => EnumHelper.GetAllValuesAndDescriptions<PostType>();
+
+      public PostType CurrentPostTypeFilter {
+         get { return _currentPostTypeFilter; }
+         set {
+            SetProperty(ref _currentPostTypeFilter, value);
+            applyFilter(_currentPostTypeFilter);
+         }
+      }
 
       public string Content {
          get { return _content; }
@@ -46,31 +63,40 @@ namespace vk.ViewModels {
          set { SetProperty(ref _isAuthorized, value); }
       }
 
-      public bool IsGroupSelected {
-         get { return _isGroupSelected; }
-         set { SetProperty(ref _isGroupSelected, value); }
+      public bool IsWallShowing {
+         get { return _isWallShowing; }
+         set { SetProperty(ref _isWallShowing, value); }
       }
 
       public MainVM() {
          ConfigureContentCommand = new DelegateCommand(configureContentCommandExecute);
          BackCommand = new DelegateCommand(backCommandExecute);
+         RefreshCommand = new DelegateCommand(refreshCommandExecute);
          AuthorizeCommand = new DelegateCommand(authorizeCommandExecute);
 
          LogOutCommand = new DelegateCommand(logOutCommandExecute);
 
          WallList = App.Container.Resolve<WallList>();
-         WallInfo = App.Container.Resolve<WallInfo>();
+         Wall = App.Container.Resolve<WallVM>();
 
          WallList.ItemClicked += onGroupItemClicked;
+
+         CurrentPostTypeFilter = PostType.Both;
+      }
+      
+      private void applyFilter(PostType currentPostTypeFilter) {
+         if (!IsWallShowing) return;
+
+         Wall?.Pull(currentPostTypeFilter.GetFilter());
       }
 
       private void onGroupItemClicked(object sender, WallItem wallItem) {
-         IsGroupSelected = true;
+         IsWallShowing = true;
          try {
-            WallInfo.Load(wallItem.WallHolder);
+            Wall.Pull(wallItem.WallHolder, CurrentPostTypeFilter.GetFilter());
          }
          catch (VkException ex) {
-            IsGroupSelected = false;
+            IsWallShowing = false;
             MessageBox.Show(ex.Message, "Error occured", MessageBoxButton.OK, MessageBoxImage.Error);
          }
       }
@@ -80,7 +106,7 @@ namespace vk.ViewModels {
          configureContentView.ShowDialog();
       }
 
-      private void fillGroupCollection() {
+      private void fillWallList() {
          var methodGroupsGet = App.Container.Resolve<GroupsGet>();
          var groups = methodGroupsGet.Get().Collection;
          if (groups == null) {
@@ -91,18 +117,28 @@ namespace vk.ViewModels {
          WallList.Clear();
 
          var userget = App.Container.Resolve<UsersGet>();
-         var user = userget.Get();
-         
-         WallList.Add(WallList.InstantiateItem(user.Users[0]));
+         var user = userget.Get().Users[0];
+
+         //todo: get rid of workaround
+         var item = new WallItem(new EmptyWallHolder {Name = user.Name, Photo200 = user.Photo200, Photo50 = user.Photo50});
+
+         WallList.Add(item);
 
          foreach (var group in groups.Groups) {
-            WallList.Add(WallList.InstantiateItem(group));
+            WallList.Add(new WallItem(group));
          }
       }
 
       private void backCommandExecute() {
-         IsGroupSelected = false;
-         WallInfo.Clear();
+         IsWallShowing = false;
+         Wall.Clear();
+      }
+
+      private void refreshCommandExecute() {
+         Messenger.Broadcast("Refresh");
+         if (IsWallShowing) {
+            Wall.Pull(CurrentPostTypeFilter.GetFilter());
+         }
       }
 
       private void authorizeIfAlreadyLoggined() {
@@ -122,15 +158,28 @@ namespace vk.ViewModels {
          var authWindow = new AuthView(accessToken);
          authWindow.ShowDialog();
 
-         var methodUsersGet = App.Container.Resolve<UsersGet>();
-         var user = methodUsersGet.Get().Users.First();
+         try {
+            var methodUsersGet = App.Container.Resolve<UsersGet>();
+            var users = methodUsersGet.Get();
 
-         Content = $"You logged as\n{user.FirstName} {user.LastName}";
-         SetUpAvatar(user.Photo50);
+            var user = users.Users.FirstOrDefault();
+            if (user == null) {
+               MessageBox.Show("Cant find user", "Error while authoriazation occured", MessageBoxButton.OK, MessageBoxImage.Error);
+               IsAuthorized = false;
+               return;
+            }
 
-         IsAuthorized = true;
+            Content = $"You logged as\n{user.FirstName} {user.LastName}";
+            SetUpAvatar(user.Photo50);
 
-         fillGroupCollection();
+            IsAuthorized = true;
+
+            fillWallList();
+         }
+         catch (VkException ex) {
+            MessageBox.Show(ex.Message, "Error while authoriazation occured", MessageBoxButton.OK, MessageBoxImage.Error);
+            IsAuthorized = false;
+         }
       }
 
       public void Deauthorize() {
@@ -158,6 +207,14 @@ namespace vk.ViewModels {
          Authorize();
       }
 
+      public void ImportFiles(IEnumerable<string> files) {
+         var sb = new StringBuilder();
+         foreach (var file in files) {
+            sb.AppendLine(file);
+         }
+         MessageBox.Show($"Importing\n{sb}");
+      }
+
       private void logOutCommandExecute() {
          var result = MessageBox.Show("Are you sure you want to log out?", "Logging out", MessageBoxButton.YesNo);
 
@@ -173,11 +230,9 @@ namespace vk.ViewModels {
       }
 
       public void OnClosing() {
-         throw new NotImplementedException();
       }
 
       public void OnClosed() {
-         throw new NotImplementedException();
       }
    }
 }

@@ -1,9 +1,8 @@
-﻿using System.Drawing;
-using System.Linq;
+﻿using System.Linq;
 using Microsoft.Practices.Prism.Mvvm;
 using vk.Models.VkApi.Entities;
 
-namespace vk.Models {
+namespace vk.ViewModels {
    public class PostItem : BindableBase {
       public Post PostRef { get; }
       public string Photo { get; }
@@ -12,13 +11,14 @@ namespace vk.Models {
          PostRef = postRef;
 
          Photo = PostRef.Attachments?.FirstOrDefault(a => a.Type == "photo")?.Photo?.Photo604;
-         Photo = PostRef.Attachments?.FirstOrDefault(a => a.Type == "doc")?.Photo?.Photo604;
+         //Photo = PostRef.Attachments?.FirstOrDefault(a => a.Type == "doc")?.Photo?.Photo604;
 
          var prev = PostRef.CopyHistory?.FirstOrDefault();
          if (prev == null) return;
          PostRef.ID = prev.ID;
          PostRef.Text = prev.Text;
          PostRef.Attachments = prev.Attachments;
+         Photo = PostRef.Attachments?.FirstOrDefault(a => a.Type == "photo")?.Photo?.Photo604;
       }
    }
 }

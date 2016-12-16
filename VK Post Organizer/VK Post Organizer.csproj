@@ -40,9 +40,15 @@
     </StartupObject>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Data Persistence Provider">
+      <HintPath>..\packages\Data Persistence Provider.dll</HintPath>
+    </Reference>
     <Reference Include="JetBrains.Annotations, Version=10.2.1.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <HintPath>..\packages\JetBrains.Annotations.10.2.1\lib\net\JetBrains.Annotations.dll</HintPath>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="Messenger">
+      <HintPath>..\packages\Messenger.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Practices.Prism.Mvvm, Version=1.1.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Prism.Mvvm.1.1.1\lib\net45\Microsoft.Practices.Prism.Mvvm.dll</HintPath>
@@ -97,13 +103,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Models\AppDataFolderProvider.cs" />
+    <Compile Include="SaveLoaderHelper.cs" />
     <Compile Include="Converter\BoolToVisibilityConverter.cs" />
+    <Compile Include="Models\Filter\PostFilters.cs" />
     <Compile Include="Models\IWallHolder.cs" />
     <Compile Include="Models\EmptyWallHolder.cs" />
     <Compile Include="Models\VkApi\Entities\Error.cs" />
     <Compile Include="Models\VkApi\Entities\RequiestParam.cs" />
     <Compile Include="Models\VkApi\Entities\VkException.cs" />
-    <Compile Include="ViewModels\WallInfo.cs" />
+    <Compile Include="Utils\EnumExtensions.cs" />
+    <Compile Include="Utils\EnumHelper.cs" />
+    <Compile Include="Models\Filter\IPostFilter.cs" />
+    <Compile Include="ViewModels\WallVM.cs" />
     <Compile Include="Models\WallItem.cs" />
     <Compile Include="Models\WallList.cs" />
     <Compile Include="ViewModels\PostItem.cs" />
@@ -185,6 +197,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\default_avatar.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Models\DataPersistance\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

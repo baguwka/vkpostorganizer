@@ -1,6 +1,5 @@
 using System;
 using System.Globalization;
-using System.Linq;
 using JetBrains.Annotations;
 using Microsoft.Practices.Prism.Mvvm;
 using Newtonsoft.Json;
@@ -36,7 +35,9 @@ namespace vk.Models.VkApi.Entities {
          get { return _dateUnix; }
          set {
             SetProperty(ref _dateUnix, value);
-            Date = new DateTime(1970, 1, 1, 3, 0, 0, 0, DateTimeKind.Utc).AddSeconds(_dateUnix).ToString("dd.mm.yy HH:mm", CultureInfo.CurrentCulture);
+
+            Date = new DateTime(1970, 1, 1, 3, 0, 0, 0, DateTimeKind.Utc)
+               .AddSeconds(_dateUnix).ToString("dd.MM.yy HH:mm", CultureInfo.CurrentCulture);
          }
       }
 

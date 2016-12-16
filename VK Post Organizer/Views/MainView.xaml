@@ -5,10 +5,16 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:vk.ViewModels"
         mc:Ignorable="d"
-        Loaded="onLoaded"
         MinHeight="450" MinWidth="750"
         Height="450" Width="750"
-        Title="MainWindow" WindowStartupLocation="CenterScreen">
+        Name="MainWindow"
+        Title="MainWindow" WindowStartupLocation="CenterScreen"
+        
+        AllowDrop="{Binding IsWallShowing, UpdateSourceTrigger=PropertyChanged}"
+        Drop="onDrop"
+        Initialized="onInitialized"
+        Loaded="onLoaded"
+        Closing="onClosing">
     <Window.DataContext>
         <vm:MainVM/>
     </Window.DataContext>
@@ -33,7 +39,7 @@
         </Grid>
 
         <!-- Group workspace -->
-        <Grid Grid.Row="1" Visibility="{Binding IsGroupSelected, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}">
+        <Grid Grid.Row="1" Visibility="{Binding IsWallShowing, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="200"/>
                 <ColumnDefinition/>
@@ -46,14 +52,18 @@
                     <RowDefinition Height="200"/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
-                <Label Grid.Row="0" Content="{Binding WallInfo.WallHolder.Name, UpdateSourceTrigger=PropertyChanged}" FontWeight="DemiBold"/>
-                <Image Grid.Row="1" Source="{Binding WallInfo.WallHolder.Photo200, UpdateSourceTrigger=PropertyChanged}"/>
+                <Label Grid.Row="0" Content="{Binding Wall.WallHolder.Name, UpdateSourceTrigger=PropertyChanged}" FontWeight="DemiBold"/>
+                <Image Grid.Row="1" Source="{Binding Wall.WallHolder.Photo200, UpdateSourceTrigger=PropertyChanged}"/>
                 <StackPanel Grid.Row="2" Orientation="Vertical">
-                    <CheckBox Margin="0,5,0,0" Content="Show photos" IsChecked="{Binding WallInfo.ShowPhotos, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"></CheckBox>
-                    <ComboBox Margin="0,5,0,0" SelectedIndex="0">
-                        <ComboBoxItem Content="All"></ComboBoxItem>
-                        <ComboBoxItem Content="Posts only"></ComboBoxItem>
-                        <ComboBoxItem Content="Reposts only"></ComboBoxItem>
+                    <CheckBox Margin="0,5,0,0" Content="Show photos" IsChecked="{Binding Wall.ShowPhotos, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"></CheckBox>
+                    <ComboBox Margin="0,5,0,0" SelectedValuePath="Value" 
+                              ItemsSource="{Binding PostTypes}"
+                              SelectedValue="{Binding CurrentPostTypeFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Margin="3,0,0,0" Height="18" HorizontalAlignment="Left" Text="{Binding Description}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
                     </ComboBox>
                 </StackPanel>
             </Grid>
@@ -61,7 +71,7 @@
             <!-- Group content -->
             <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" Margin="5">
                 <ItemsControl BorderThickness="0" Background="Transparent" VerticalAlignment="Top"
-                          ItemsSource="{Binding WallInfo.Items, UpdateSourceTrigger=PropertyChanged}">
+                          ItemsSource="{Binding Wall.Items, UpdateSourceTrigger=PropertyChanged}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <VirtualizingStackPanel VerticalAlignment="Bottom"/>
@@ -82,7 +92,7 @@
                                     </Grid>
                                     <Image HorizontalAlignment="Left" Width="400" Source="{Binding Photo, IsAsync=True}"
                                            Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, 
-                                            Path=DataContext.WallInfo.ShowPhotos, Converter={StaticResource BoolToVisibilityConverter}}"></Image>
+                                            Path=DataContext.Wall.ShowPhotos, Converter={StaticResource BoolToVisibilityConverter}}"></Image>
                                 </StackPanel>
                             </Border>
                         </DataTemplate>
@@ -92,7 +102,7 @@
         </Grid>
 
         <!-- Group selection -->
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Visibility="{Binding IsGroupSelected, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityNegativeConverter}}">
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Visibility="{Binding IsWallShowing, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityNegativeConverter}}">
             <ItemsControl BorderThickness="0" Background="Transparent" VerticalAlignment="Top" Margin="10"
                           ItemsSource="{Binding WallList.Items, UpdateSourceTrigger=PropertyChanged}">
                 <ItemsControl.ItemsPanel>
@@ -124,7 +134,8 @@
                 <ColumnDefinition Width="175"/>
             </Grid.ColumnDefinitions>
             <Button Content="Back" Style="{StaticResource ButtonWarning}" Command="{Binding BackCommand}"
-                    Visibility="{Binding IsGroupSelected, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}"></Button>
+                    Visibility="{Binding IsWallShowing, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}"></Button>
+            <Button Grid.Column="1" Content="Refresh" Style="{StaticResource ButtonPrimary}" Command="{Binding RefreshCommand}"></Button>
         </Grid>
     </Grid>
 </Window>

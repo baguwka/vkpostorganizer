@@ -1,8 +1,7 @@
-﻿using System.ComponentModel;
-using System.Windows;
+﻿using System.Windows;
+using Data_Persistence_Provider;
 using Microsoft.Practices.Unity;
 using vk.Models;
-using vk.ViewModels;
 using vk.Views;
 
 namespace vk {
@@ -18,8 +17,13 @@ namespace vk {
       private void CompositionRoot(object sender, StartupEventArgs e) {
          Container = new UnityContainer();
 
+         Container.RegisterType<ISerializer, SaveLoadJsonSerializer>();
+         Container.RegisterType<IDataProvider, AppDataFolderProvider>();
+         Container.RegisterType<SaveLoadController>(new ContainerControlledLifetimeManager());
+
          Container.RegisterType<IWebClient, DefaultWebClient>();
-         Container.RegisterInstance(new EmptyWallHolder());
+         Container.RegisterType<IWallHolder, EmptyWallHolder>();
+         Container.RegisterType<EmptyWallHolder>(new ContainerControlledLifetimeManager());
 
          var window = new MainView();
          window.Show();
