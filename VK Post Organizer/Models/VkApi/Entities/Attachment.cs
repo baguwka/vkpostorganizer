@@ -7,6 +7,7 @@ namespace vk.Models.VkApi.Entities {
    public class Attachment : BindableBase {
       private string _type;
       private Photo _photo;
+      private Document _document;
 
       [JsonProperty(PropertyName = "type")]
       public string Type {
@@ -18,6 +19,12 @@ namespace vk.Models.VkApi.Entities {
       public Photo Photo {
          get { return _photo; }
          set { SetProperty(ref _photo, value); }
+      }
+
+      [JsonProperty(PropertyName = "doc")]
+      public Document Document {
+         get { return _document; }
+         set { SetProperty(ref _document, value); }
       }
    }
 }

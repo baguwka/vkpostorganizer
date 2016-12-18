@@ -6,12 +6,12 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Data_Persistence_Provider;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
 using Microsoft.Practices.Unity;
 using Utilities;
 using vk.Models;
-using vk.Models.Filter;
 using vk.Models.VkApi;
 using vk.Models.VkApi.Entities;
 using vk.Utils;
@@ -24,6 +24,8 @@ namespace vk.ViewModels {
       private bool _isAuthorized;
       private bool _isWallShowing;
       private PostType _currentPostTypeFilter;
+      private bool _canTestPost;
+      private int _testingGroup;
 
       public WallList WallList { get; }
       public WallVM Wall { get; }
@@ -34,6 +36,7 @@ namespace vk.ViewModels {
       public ICommand ConfigureContentCommand { get; set; }
       public ICommand BackCommand { get; set; }
       public ICommand RefreshCommand { get; set; }
+      public ICommand TestPostCommand { get; set; }
       public ICommand AuthorizeCommand { get; set; }
 
       public ICommand LogOutCommand { get; set; }
@@ -46,6 +49,16 @@ namespace vk.ViewModels {
             SetProperty(ref _currentPostTypeFilter, value);
             applyFilter(_currentPostTypeFilter);
          }
+      }
+
+      public int TestingGroup {
+         get { return _testingGroup; }
+         set { SetProperty(ref _testingGroup, value); }
+      }
+
+      public bool CanTestPost {
+         get { return _canTestPost; }
+         set { SetProperty(ref _canTestPost, value); }
       }
 
       public string Content {
@@ -65,7 +78,12 @@ namespace vk.ViewModels {
 
       public bool IsWallShowing {
          get { return _isWallShowing; }
-         set { SetProperty(ref _isWallShowing, value); }
+         set {
+            SetProperty(ref _isWallShowing, value);
+            if (value == false) {
+               CanTestPost = false;
+            }
+         }
       }
 
       public MainVM() {
@@ -73,6 +91,7 @@ namespace vk.ViewModels {
          BackCommand = new DelegateCommand(backCommandExecute);
          RefreshCommand = new DelegateCommand(refreshCommandExecute);
          AuthorizeCommand = new DelegateCommand(authorizeCommandExecute);
+         TestPostCommand = new DelegateCommand(testPostCommandExecute);
 
          LogOutCommand = new DelegateCommand(logOutCommandExecute);
 
@@ -83,7 +102,31 @@ namespace vk.ViewModels {
 
          CurrentPostTypeFilter = PostType.Both;
       }
-      
+
+      private void testPostCommandExecute() {
+         if (TestingGroup != Wall.WallHolder.ID) {
+            var groupsGet = App.Container.Resolve<GroupsGetById>();
+            var response = groupsGet.Get(TestingGroup, "");
+            var group = response.Response.FirstOrDefault();
+
+            MessageBox.Show($"You're only available to post in \"{group?.Name}\" wall in testing purposes.", "Cant post here",
+               MessageBoxButton.OK, MessageBoxImage.Error);
+            return;
+         }
+
+         var wallPost = App.Container.Resolve<WallPost>();
+
+         var unixTimestamp = (int)(new DateTime(2016, 12, 21, 18, 30, 0).Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+
+         try {
+            var post = wallPost.Post(Wall.WallHolder.ID, "Тест :3", false, true, unixTimestamp);
+            refreshCommandExecute();
+         }
+         catch (VkException ex) {
+            MessageBox.Show(ex.Message);
+         }
+      }
+
       private void applyFilter(PostType currentPostTypeFilter) {
          if (!IsWallShowing) return;
 
@@ -92,11 +135,14 @@ namespace vk.ViewModels {
 
       private void onGroupItemClicked(object sender, WallItem wallItem) {
          IsWallShowing = true;
+         CanTestPost = TestingGroup == wallItem.WallHolder.ID;
+
          try {
             Wall.Pull(wallItem.WallHolder, CurrentPostTypeFilter.GetFilter());
          }
          catch (VkException ex) {
             IsWallShowing = false;
+
             MessageBox.Show(ex.Message, "Error occured", MessageBoxButton.OK, MessageBoxImage.Error);
          }
       }
@@ -224,15 +270,30 @@ namespace vk.ViewModels {
       }
 
       public void OnLoad() {
+         MainVMSaveInfo data;
+         if (SaveLoaderHelper.TryLoad("MainVM", out data)) {
+            TestingGroup = data.TestingGroup;
+         }
+
          SetUpAvatar(DEFAULT_AVATAR);
 
          authorizeIfAlreadyLoggined();
       }
 
       public void OnClosing() {
+         SaveLoaderHelper.Save("MainVM", new MainVMSaveInfo(TestingGroup));
       }
 
       public void OnClosed() {
       }
+   }
+
+   [Serializable]
+   public class MainVMSaveInfo : CommonSaveData {
+      public MainVMSaveInfo(int testingGroup) {
+         TestingGroup = testingGroup;
+      }
+
+      public int TestingGroup { get; set; }
    }
 }

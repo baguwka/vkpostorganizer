@@ -68,7 +68,7 @@ namespace vk.ViewModels {
          }
 
          WallHolder = other;
-         Items.Clear();
+         Clear();
 
          var wall = App.Container.Resolve<WallGet>();
 
@@ -80,12 +80,15 @@ namespace vk.ViewModels {
             Items.AddRange(filter.FilterPosts(posts2.Response.Wall.Select(p => new PostItem(p))));
          }
          catch (VkException) {
-            Items.Clear();
+            Clear();
             throw;
          }
       }
 
       public void Clear() {
+         foreach (var postItem in Items) {
+            postItem.Clear();
+         }
          Items.Clear();
       }
    }

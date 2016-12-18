@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:vk.ViewModels"
+        xmlns:views="clr-namespace:vk.Views"
         mc:Ignorable="d"
         MinHeight="450" MinWidth="750"
         Height="450" Width="750"
@@ -18,11 +19,11 @@
     <Window.DataContext>
         <vm:MainVM/>
     </Window.DataContext>
-    <Grid Margin="3">
+    <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
             <RowDefinition/>
-            <RowDefinition Height="25"/>
+            <RowDefinition Height="35"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0" Height="50">
             <Grid.ColumnDefinitions>
@@ -38,7 +39,7 @@
                     Visibility="{Binding IsAuthorized, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityNegativeConverter}}"/>
         </Grid>
 
-        <!-- Group workspace -->
+        <!-- Wall workspace -->
         <Grid Grid.Row="1" Visibility="{Binding IsWallShowing, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="200"/>
@@ -90,9 +91,21 @@
                                         <Label Grid.Column="0"  Width="120" Height="25" Content="{Binding PostRef.Date}"></Label>
                                         <Label Grid.Column="1" Height="25" Content="{Binding PostRef.Text}"></Label>
                                     </Grid>
-                                    <Image HorizontalAlignment="Left" Width="400" Source="{Binding Photo, IsAsync=True}"
+                                    <ItemsControl ItemsSource="{Binding Images, UpdateSourceTrigger=PropertyChanged}" 
                                            Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, 
-                                            Path=DataContext.Wall.ShowPhotos, Converter={StaticResource BoolToVisibilityConverter}}"></Image>
+                                            Path=DataContext.Wall.ShowPhotos, Converter={StaticResource BoolToVisibilityConverter}}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <VirtualizingStackPanel VerticalAlignment="Bottom"/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Image HorizontalAlignment="Left" Width="400" Source="{Binding Url, IsAsync=True}"></Image>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                    
                                 </StackPanel>
                             </Border>
                         </DataTemplate>
@@ -101,41 +114,24 @@
             </ScrollViewer>
         </Grid>
 
-        <!-- Group selection -->
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Visibility="{Binding IsWallShowing, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityNegativeConverter}}">
-            <ItemsControl BorderThickness="0" Background="Transparent" VerticalAlignment="Top" Margin="10"
-                          ItemsSource="{Binding WallList.Items, UpdateSourceTrigger=PropertyChanged}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <VirtualizingStackPanel VerticalAlignment="Bottom"/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
+        <views:WallSelection Grid.Row="1" WallController="{Binding WallList}"
+                             Visibility="{Binding IsWallShowing, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityNegativeConverter}}"/>
 
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Button Width="300" Height="50" Command="{Binding ClickCommand}" Margin="0,0,0,5" Background="White" BorderBrush="White" HorizontalContentAlignment="Left">
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                                <Image Source="{Binding WallHolder.Photo50, UpdateSourceTrigger=PropertyChanged}" 
-                                       Width="50" Height="50" HorizontalAlignment="Left"></Image>
-                                <TextBlock  Text="{Binding WallHolder.Name, UpdateSourceTrigger=PropertyChanged}" Margin="5,1,1,1" 
-                                            FontFamily="Roboto" Foreground="#2A5885" FontWeight="Bold" FontSize="12"
-                                            Width="250" Height="50" HorizontalAlignment="Left" VerticalAlignment="Top" TextWrapping="WrapWithOverflow"></TextBlock>
-                            </StackPanel>
-                        </Button>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ScrollViewer>
-        <Grid Grid.Row="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="175"/>
-                <ColumnDefinition Width="175"/>
-                <ColumnDefinition Width="175"/>
-                <ColumnDefinition Width="175"/>
-            </Grid.ColumnDefinitions>
-            <Button Content="Back" Style="{StaticResource ButtonWarning}" Command="{Binding BackCommand}"
+        <Border Grid.Row="2" BorderThickness="0,1,0,0" BorderBrush="#e7e8ec" Height="35" >
+            <Grid Height="25">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="175"/>
+                    <ColumnDefinition Width="175"/>
+                    <ColumnDefinition Width="175"/>
+                    <ColumnDefinition Width="175"/>
+                </Grid.ColumnDefinitions>
+                <Button Margin="5,0,5,0"  Content="Back" Style="{StaticResource VkCommon}" Command="{Binding BackCommand}"
                     Visibility="{Binding IsWallShowing, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}"></Button>
-            <Button Grid.Column="1" Content="Refresh" Style="{StaticResource ButtonPrimary}" Command="{Binding RefreshCommand}"></Button>
-        </Grid>
+                <Button Margin="5,0,5,0" Grid.Column="1" Content="Refresh" Style="{StaticResource VkCommon}" Command="{Binding RefreshCommand}"></Button>
+                <Button Margin="5,0,5,0" Visibility="{Binding IsWallShowing, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}"
+                Grid.Column="2" Content="Test post" Style="{StaticResource VkBlue}" Command="{Binding TestPostCommand}"></Button>
+                <TextBox Margin="5,0,5,0" Grid.Column="3" Text="{Binding TestingGroup, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"></TextBox>
+            </Grid>
+        </Border>
     </Grid>
 </Window>

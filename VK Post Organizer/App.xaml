@@ -10,7 +10,83 @@
         <converters:BoolToVisibilityCollapsedConverter x:Key="BoolToVisibilityConverter"/>
         <converters:BoolToVisibilityNegativeCollapsedConverter x:Key="BoolToVisibilityNegativeConverter"/>
 
+        
+        <Style TargetType="{x:Type Button}" x:Key="VkCommon">
+            <Setter Property="Background" Value="#ffffff"></Setter>
+            <Setter Property="Foreground" Value="#4a7198"></Setter>
 
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border CornerRadius="2" BorderBrush="#357ebd" BorderThickness="0" Background="{TemplateBinding Background}">
+                            <Grid>
+                                <TextBlock x:Name="MyContentPresenter" Text="{TemplateBinding Content}"
+                                                  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#e5ebf1"></Setter>
+                                <Setter Property="Foreground" Value="#4a7198"></Setter>
+                            </Trigger>
+
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#dae2ea"></Setter>
+                                <Setter Property="Foreground" Value="#4a7198"></Setter>
+                            </Trigger>
+
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#DCE0E3"></Setter>
+                                <Setter Property="Foreground" Value="#868E96"></Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="{x:Type Button}" x:Key="VkBlue" BasedOn="{StaticResource VkCommon}">
+            <Setter Property="Background" Value="#5E81A8"></Setter>
+            <Setter Property="Foreground" Value="#ffffff"></Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border CornerRadius="2" BorderBrush="#5E81A8" BorderThickness="1" Background="{TemplateBinding Background}">
+                            <Grid>
+                                <TextBlock x:Name="MyContentPresenter" Text="{TemplateBinding Content}"
+                                                  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="BorderBrush" Value="#6888AD"></Setter>
+                                <Setter Property="Background" Value="#6888AD"></Setter>
+                                <Setter Property="Foreground" Value="#ffffff"></Setter>
+                            </Trigger>
+
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="BorderBrush" Value="#5779A1"></Setter>
+                                <Setter Property="Background" Value="#5779A1"></Setter>
+                                <Setter Property="Foreground" Value="#ffffff"></Setter>
+                            </Trigger>
+
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="BorderBrush" Value="#8999AB"></Setter>
+                                <Setter Property="Background" Value="#8999AB"></Setter>
+                                <Setter Property="Foreground" Value="#efefef"></Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        
+        
+        
+        
+        
+        
         <Style TargetType="{x:Type Button}" x:Key="ButtonPrimary">
             <Setter Property="Background" Value="#428bca"></Setter>
             <Setter Property="Foreground" Value="#ffffff"></Setter>

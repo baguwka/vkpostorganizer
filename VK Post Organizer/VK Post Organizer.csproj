@@ -104,6 +104,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Models\AppDataFolderProvider.cs" />
+    <Compile Include="Models\VkApi\Entities\Document.cs" />
+    <Compile Include="Models\VkApi\GroupsGetById.cs" />
+    <Compile Include="Models\VkApi\WallPost.cs" />
     <Compile Include="SaveLoaderHelper.cs" />
     <Compile Include="Converter\BoolToVisibilityConverter.cs" />
     <Compile Include="Models\Filter\PostFilters.cs" />
@@ -142,6 +145,9 @@
     <Compile Include="Views\ConfigureContentView.xaml.cs">
       <DependentUpon>ConfigureContentView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\WallSelection.xaml.cs">
+      <DependentUpon>WallSelection.xaml</DependentUpon>
+    </Compile>
     <Page Include="Views\AuthView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -159,6 +165,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Views\ConfigureContentView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\WallSelection.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
