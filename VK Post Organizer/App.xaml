@@ -10,7 +10,14 @@
         <converters:BoolToVisibilityCollapsedConverter x:Key="BoolToVisibilityConverter"/>
         <converters:BoolToVisibilityNegativeCollapsedConverter x:Key="BoolToVisibilityNegativeConverter"/>
 
-        
+
+        <Style TargetType="{x:Type Border}" x:Key="VkBorder">
+            <Setter Property="Background" Value="#ffffff"></Setter>
+            <Setter Property="BorderBrush" Value="#d7d8db"></Setter>
+            <Setter Property="BorderThickness" Value="1"></Setter>
+        </Style>
+
+
         <Style TargetType="{x:Type Button}" x:Key="VkCommon">
             <Setter Property="Background" Value="#ffffff"></Setter>
             <Setter Property="Foreground" Value="#4a7198"></Setter>

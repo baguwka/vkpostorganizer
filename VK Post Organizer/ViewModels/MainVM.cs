@@ -116,7 +116,7 @@ namespace vk.ViewModels {
 
          var wallPost = App.Container.Resolve<WallPost>();
 
-         var unixTimestamp = (int)(new DateTime(2016, 12, 21, 18, 30, 0).Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+         var unixTimestamp = (int)(new DateTime(2016, 12, 21, 18 + 3, 30, 0).Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
 
          try {
             var post = wallPost.Post(Wall.WallHolder.ID, "Тест :3", false, true, unixTimestamp);
