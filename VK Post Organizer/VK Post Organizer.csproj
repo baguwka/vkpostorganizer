@@ -104,7 +104,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Models\AppDataFolderProvider.cs" />
-    <Compile Include="Models\UrlHelper\DocumentUrlObtainer.cs" />
+    <Compile Include="Models\UrlHelper\DocumentPreviewUrlObtainer.cs" />
     <Compile Include="Models\UrlHelper\PhotoUrlObtainer.cs" />
     <Compile Include="Models\VkApi\Entities\Document.cs" />
     <Compile Include="Models\VkApi\GroupsGetById.cs" />

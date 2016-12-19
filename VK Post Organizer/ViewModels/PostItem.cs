@@ -24,12 +24,12 @@ namespace vk.ViewModels {
       private void loadImages() {
          foreach (var attachment in PostRef.Attachments) {
             if (attachment.Type == "photo") {
-               Images.Add(new PhotoUrlObtainer().Obtain(attachment));
+               Images.Add(new PhotoUrlObtainer().Obtain(attachment, ImageSize.Medium));
             }
 
             if (attachment.Type == "doc") {
                if (attachment.Document.Type == (int)DocType.Image || attachment.Document.Type == (int)DocType.Gif) {
-                  Images.Add(new DocumentUrlObtainer().Obtain(attachment));
+                  Images.Add(new DocumentPreviewUrlObtainer().Obtain(attachment, ImageSize.Large));
                }
             }
          }
