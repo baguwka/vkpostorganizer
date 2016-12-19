@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
+using System.Windows.Input;
 using JetBrains.Annotations;
+using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
 using Microsoft.Practices.Unity;
 using vk.Models;
@@ -11,7 +13,6 @@ using vk.Models.VkApi.Entities;
 namespace vk.ViewModels {
    [UsedImplicitly]
    public class WallVM : BindableBase {
-      private bool _showPhotos;
       private IWallHolder _wallHolder;
       private SmartCollection<PostItem> _items;
 
@@ -22,6 +23,9 @@ namespace vk.ViewModels {
 
          _wallHolder = wallHolder;
          Items = new SmartCollection<PostItem>();
+
+         ExpandAllCommand = new DelegateCommand(expandAllCommandExecute);
+         CollapseAllCommand = new DelegateCommand(collapseAllCommandExecute);
       }
 
       public IWallHolder WallHolder {
@@ -34,10 +38,8 @@ namespace vk.ViewModels {
          set { SetProperty(ref _items, value); }
       }
 
-      public bool ShowPhotos {
-         get { return _showPhotos; }
-         set { SetProperty(ref _showPhotos, value); }
-      }
+      public ICommand ExpandAllCommand { get; set; }
+      public ICommand CollapseAllCommand { get; set; }
 
       public void Pull() {
          if (WallHolder == null) {
@@ -90,6 +92,18 @@ namespace vk.ViewModels {
             postItem.Clear();
          }
          Items.Clear();
+      }
+
+      private void expandAllCommandExecute() {
+         foreach (var postItem in Items) {
+            postItem.Expand();
+         }
+      }
+
+      private void collapseAllCommandExecute() {
+         foreach (var postItem in Items) {
+            postItem.Collapse();
+         }
       }
    }
 }

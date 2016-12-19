@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using Microsoft.Practices.Prism.Mvvm;
 using Newtonsoft.Json;
@@ -47,6 +48,36 @@ namespace vk.Models.VkApi.Entities {
          get { return _type; }
          set { SetProperty(ref _type, value); }
       }
+
+      [JsonProperty(PropertyName = "preview")]
+      public DocumentPreview Preview { get; set; }
+   }
+
+   [UsedImplicitly]
+   public class DocumentPreview {
+      [JsonProperty(PropertyName = "photo")]
+      public  DocumentPreviewPhoto Photo { get; set; }
+   }
+
+   [UsedImplicitly]
+   public class DocumentPreviewPhoto {
+      [JsonProperty(PropertyName = "sizes")]
+      public List<DocumentPreviewPhotoSizes> Sizes { get; set; }
+   }
+
+   [UsedImplicitly]
+   public class DocumentPreviewPhotoSizes {
+      [JsonProperty(PropertyName = "src")]
+      public string Source { get; set; }
+
+      [JsonProperty(PropertyName = "width")]
+      public int Width { get; set; }
+
+      [JsonProperty(PropertyName = "height")]
+      public int Height { get; set; }
+
+      [JsonProperty(PropertyName = "type")]
+      public string Type { get; set; }
    }
 
    public enum DocType {

@@ -6,8 +6,8 @@
         xmlns:vm="clr-namespace:vk.ViewModels"
         xmlns:views="clr-namespace:vk.Views"
         mc:Ignorable="d"
-        MinHeight="500" MinWidth="750"
-        Height="500" Width="750"
+        MinHeight="600" MinWidth="750"
+        Height="600" Width="750"
         Name="MainWindow"
         Title="MainWindow" WindowStartupLocation="CenterScreen"
         
@@ -61,7 +61,13 @@
                     <Label Grid.Row="0" Content="{Binding Wall.WallHolder.Name, UpdateSourceTrigger=PropertyChanged}" FontWeight="DemiBold"/>
                     <Image Grid.Row="1" Source="{Binding Wall.WallHolder.Photo200, UpdateSourceTrigger=PropertyChanged}"/>
                     <StackPanel Grid.Row="2" Orientation="Vertical">
-                        <CheckBox Margin="0,5,0,0" Content="Show photos" IsChecked="{Binding Wall.ShowPhotos, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"></CheckBox>
+                        <Button Width="150" Height="25" Margin="5,5,0,0" Content="Expand all" Style="{StaticResource VkCommon}" HorizontalAlignment="Left"
+                                Command="{Binding Wall.ExpandAllCommand}"/>
+
+                        <Button Width="150" Height="25" Margin="5,5,0,0" Content="Collapse all" Style="{StaticResource VkCommon}" HorizontalAlignment="Left"
+                                Command="{Binding Wall.CollapseAllCommand}"/>
+                        
+                        <!--<CheckBox Margin="0,5,0,0" Content="Show photos" IsChecked="{Binding Wall.ShowPhotos, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"></CheckBox>-->
                         <ComboBox Margin="0,5,0,0" SelectedValuePath="Value" 
                               ItemsSource="{Binding PostTypes}"
                               SelectedValue="{Binding CurrentPostTypeFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
@@ -91,15 +97,17 @@
                                 <StackPanel Orientation="Vertical">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="70"/>
+                                            <ColumnDefinition Width="100"/>
                                             <ColumnDefinition/>
+                                            <ColumnDefinition Width="25"/>
                                         </Grid.ColumnDefinitions>
                                         <Label Grid.Column="0" Height="25" Content="{Binding PostRef.Date}"></Label>
                                         <Label Grid.Column="1" Height="25" Content="{Binding PostRef.Text}"></Label>
+                                        <Button Grid.Column="2" Height="25" Width="25" Content="+" Style="{StaticResource VkCommon}"
+                                                Command="{Binding ExpandToggleCommand}"/>
                                     </Grid>
                                     <ItemsControl Margin="10" HorizontalAlignment="Center" ItemsSource="{Binding Images, UpdateSourceTrigger=PropertyChanged}" 
-                                           Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, 
-                                            Path=DataContext.Wall.ShowPhotos, Converter={StaticResource BoolToVisibilityConverter}}">
+                                           Visibility="{Binding Expanded, Converter={StaticResource BoolToVisibilityConverter}}">
                                         <ItemsControl.ItemsPanel>
                                             <ItemsPanelTemplate>
                                                 <VirtualizingStackPanel VerticalAlignment="Bottom"/>
@@ -132,11 +140,14 @@
                     <ColumnDefinition Width="175"/>
                 </Grid.ColumnDefinitions>
                 <Button Margin="5,0,5,0" Height="25" Content="Back" Style="{StaticResource VkCommon}" Command="{Binding BackCommand}"
-                    Visibility="{Binding IsWallShowing, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}"></Button>
-                <Button Margin="5,0,5,0" Height="25" Grid.Column="1" Content="Refresh" Style="{StaticResource VkCommon}" Command="{Binding RefreshCommand}"></Button>
+                    Visibility="{Binding IsWallShowing, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+                <Button Margin="5,0,5,0" Height="25" Grid.Column="1" Content="Refresh" Style="{StaticResource VkCommon}" Command="{Binding RefreshCommand}"/>
+                
                 <Button Margin="5,0,5,0" Height="25" Visibility="{Binding IsWallShowing, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}"
-                Grid.Column="2" Content="Test post" Style="{StaticResource VkBlue}" Command="{Binding TestPostCommand}"></Button>
-                <TextBox Margin="5,0,5,0" Grid.Column="3" Text="{Binding TestingGroup, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"></TextBox>
+                Grid.Column="2" Content="Test post" Style="{StaticResource VkBlue}" Command="{Binding TestPostCommand}"/>
+                
+                <TextBox Margin="5,0,5,0" Grid.Column="3" VerticalContentAlignment="Center" Text="{Binding TestingGroup, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
             </Grid>
         </Border>
     </Grid>

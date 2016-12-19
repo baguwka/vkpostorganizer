@@ -19,8 +19,8 @@
 
 
         <Style TargetType="{x:Type Button}" x:Key="VkCommon">
-            <Setter Property="Background" Value="#ffffff"></Setter>
-            <Setter Property="Foreground" Value="#4a7198"></Setter>
+            <Setter Property="Background" Value="#ffffff"/>
+            <Setter Property="Foreground" Value="#4a7198"/>
 
             <Setter Property="Template">
                 <Setter.Value>
@@ -55,6 +55,7 @@
         <Style TargetType="{x:Type Button}" x:Key="VkBlue" BasedOn="{StaticResource VkCommon}">
             <Setter Property="Background" Value="#5E81A8"></Setter>
             <Setter Property="Foreground" Value="#ffffff"></Setter>
+            
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Button}">
