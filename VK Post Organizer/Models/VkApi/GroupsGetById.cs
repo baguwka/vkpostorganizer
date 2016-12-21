@@ -8,7 +8,7 @@ namespace vk.Models.VkApi {
       public GroupsGetById(AccessToken token, IWebClient webClient) : base(token, webClient) {
       }
 
-      public GroupsGetByIdResponse Get(int id, string fields) {
+      public GroupsGetByIdResponse Get(int id, string fields = "") {
          var response = ExecuteMethod("groups.getById", $"group_id={id}&fields={fields}");
          checkForErrors(response);
          return JsonConvert.DeserializeObject<GroupsGetByIdResponse>(response);

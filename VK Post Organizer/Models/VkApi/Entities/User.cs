@@ -10,6 +10,7 @@ namespace vk.Models.VkApi.Entities {
       private string _photo200;
       private string _firstName;
       private string _lastName;
+      private string _description;
 
       [JsonProperty(PropertyName = "id")]
       public int ID {
@@ -27,6 +28,12 @@ namespace vk.Models.VkApi.Entities {
       public string LastName {
          get { return _lastName; }
          set { SetProperty(ref _lastName, value); }
+      }
+
+      [JsonProperty(PropertyName = "description")]
+      public string Description {
+         get { return _description; }
+         set { SetProperty(ref _description, value); }
       }
 
       [JsonProperty(PropertyName = "photo_50")]

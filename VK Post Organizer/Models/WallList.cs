@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using Microsoft.Practices.Prism.Mvvm;
 
@@ -45,7 +46,7 @@ namespace vk.Models {
       }
 
       public void Clear() {
-         foreach (var wallItem in _items) {
+         foreach (var wallItem in _items.ToList()) {
             Remove(wallItem);
          }
       }

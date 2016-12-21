@@ -5,6 +5,7 @@ namespace vk.Models {
    public class EmptyWallHolder : IWallHolder {
       public int ID { get; set; }
       public string Name { get; set; }
+      public string Description { get; set; }
       public string Photo50 { get; set; }
       public string Photo200 { get; set; }
    }

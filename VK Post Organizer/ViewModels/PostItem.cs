@@ -10,6 +10,7 @@ using vk.Models.VkApi.Entities;
 namespace vk.ViewModels {
    public class PostItem : BindableBase {
       private bool _expanded;
+      private PostMark _mark;
       public Post PostRef { get; }
 
       public SmartCollection<ImageItem> Images { get; }
@@ -17,6 +18,11 @@ namespace vk.ViewModels {
       public bool Expanded {
          get { return _expanded; }
          set { SetProperty(ref _expanded, value); }
+      }
+
+      public PostMark Mark {
+         get { return _mark; }
+         set { SetProperty(ref _mark, value); }
       }
 
       public ICommand ExpandToggleCommand { get; set; }
@@ -69,5 +75,11 @@ namespace vk.ViewModels {
       public void Collapse() {
          Expanded = false;
       }
+   }
+
+   public enum PostMark {
+      Neutral,
+      Good,
+      Bad,
    }
 }

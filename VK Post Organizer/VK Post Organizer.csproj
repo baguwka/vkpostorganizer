@@ -39,6 +39,10 @@
     <StartupObject>
     </StartupObject>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>
+    </ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Data Persistence Provider">
       <HintPath>..\packages\Data Persistence Provider.dll</HintPath>
@@ -123,13 +127,15 @@
     <Compile Include="Utils\UnixTimeConverter.cs" />
     <Compile Include="Models\UrlHelper\IImageUrlObtainer.cs" />
     <Compile Include="ViewModels\ImageItem.cs" />
+    <Compile Include="ViewModels\ScheduleNameEditVM.cs" />
+    <Compile Include="ViewModels\ScheduleVM.cs" />
     <Compile Include="ViewModels\WallVM.cs" />
     <Compile Include="Models\WallItem.cs" />
     <Compile Include="Models\WallList.cs" />
     <Compile Include="ViewModels\PostItem.cs" />
     <Compile Include="Models\PostType.cs" />
     <Compile Include="Models\SmartCollection.cs" />
-    <Compile Include="Models\Timeline.cs" />
+    <Compile Include="Models\Schedule.cs" />
     <Compile Include="Models\VkApi\AccessToken.cs" />
     <Compile Include="Models\DefaultWebClient.cs" />
     <Compile Include="Models\VkApi\Entities\Attachment.cs" />
@@ -147,8 +153,11 @@
     <Compile Include="Views\AuthView.xaml.cs">
       <DependentUpon>AuthView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\ConfigureContentView.xaml.cs">
-      <DependentUpon>ConfigureContentView.xaml</DependentUpon>
+    <Compile Include="Views\ScheduleNameEdit.xaml.cs">
+      <DependentUpon>ScheduleNameEdit.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ScheduleWindow.xaml.cs">
+      <DependentUpon>ScheduleWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\WallSelection.xaml.cs">
       <DependentUpon>WallSelection.xaml</DependentUpon>
@@ -169,7 +178,11 @@
       <DependentUpon>MainView.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Views\ConfigureContentView.xaml">
+    <Page Include="Views\ScheduleNameEdit.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ScheduleWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -215,6 +228,12 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\DataPersistance\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\16x16 icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\32x32.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
