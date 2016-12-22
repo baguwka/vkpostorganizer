@@ -73,6 +73,7 @@ namespace vk.ViewModels {
          }
 
          WallHolder = other;
+
          if (clear) {
             Clear();
          }
@@ -92,49 +93,90 @@ namespace vk.ViewModels {
          }
       }
 
-      public void PullWithScheduleHightlight([NotNull] IPostFilter filter, Schedule schedule) {
+      public void PullWithScheduleHightlight([NotNull] IPostFilter filter, [NotNull] Schedule schedule) {
          if (filter == null) {
             throw new ArgumentNullException(nameof(filter));
+         }
+         if (schedule == null) {
+            throw new ArgumentNullException(nameof(schedule));
+         }
+         if (WallHolder == null) {
+            return;
+         }
+
+
+         PullWithScheduleHightlight(WallHolder, filter, schedule);
+      }
+
+
+      public void PullWithScheduleHightlight([NotNull] IWallHolder other, [NotNull] IPostFilter filter, [NotNull] Schedule schedule) {
+         if (other == null) {
+            throw new ArgumentNullException(nameof(other));
+         }
+         if (filter == null) {
+            throw new ArgumentNullException(nameof(filter));
+         }
+         if (schedule == null) {
+            throw new ArgumentNullException(nameof(schedule));
          }
 
          if (WallHolder == null) {
             return;
          }
 
-         Clear();
+         WallHolder = other;
 
-         //Items.Add(
-         //   new PostItem(new Post {
-         //      DateUnix = UnixTimeConverter.ToUnix(new DateTime(2016, 12, 22, schedule.Items[5].Hour, schedule.Items[5].Minute, 0)),
-         //      ID = 0
-         //   }) {
-         //      Mark = PostMark.Bad
-         //   });
-         //Items.Add(
-         //   new PostItem(new Post {
-         //      DateUnix = UnixTimeConverter.ToUnix(new DateTime(2016, 12, 22, schedule.Items[6].Hour, schedule.Items[6].Minute, 0)),
-         //      ID = 0
-         //   }) {
-         //      Mark = PostMark.Good
-         //   });
-         //Items.Add(
-         //   new PostItem(new Post {
-         //      DateUnix = UnixTimeConverter.ToUnix(new DateTime(2016, 12, 22, schedule.Items[7].Hour, schedule.Items[7].Minute, 0)),
-         //      ID = 0
-         //   }) {
-         //      Mark = PostMark.Neutral
-         //   });
+         Clear();
 
          Pull(WallHolder, filter, false);
 
          Items.Where(i => IsDateMatchTheSchedule(i.PostRef.DateUnix, schedule)).ForEach(i => i.Mark = PostMark.Good);
 
+         var firstItem = Items.FirstOrDefault();
+
+         if (firstItem == null) return;
+
+         var firstDate = UnixTimeConverter.ToDateTime(firstItem.PostRef.DateUnix);
+         var nextDate = firstDate;
+         var totalDays = 150 / schedule.Items.Count;
+
+         for (var day = 1; day < totalDays; day++) {
+
+            foreach (var scheduleItem in schedule.Items) {
+               var scheduledDate =
+                  ConvertScheduleItemToDateTime(new DateTime(nextDate.Year, nextDate.Month, nextDate.Day), scheduleItem);
+
+               var thisDayPosts = Items.Where(i => i.PostRef.Date.Date == scheduledDate.Date);
+
+               var isTimeCorrectlyScheduled = thisDayPosts.Any(i => IsTimeCorrectlyScheduled(i.PostRef.DateUnix, scheduleItem));
+
+               if (isTimeCorrectlyScheduled == false) {
+                  Items.Add(
+                     new PostItem(new Post {
+                        DateUnix = UnixTimeConverter.ToUnix(scheduledDate),
+                        ID = 0,
+                        Text = "Здесь должен быть пост."
+                     }) {Mark = PostMark.Bad});
+               }
+            }
+
+            nextDate = nextDate.AddDays(1);
+         }
+         SortWallByDate();
+      }
+
+      public bool IsTimeCorrectlyScheduled(int unixTime, ScheduleItem scheduleItem) {
+         var dateTime = UnixTimeConverter.ToDateTime(unixTime);
+         return new ScheduleItem(dateTime).Equals(scheduleItem);
       }
 
       public bool IsDateMatchTheSchedule(int unixTime, Schedule schedule) {
          var dateTime = UnixTimeConverter.ToDateTime(unixTime);
-
          return schedule.Items.Any(i => i.Hour == dateTime.Hour && i.Minute == dateTime.Minute);
+      }
+
+      public DateTime ConvertScheduleItemToDateTime(DateTime yearMonthDay, ScheduleItem scheduleItem) {
+         return new DateTime(yearMonthDay.Year, yearMonthDay.Month, yearMonthDay.Day, scheduleItem.Hour, scheduleItem.Minute, 0);
       }
 
       public void SortWallByDate() {

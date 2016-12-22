@@ -159,7 +159,7 @@ namespace vk.ViewModels {
          CanTestPost = TestingGroup == wallItem.WallHolder.ID;
 
          try {
-            Wall.Pull(wallItem.WallHolder, CurrentPostTypeFilter.GetFilter());
+            Wall.PullWithScheduleHightlight(wallItem.WallHolder, CurrentPostTypeFilter.GetFilter(), CurrentSchedule);
          }
          catch (VkException ex) {
             IsWallShowing = false;
@@ -209,7 +209,7 @@ namespace vk.ViewModels {
          if (!IsAuthorized) return;
          Messenger.Broadcast("Refresh");
          if (IsWallShowing) {
-            Wall.Pull(CurrentPostTypeFilter.GetFilter());
+            Wall.PullWithScheduleHightlight(CurrentPostTypeFilter.GetFilter(), CurrentSchedule);
          }
          else {
             fillWallList();

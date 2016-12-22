@@ -58,6 +58,14 @@ namespace vk.Models {
             return (_hour * 397) ^ _minute;
          }
       }
+
+      public ScheduleItem() {
+      }
+
+      public ScheduleItem(DateTime time) {
+         Hour = time.Hour;
+         Minute = time.Minute;
+      }
    }
 
    public class Schedule : BindableBase {

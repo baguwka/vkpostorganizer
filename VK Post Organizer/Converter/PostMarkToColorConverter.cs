@@ -14,7 +14,7 @@ namespace vk.Converter {
 
          switch (postMark) {
             case PostMark.Bad:
-               return color = "#DEDEDE";
+               return color = "#d6b6b6";
             case PostMark.Good:
                return color = "#B9D6B6";
             case PostMark.Neutral:

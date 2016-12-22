@@ -12,7 +12,7 @@ namespace vk.Models.VkApi.Entities {
       private string _text;
       private int _dateUnix;
       private SmartCollection<Attachment> _attachments;
-      private string _date;
+      private string _dateString;
       private SmartCollection<Post> _copyHistory;
 
       public Post() {
@@ -36,13 +36,15 @@ namespace vk.Models.VkApi.Entities {
          get { return _dateUnix; }
          set {
             SetProperty(ref _dateUnix, value);
-            Date = UnixTimeConverter.ToDateTime(_dateUnix).ToString("dd.MM.yy HH:mm", CultureInfo.CurrentCulture);
+            DateString = UnixTimeConverter.ToDateTime(_dateUnix).ToString("dd.MM.yy HH:mm", CultureInfo.CurrentCulture);
          }
       }
 
-      public string Date {
-         get { return _date; }
-         private set { SetProperty(ref _date, value); }
+      public DateTime Date => UnixTimeConverter.ToDateTime(_dateUnix);
+
+      public string DateString {
+         get { return _dateString; }
+         private set { SetProperty(ref _dateString, value); }
       }
 
       [JsonProperty(PropertyName = "attachments")]
