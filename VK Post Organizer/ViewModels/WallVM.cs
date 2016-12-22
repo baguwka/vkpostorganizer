@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
 using JetBrains.Annotations;
+using Microsoft.Practices.ObjectBuilder2;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
 using Microsoft.Practices.Unity;
@@ -9,6 +11,7 @@ using vk.Models;
 using vk.Models.Filter;
 using vk.Models.VkApi;
 using vk.Models.VkApi.Entities;
+using vk.Utils;
 
 namespace vk.ViewModels {
    [UsedImplicitly]
@@ -61,7 +64,7 @@ namespace vk.ViewModels {
          Pull(WallHolder, filter);
       }
 
-      public void Pull([NotNull] IWallHolder other, [NotNull] IPostFilter filter) {
+      public void Pull([NotNull] IWallHolder other, [NotNull] IPostFilter filter, bool clear = true) {
          if (other == null) {
             throw new ArgumentNullException(nameof(other));
          }
@@ -70,7 +73,9 @@ namespace vk.ViewModels {
          }
 
          WallHolder = other;
-         Clear();
+         if (clear) {
+            Clear();
+         }
 
          var wall = App.Container.Resolve<WallGet>();
 
@@ -85,6 +90,58 @@ namespace vk.ViewModels {
             Clear();
             throw;
          }
+      }
+
+      public void PullWithScheduleHightlight([NotNull] IPostFilter filter, Schedule schedule) {
+         if (filter == null) {
+            throw new ArgumentNullException(nameof(filter));
+         }
+
+         if (WallHolder == null) {
+            return;
+         }
+
+         Clear();
+
+         //Items.Add(
+         //   new PostItem(new Post {
+         //      DateUnix = UnixTimeConverter.ToUnix(new DateTime(2016, 12, 22, schedule.Items[5].Hour, schedule.Items[5].Minute, 0)),
+         //      ID = 0
+         //   }) {
+         //      Mark = PostMark.Bad
+         //   });
+         //Items.Add(
+         //   new PostItem(new Post {
+         //      DateUnix = UnixTimeConverter.ToUnix(new DateTime(2016, 12, 22, schedule.Items[6].Hour, schedule.Items[6].Minute, 0)),
+         //      ID = 0
+         //   }) {
+         //      Mark = PostMark.Good
+         //   });
+         //Items.Add(
+         //   new PostItem(new Post {
+         //      DateUnix = UnixTimeConverter.ToUnix(new DateTime(2016, 12, 22, schedule.Items[7].Hour, schedule.Items[7].Minute, 0)),
+         //      ID = 0
+         //   }) {
+         //      Mark = PostMark.Neutral
+         //   });
+
+         Pull(WallHolder, filter, false);
+
+         Items.Where(i => IsDateMatchTheSchedule(i.PostRef.DateUnix, schedule)).ForEach(i => i.Mark = PostMark.Good);
+
+      }
+
+      public bool IsDateMatchTheSchedule(int unixTime, Schedule schedule) {
+         var dateTime = UnixTimeConverter.ToDateTime(unixTime);
+
+         return schedule.Items.Any(i => i.Hour == dateTime.Hour && i.Minute == dateTime.Minute);
+      }
+
+      public void SortWallByDate() {
+         var tempList = new List<PostItem>(Items);
+         tempList.Sort((a, b) => a.PostRef.DateUnix.CompareTo(b.PostRef.DateUnix));
+         Items.Clear();
+         Items.AddRange(tempList);
       }
 
       public void Clear() {

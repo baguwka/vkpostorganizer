@@ -107,13 +107,17 @@ namespace vk.ViewModels {
 
          CurrentSchedule = new Schedule();
 
+         SortCommand = new DelegateCommand(() => {Wall?.SortWallByDate();});
       }
 
       private void applyScheduleCommandExecute() {
-
+         Wall?.PullWithScheduleHightlight(CurrentPostTypeFilter.GetFilter(), CurrentSchedule);
       }
 
+
       public Schedule CurrentSchedule { get; set; }
+
+      public ICommand SortCommand { get; set; }
 
 
       private void testPostCommandExecute() {
@@ -129,10 +133,7 @@ namespace vk.ViewModels {
 
          var wallPost = App.Container.Resolve<WallPost>();
 
-         //var unixTimestamp = UnixTimeConverter.ToUnix(new DateTime(2016, 12, 21, 15, 30, 0));
-
          try {
-
             var date = new DateTime(2016, 12, 22, 18, 30, 0);
             for (int i = 0; i < 150; i++) {
                date = date.AddHours(1);
@@ -140,7 +141,6 @@ namespace vk.ViewModels {
                var post = wallPost.Post(Wall.WallHolder.ID, $"Тестовая пустая отложка номер {i}", false, true, unixTimestamp);
             }
 
-            //var post = wallPost.Post(Wall.WallHolder.ID, "Тест :3", false, true, unixTimestamp);
             refreshCommandExecute();
          }
          catch (VkException ex) {

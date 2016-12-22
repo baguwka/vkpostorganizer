@@ -84,9 +84,13 @@
 
                         <Button Margin="0,5,0,5" Content="Configure schedule" Style="{StaticResource VkBlue}" 
                                 Command="{Binding ConfigureScheduleCommand}"
-                                Height="25" Width="150"></Button>
+                                Height="25" Width="150" IsEnabled="False"></Button>
                         <Button Margin="0,5,0,5" Content="Apply schedule" Style="{StaticResource VkBlue}" 
                                 Command="{Binding ApplyScheduleCommand}"
+                                Height="25" Width="150"></Button>
+                        
+                        <Button Margin="0,5,0,5" Content="Sort" Style="{StaticResource VkBlue}" 
+                                Command="{Binding SortCommand}"
                                 Height="25" Width="150"></Button>
                     </StackPanel>
                 </Grid>
@@ -104,7 +108,7 @@
 
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource VkBorder}" Margin="5" MinWidth="400" MaxWidth="750">
+                            <Border Background="{Binding Mark, Converter={StaticResource PostMarkToColorConverter}}" Style="{StaticResource VkBorder}" Margin="5" MinWidth="400" MaxWidth="750">
                                 <StackPanel Orientation="Vertical">
                                     <Grid>
                                         <Grid.ColumnDefinitions>

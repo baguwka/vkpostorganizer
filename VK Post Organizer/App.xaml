@@ -6,6 +6,7 @@
              Startup="CompositionRoot">
     <Application.Resources>
 
+        <converters:PostMarkToColorConverter x:Key="PostMarkToColorConverter"/>
         <converters:BoolToVisibilityHiddenConverter x:Key="BoolToVisibilityConverterHide"/>
         <converters:BoolToVisibilityCollapsedConverter x:Key="BoolToVisibilityConverter"/>
         <converters:BoolToVisibilityNegativeCollapsedConverter x:Key="BoolToVisibilityNegativeConverter"/>

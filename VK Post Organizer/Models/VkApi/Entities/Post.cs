@@ -42,7 +42,7 @@ namespace vk.Models.VkApi.Entities {
 
       public string Date {
          get { return _date; }
-         set { SetProperty(ref _date, value); }
+         private set { SetProperty(ref _date, value); }
       }
 
       [JsonProperty(PropertyName = "attachments")]

@@ -107,6 +107,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converter\PostMarkToColorConverter.cs" />
     <Compile Include="Models\AppDataFolderProvider.cs" />
     <Compile Include="Models\UrlHelper\DocumentPreviewUrlObtainer.cs" />
     <Compile Include="Models\UrlHelper\PhotoUrlObtainer.cs" />
