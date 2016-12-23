@@ -47,5 +47,21 @@ namespace vk.Models.VkApi.Entities {
          get { return _text; }
          set { SetProperty(ref _text, value); }
       }
+
+      public string GetLargest() {
+         if (!string.IsNullOrEmpty(Photo1280)) {
+            return Photo1280;
+         }
+
+         if (!string.IsNullOrEmpty(Photo604)) {
+            return Photo604;
+         }
+
+         if (!string.IsNullOrEmpty(Photo75)) {
+            return Photo75;
+         }
+
+         return "";
+      }
    }
 }

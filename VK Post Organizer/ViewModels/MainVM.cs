@@ -26,6 +26,11 @@ namespace vk.ViewModels {
       private PostType _currentPostTypeFilter;
       private bool _canTestPost;
       private int _testingGroup;
+      private int _missingPosts;
+      private int _postCount;
+      private int _repostCount;
+      private int _totalPostCount;
+      private string _infoPanel;
 
       public WallList ListOfAvaliableWalls { get; }
       public WallVM Wall { get; }
@@ -87,6 +92,32 @@ namespace vk.ViewModels {
          }
       }
 
+      public int TotalPostCount {
+         get { return _totalPostCount; }
+         set { SetProperty(ref _totalPostCount, value); }
+      }
+
+      public int RepostCount {
+         get { return _repostCount; }
+         set { SetProperty(ref _repostCount, value); }
+      }
+
+      public int PostCount {
+         get { return _postCount; }
+         set { SetProperty(ref _postCount, value); }
+      }
+
+      public int MissingPosts {
+         get { return _missingPosts; }
+         set { SetProperty(ref _missingPosts, value); }
+      }
+
+      public string InfoPanel {
+         get { return _infoPanel; }
+         set { SetProperty(ref _infoPanel, value); }
+      }
+
+
       public MainVM() {
          ConfigureScheduleCommand = new DelegateCommand(configureScheduleCommandExecute);
          BackCommand = new DelegateCommand(backCommandExecute);
@@ -101,13 +132,21 @@ namespace vk.ViewModels {
          ListOfAvaliableWalls = App.Container.Resolve<WallList>();
          Wall = App.Container.Resolve<WallVM>();
 
+         Wall.Items.CollectionChanged += (sender, args) => {
+            var realPosts = Wall.Items.Where(post => post.IsExisting).ToList();
+            TotalPostCount = realPosts.Count();
+            RepostCount = realPosts.Count(post => post.PostType == PostType.Repost);
+            PostCount = realPosts.Count(post => post.PostType == PostType.Post);
+            MissingPosts = Wall.Items.Count(post => post.PostType == PostType.Missing);
+
+            InfoPanel = $"Total: {TotalPostCount} ({TotalPostCount + MissingPosts})\nPosts: {PostCount}\nReposts: {RepostCount}\nMissing {MissingPosts}";
+         };
+
          ListOfAvaliableWalls.ItemClicked += onGroupItemClicked;
 
-         CurrentPostTypeFilter = PostType.Both;
+         CurrentPostTypeFilter = PostType.All;
 
          CurrentSchedule = new Schedule();
-
-         SortCommand = new DelegateCommand(() => {Wall?.SortWallByDate();});
       }
 
       private void applyScheduleCommandExecute() {
@@ -116,8 +155,6 @@ namespace vk.ViewModels {
 
 
       public Schedule CurrentSchedule { get; set; }
-
-      public ICommand SortCommand { get; set; }
 
 
       private void testPostCommandExecute() {
@@ -151,7 +188,7 @@ namespace vk.ViewModels {
       private void applyFilter(PostType currentPostTypeFilter) {
          if (!IsWallShowing) return;
 
-         Wall?.Pull(currentPostTypeFilter.GetFilter());
+         Wall?.PullWithScheduleHightlight(currentPostTypeFilter.GetFilter(), CurrentSchedule);
       }
 
       private void onGroupItemClicked(object sender, WallItem wallItem) {

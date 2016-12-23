@@ -8,16 +8,20 @@ using vk.Models.UrlHelper;
 using vk.Models.VkApi.Entities;
 
 namespace vk.ViewModels {
-   public class PostItem : BindableBase {
+   public class PostControl : BindableBase {
       private bool _expanded;
       private PostMark _mark;
-      public Post PostRef { get; }
+      private PostType _postType;
+      public Post Post { get; }
 
       public SmartCollection<ImageItem> Images { get; }
 
       public bool Expanded {
          get { return _expanded; }
-         set { SetProperty(ref _expanded, value); }
+         set {
+            if (PostType == PostType.Missing) value = false;
+            SetProperty(ref _expanded, value);
+         }
       }
 
       public PostMark Mark {
@@ -27,8 +31,15 @@ namespace vk.ViewModels {
 
       public ICommand ExpandToggleCommand { get; set; }
 
+      public bool IsExisting { get; set; }
+
+      public PostType PostType {
+         get { return _postType; }
+         set { _postType = value; }
+      }
+
       private void loadImages() {
-         foreach (var attachment in PostRef.Attachments) {
+         foreach (var attachment in Post.Attachments) {
             if (attachment.Type == "photo") {
                Images.Add(new PhotoUrlObtainer().Obtain(attachment, ImageSize.Medium));
             }
@@ -41,21 +52,23 @@ namespace vk.ViewModels {
          }
       }
 
-      public PostItem(Post postRef) {
+      public PostControl(Post post) {
          Images = new SmartCollection<ImageItem>();
-         PostRef = postRef;
+         Post = post;
 
          ExpandToggleCommand = new DelegateCommand(ExpandToggle);
 
-         var prev = PostRef.CopyHistory?.FirstOrDefault();
+         var prev = Post.CopyHistory?.FirstOrDefault();
          if (prev == null) {
             loadImages();
+            PostType = PostType.Post;
             return;
          }
 
-         PostRef.ID = prev.ID;
-         PostRef.Text = prev.Text;
-         PostRef.Attachments = prev.Attachments;
+         PostType = PostType.Repost;
+         Post.ID = prev.ID;
+         Post.Text = prev.Text;
+         Post.Attachments = prev.Attachments;
 
          loadImages();
       }

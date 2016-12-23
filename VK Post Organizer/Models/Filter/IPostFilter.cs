@@ -3,6 +3,6 @@ using vk.ViewModels;
 
 namespace vk.Models.Filter {
    public interface IPostFilter {
-      IEnumerable<PostItem> FilterPosts(IEnumerable<PostItem> postItems);
+      IEnumerable<PostControl> FilterPosts(IEnumerable<PostControl> postItems);
    }
 }

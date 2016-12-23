@@ -6,24 +6,24 @@ namespace vk.Models.UrlHelper {
    public class DocumentPreviewUrlObtainer : IImageUrlObtainer {
       public ImageItem Obtain(Attachment attachment, ImageSize preferableImageSize = ImageSize.Any) {
          if (attachment.Document.Preview.Photo == null) {
-            return new ImageItem("");
+            return new ImageItem("", "");
          }
 
-         var original = attachment.Document.Preview.Photo.Sizes.FirstOrDefault(s => s.Type == "o");
-         var medium = attachment.Document.Preview.Photo.Sizes.FirstOrDefault(s => s.Type == "m");
-         var small = attachment.Document.Preview.Photo.Sizes.FirstOrDefault(s => s.Type == "s");
+         var originalPreview = attachment.Document.Preview.Photo.Sizes.FirstOrDefault(s => s.Type == "o");
+         var mediumPreview = attachment.Document.Preview.Photo.Sizes.FirstOrDefault(s => s.Type == "m");
+         var smallPreview = attachment.Document.Preview.Photo.Sizes.FirstOrDefault(s => s.Type == "s");
 
-         if (!string.IsNullOrEmpty(original?.Source) && (preferableImageSize & ImageSize.Large) != 0) {
-            return new ImageItem(original.Source);
+         if (!string.IsNullOrEmpty(originalPreview?.Source) && (preferableImageSize & ImageSize.Large) != 0) {
+            return new ImageItem(originalPreview.Source, attachment.Document.Url);
          }
-         if (!string.IsNullOrEmpty(medium?.Source) && (preferableImageSize & ImageSize.Medium) != 0) {
-            return new ImageItem(medium.Source);
+         if (!string.IsNullOrEmpty(mediumPreview?.Source) && (preferableImageSize & ImageSize.Medium) != 0) {
+            return new ImageItem(mediumPreview.Source, attachment.Document.Url);
          }
-         if (!string.IsNullOrEmpty(small?.Source) && (preferableImageSize & ImageSize.Small) != 0) {
-            return new ImageItem(small.Source);
+         if (!string.IsNullOrEmpty(smallPreview?.Source) && (preferableImageSize & ImageSize.Small) != 0) {
+            return new ImageItem(smallPreview.Source, attachment.Document.Url);
          }
 
-         return new ImageItem("");
+         return new ImageItem("", "");
       }
    }
 }

@@ -10,20 +10,32 @@ namespace vk.Models.Filter {
          Instance = new NoPostFilter();
       }
 
-      public IEnumerable<PostItem> FilterPosts(IEnumerable<PostItem> postItems) {
+      public IEnumerable<PostControl> FilterPosts(IEnumerable<PostControl> postItems) {
          return postItems;
       }
    }
 
+   public class MissingPostFilter : IPostFilter {
+      public IEnumerable<PostControl> FilterPosts(IEnumerable<PostControl> postItems) {
+         return postItems.Where(i => i.PostType == PostType.Missing);
+      }
+   }
+
+   public class PostsAndRepostsFilter : IPostFilter {
+      public IEnumerable<PostControl> FilterPosts(IEnumerable<PostControl> postItems) {
+         return postItems.Where(i => i.PostType == PostType.Post || i.PostType == PostType.Repost);
+      }
+   }
+
    public class PostsOnlyFilter : IPostFilter {
-      public IEnumerable<PostItem> FilterPosts(IEnumerable<PostItem> postItems) {
-         return postItems.Where(i => i.PostRef.CopyHistory == null || !i.PostRef.CopyHistory.Any());
+      public IEnumerable<PostControl> FilterPosts(IEnumerable<PostControl> postItems) {
+         return postItems.Where(i => i.PostType == PostType.Post);
       }
    }
 
    public class RepostsOnlyFilter : IPostFilter {
-      public IEnumerable<PostItem> FilterPosts(IEnumerable<PostItem> postItems) {
-         return postItems.Where(i => i.PostRef.CopyHistory != null && i.PostRef.CopyHistory.Any());
+      public IEnumerable<PostControl> FilterPosts(IEnumerable<PostControl> postItems) {
+         return postItems.Where(i => i.PostType == PostType.Repost);
       }
    }
 }

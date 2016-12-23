@@ -17,7 +17,7 @@ namespace vk.ViewModels {
    [UsedImplicitly]
    public class WallVM : BindableBase {
       private IWallHolder _wallHolder;
-      private SmartCollection<PostItem> _items;
+      private SmartCollection<PostControl> _items;
 
       public WallVM([NotNull] IWallHolder wallHolder) {
          if (wallHolder == null) {
@@ -25,7 +25,7 @@ namespace vk.ViewModels {
          }
 
          _wallHolder = wallHolder;
-         Items = new SmartCollection<PostItem>();
+         Items = new SmartCollection<PostControl>();
 
          ExpandAllCommand = new DelegateCommand(expandAllCommandExecute);
          CollapseAllCommand = new DelegateCommand(collapseAllCommandExecute);
@@ -36,7 +36,7 @@ namespace vk.ViewModels {
          set { SetProperty(ref _wallHolder, value); }
       }
 
-      public SmartCollection<PostItem> Items {
+      public SmartCollection<PostControl> Items {
          get { return _items; }
          set { SetProperty(ref _items, value); }
       }
@@ -49,7 +49,8 @@ namespace vk.ViewModels {
             return;
          }
 
-         Pull(WallHolder, NoPostFilter.Instance);
+         Clear();
+         Items.AddRange(pull(WallHolder));
       }
 
       public void Pull([NotNull] IPostFilter filter) {
@@ -61,31 +62,30 @@ namespace vk.ViewModels {
             return;
          }
 
-         Pull(WallHolder, filter);
+         Clear();
+         var tempList = new List<PostControl>();
+         tempList.AddRange(pull(WallHolder));
+         tempList = filter.FilterPosts(tempList).ToList();
+         Items.AddRange(tempList);
       }
 
-      public void Pull([NotNull] IWallHolder other, [NotNull] IPostFilter filter, bool clear = true) {
-         if (other == null) {
-            throw new ArgumentNullException(nameof(other));
-         }
-         if (filter == null) {
-            throw new ArgumentNullException(nameof(filter));
-         }
-
-         WallHolder = other;
-
-         if (clear) {
-            Clear();
+      private IEnumerable<PostControl> pull([NotNull] IWallHolder wallHolder) {
+         if (wallHolder == null) {
+            throw new ArgumentNullException(nameof(wallHolder));
          }
 
          var wall = App.Container.Resolve<WallGet>();
 
          try {
-            var posts1 = wall.Get(WallHolder.ID);
-            var posts2 = wall.Get(WallHolder.ID, 50, 100);
+            var postList = new List<PostControl>();
 
-            Items.AddRange(filter.FilterPosts(posts1.Response.Wall.Select(p => new PostItem(p))));
-            Items.AddRange(filter.FilterPosts(posts2.Response.Wall.Select(p => new PostItem(p))));
+            var posts1 = wall.Get(wallHolder.ID);
+            var posts2 = wall.Get(wallHolder.ID, 50, 100);
+
+            postList.AddRange(posts1.Response.Wall.Select(p => new PostControl(p) { IsExisting = true }));
+            postList.AddRange(posts2.Response.Wall.Select(p => new PostControl(p) { IsExisting = true }));
+
+            return postList;
          }
          catch (VkException) {
             Clear();
@@ -104,7 +104,6 @@ namespace vk.ViewModels {
             return;
          }
 
-
          PullWithScheduleHightlight(WallHolder, filter, schedule);
       }
 
@@ -120,49 +119,62 @@ namespace vk.ViewModels {
             throw new ArgumentNullException(nameof(schedule));
          }
 
-         if (WallHolder == null) {
-            return;
-         }
-
          WallHolder = other;
 
          Clear();
 
-         Pull(WallHolder, filter, false);
+         var tempList = new List<PostControl>();
 
-         Items.Where(i => IsDateMatchTheSchedule(i.PostRef.DateUnix, schedule)).ForEach(i => i.Mark = PostMark.Good);
+         tempList.AddRange(pull(WallHolder));
 
-         var firstItem = Items.FirstOrDefault();
+         tempList.Where(i => IsDateMatchTheSchedule(i.Post.DateUnix, schedule)).ForEach(i => i.Mark = PostMark.Good);
+
+         var firstItem = tempList.FirstOrDefault();
 
          if (firstItem == null) return;
 
-         var firstDate = UnixTimeConverter.ToDateTime(firstItem.PostRef.DateUnix);
+         var firstDate = DateTime.Now;
          var nextDate = firstDate;
-         var totalDays = 150 / schedule.Items.Count;
 
-         for (var day = 1; day < totalDays; day++) {
+         int totalCount = 0;
+
+         //for (var day = 1; day <= totalDays + 10; day++) {
+         while(totalCount <= 150) { 
+            var thisDayDate = nextDate;
+            var thisDayPosts = tempList.Where(i => i.Post.Date.Date == thisDayDate.Date).ToList();
 
             foreach (var scheduleItem in schedule.Items) {
-               var scheduledDate =
-                  ConvertScheduleItemToDateTime(new DateTime(nextDate.Year, nextDate.Month, nextDate.Day), scheduleItem);
+               if (totalCount > 150) continue;
+               totalCount++;
 
-               var thisDayPosts = Items.Where(i => i.PostRef.Date.Date == scheduledDate.Date);
+               var scheduledDate = ConvertScheduleItemToDateTime(new DateTime(thisDayDate.Year, thisDayDate.Month, thisDayDate.Day), scheduleItem);
 
-               var isTimeCorrectlyScheduled = thisDayPosts.Any(i => IsTimeCorrectlyScheduled(i.PostRef.DateUnix, scheduleItem));
+
+               if (scheduledDate <= DateTime.Now) continue;
+
+               var isTimeCorrectlyScheduled = thisDayPosts.Any(i => IsTimeCorrectlyScheduled(i.Post.DateUnix, scheduleItem));
 
                if (isTimeCorrectlyScheduled == false) {
-                  Items.Add(
-                     new PostItem(new Post {
+                  tempList.Add(
+                     new PostControl(new Post {
                         DateUnix = UnixTimeConverter.ToUnix(scheduledDate),
                         ID = 0,
                         Text = "Здесь должен быть пост."
-                     }) {Mark = PostMark.Bad});
+                     }) {
+                        Mark = PostMark.Bad,
+                        IsExisting = false,
+                        PostType = PostType.Missing
+                     });
                }
             }
 
             nextDate = nextDate.AddDays(1);
          }
-         SortWallByDate();
+
+         tempList = filter.FilterPosts(tempList).ToList();
+         SortListByDate(tempList);
+
+         Items.AddRange(tempList);
       }
 
       public bool IsTimeCorrectlyScheduled(int unixTime, ScheduleItem scheduleItem) {
@@ -179,11 +191,8 @@ namespace vk.ViewModels {
          return new DateTime(yearMonthDay.Year, yearMonthDay.Month, yearMonthDay.Day, scheduleItem.Hour, scheduleItem.Minute, 0);
       }
 
-      public void SortWallByDate() {
-         var tempList = new List<PostItem>(Items);
-         tempList.Sort((a, b) => a.PostRef.DateUnix.CompareTo(b.PostRef.DateUnix));
-         Items.Clear();
-         Items.AddRange(tempList);
+      public static void SortListByDate(List<PostControl> posts) {
+         posts.Sort((a, b) => a.Post.DateUnix.CompareTo(b.Post.DateUnix));
       }
 
       public void Clear() {

@@ -6,7 +6,11 @@ namespace vk.Models {
       Post = 1,
       [Description("Only reposts")]
       Repost = 2,
+      [Description("Missing")]
+      Missing = 4,
+      [Description("Posts and reposts")]
+      PostOrRepost = Post | Repost,
       [Description("All")]
-      Both = Post | Repost,
+      All = PostOrRepost | Missing
    }
 }

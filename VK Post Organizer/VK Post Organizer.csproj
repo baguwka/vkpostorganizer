@@ -133,7 +133,7 @@
     <Compile Include="ViewModels\WallVM.cs" />
     <Compile Include="Models\WallItem.cs" />
     <Compile Include="Models\WallList.cs" />
-    <Compile Include="ViewModels\PostItem.cs" />
+    <Compile Include="ViewModels\PostControl.cs" />
     <Compile Include="Models\PostType.cs" />
     <Compile Include="Models\SmartCollection.cs" />
     <Compile Include="Models\Schedule.cs" />

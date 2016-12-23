@@ -10,7 +10,11 @@ namespace vk.Utils {
                return new PostsOnlyFilter();
             case PostType.Repost:
                return new RepostsOnlyFilter();
-            case PostType.Both:
+            case PostType.PostOrRepost:
+               return new PostsAndRepostsFilter();
+            case PostType.Missing:
+               return new MissingPostFilter();
+            case PostType.All:
                return new NoPostFilter();
             default:
                throw new ArgumentOutOfRangeException(nameof(type), type, null);
