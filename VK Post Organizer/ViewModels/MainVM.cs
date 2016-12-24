@@ -257,13 +257,18 @@ namespace vk.ViewModels {
       }
 
       private void authorizeIfAlreadyLoggined() {
-         var cookies = Application.GetCookie(new Uri("https://www.vk.com"));
-         if (!string.IsNullOrEmpty(cookies)) {
-            var values = cookies.Split(';');
+         try {
+            var cookies = Application.GetCookie(new Uri("https://www.vk.com"));
+            if (!string.IsNullOrEmpty(cookies)) {
+               var values = cookies.Split(';');
 
-            if (values.Where(s => s.IndexOf('=') > 0).Any(s => s.Substring(0, s.IndexOf('=')).Trim() == "remixsid")) {
-               Authorize(false);
+               if (values.Where(s => s.IndexOf('=') > 0).Any(s => s.Substring(0, s.IndexOf('=')).Trim() == "remixsid")) {
+                  Authorize(false);
+               }
             }
+         }
+         catch (Exception ex) {
+            MessageBox.Show(ex.Message, "Exception occured", MessageBoxButton.OK, MessageBoxImage.Error);
          }
       }
 

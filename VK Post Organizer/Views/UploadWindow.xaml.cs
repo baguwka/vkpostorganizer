@@ -19,9 +19,9 @@ namespace vk.Views {
 
          InitializeComponent();
 
-         var vm = (UploadVM)getViewModel;
+         //var vm = (UploadVM)getViewModel;
 
-         vm.PrepareImages(slots, files);
+         //vm.PrepareImages(slots, files);
       }
    }
 }
