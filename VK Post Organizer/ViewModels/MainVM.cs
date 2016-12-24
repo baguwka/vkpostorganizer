@@ -158,31 +158,34 @@ namespace vk.ViewModels {
 
 
       private void testPostCommandExecute() {
-         if (TestingGroup != Wall.WallHolder.ID) {
-            var groupsGet = App.Container.Resolve<GroupsGetById>();
-            var response = groupsGet.Get(TestingGroup);
-            var group = response.Response.FirstOrDefault();
+         var upload = new UploadWindow(Wall.Items, null);
+         upload.ShowDialog();
 
-            MessageBox.Show($"You're only available to post in \"{group?.Name}\" wall in testing purposes.", "Cant post here",
-               MessageBoxButton.OK, MessageBoxImage.Error);
-            return;
-         }
+         //if (TestingGroup != Wall.WallHolder.ID) {
+         //   var groupsGet = App.Container.Resolve<GroupsGetById>();
+         //   var response = groupsGet.Get(TestingGroup);
+         //   var group = response.Response.FirstOrDefault();
 
-         var wallPost = App.Container.Resolve<WallPost>();
+         //   MessageBox.Show($"You're only available to post in \"{group?.Name}\" wall in testing purposes.", "Cant post here",
+         //      MessageBoxButton.OK, MessageBoxImage.Error);
+         //   return;
+         //}
 
-         try {
-            var date = new DateTime(2016, 12, 22, 18, 30, 0);
-            for (int i = 0; i < 150; i++) {
-               date = date.AddHours(1);
-               var unixTimestamp = UnixTimeConverter.ToUnix(date);
-               var post = wallPost.Post(Wall.WallHolder.ID, $"Тестовая пустая отложка номер {i}", false, true, unixTimestamp);
-            }
+         //var wallPost = App.Container.Resolve<WallPost>();
 
-            refreshCommandExecute();
-         }
-         catch (VkException ex) {
-            MessageBox.Show(ex.Message);
-         }
+         //try {
+         //   var date = new DateTime(2016, 12, 22, 18, 30, 0);
+         //   for (int i = 0; i < 150; i++) {
+         //      date = date.AddHours(1);
+         //      var unixTimestamp = UnixTimeConverter.ToUnix(date);
+         //      var post = wallPost.Post(Wall.WallHolder.ID, $"Тестовая пустая отложка номер {i}", false, true, unixTimestamp);
+         //   }
+
+         //   refreshCommandExecute();
+         //}
+         //catch (VkException ex) {
+         //   MessageBox.Show(ex.Message);
+         //}
       }
 
       private void applyFilter(PostType currentPostTypeFilter) {
@@ -331,11 +334,13 @@ namespace vk.ViewModels {
       }
 
       public void ImportFiles(IEnumerable<string> files) {
-         var sb = new StringBuilder();
-         foreach (var file in files) {
-            sb.AppendLine(file);
-         }
-         MessageBox.Show($"Importing\n{sb}");
+         //var sb = new StringBuilder();
+         //foreach (var file in files) {
+         //   sb.AppendLine(file);
+         //}
+         var upload = new UploadWindow(Wall.Items, files);
+         upload.ShowDialog();
+         //MessageBox.Show($"Importing\n{sb}");
       }
 
       private void logOutCommandExecute() {

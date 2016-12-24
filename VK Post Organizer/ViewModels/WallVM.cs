@@ -129,32 +129,27 @@ namespace vk.ViewModels {
 
          tempList.Where(i => IsDateMatchTheSchedule(i.Post.DateUnix, schedule)).ForEach(i => i.Mark = PostMark.Good);
 
-         var firstItem = tempList.FirstOrDefault();
-
-         if (firstItem == null) return;
-
          var firstDate = DateTime.Now;
          var nextDate = firstDate;
 
-         int totalCount = 0;
+         int totalCount = tempList.Count;
 
          //for (var day = 1; day <= totalDays + 10; day++) {
-         while(totalCount <= 150) { 
+         while(totalCount < 150) { 
             var thisDayDate = nextDate;
             var thisDayPosts = tempList.Where(i => i.Post.Date.Date == thisDayDate.Date).ToList();
 
             foreach (var scheduleItem in schedule.Items) {
-               if (totalCount > 150) continue;
-               totalCount++;
+               if (totalCount >= 150) continue;
 
                var scheduledDate = ConvertScheduleItemToDateTime(new DateTime(thisDayDate.Year, thisDayDate.Month, thisDayDate.Day), scheduleItem);
-
 
                if (scheduledDate <= DateTime.Now) continue;
 
                var isTimeCorrectlyScheduled = thisDayPosts.Any(i => IsTimeCorrectlyScheduled(i.Post.DateUnix, scheduleItem));
 
                if (isTimeCorrectlyScheduled == false) {
+                  totalCount++;
                   tempList.Add(
                      new PostControl(new Post {
                         DateUnix = UnixTimeConverter.ToUnix(scheduledDate),
