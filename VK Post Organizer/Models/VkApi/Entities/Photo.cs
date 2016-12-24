@@ -10,7 +10,7 @@ namespace vk.Models.VkApi.Entities {
       private string _photo604;
       private string _photo1280;
       private int _date;
-      private string _accessKey;
+      private string _text;
 
       [JsonProperty(PropertyName = "id")]
       public int ID {
@@ -42,10 +42,26 @@ namespace vk.Models.VkApi.Entities {
          set { SetProperty(ref _date, value); }
       }
 
-      [JsonProperty(PropertyName = "access_key")]
-      public string AccessKey {
-         get { return _accessKey; }
-         set { SetProperty(ref _accessKey, value); }
+      [JsonProperty(PropertyName = "text")]
+      public string Text {
+         get { return _text; }
+         set { SetProperty(ref _text, value); }
+      }
+
+      public string GetLargest() {
+         if (!string.IsNullOrEmpty(Photo1280)) {
+            return Photo1280;
+         }
+
+         if (!string.IsNullOrEmpty(Photo604)) {
+            return Photo604;
+         }
+
+         if (!string.IsNullOrEmpty(Photo75)) {
+            return Photo75;
+         }
+
+         return "";
       }
    }
 }

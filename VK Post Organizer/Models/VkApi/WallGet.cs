@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Windows;
+﻿using System.Collections.Generic;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using vk.Models.VkApi.Entities;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using Microsoft.Practices.Prism.Mvvm;
 
@@ -19,8 +20,24 @@ namespace vk.Models {
          Items.CollectionChanged += (sender, args) => OnPropertyChanged(nameof(Items));
       }
 
-      public void Add(WallItem item) {
+      public void Add([NotNull] WallItem item) {
+         if (item == null) {
+            throw new ArgumentNullException(nameof(item));
+         }
+
          _items.Add(item);
+         item.Clicked += OnItemClicked;
+      }
+
+      public void Remove([NotNull] WallItem item) {
+         if (item == null) {
+            throw new ArgumentNullException(nameof(item));
+         }
+
+         if (_items.Contains(item)) {
+            _items.Remove(item);
+            item.Clicked -= OnItemClicked;
+         }
       }
 
       public void Fill(IEnumerable<WallItem> items) {
@@ -29,16 +46,12 @@ namespace vk.Models {
       }
 
       public void Clear() {
-         _items.Clear();
+         foreach (var wallItem in _items.ToList()) {
+            Remove(wallItem);
+         }
       }
 
-      public WallItem InstantiateItem(IWallHolder wallHolder) {
-         return new WallItem(wallHolder) {
-            ClickHandler = OnItemClicked
-      };
-   }
-
-      protected void OnItemClicked(WallItem e) {
+      protected void OnItemClicked(object sender, WallItem e) {
          ItemClicked?.Invoke(this, e);
       }
    }

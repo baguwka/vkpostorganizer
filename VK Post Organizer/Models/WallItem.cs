@@ -10,7 +10,7 @@ namespace vk.Models {
 
       public ICommand ClickCommand { get; set; }
 
-      public Action<WallItem> ClickHandler { get; set; }
+      public event EventHandler<WallItem> Clicked;
 
       public IWallHolder WallHolder {
          get { return _wallHolder; }
@@ -23,11 +23,11 @@ namespace vk.Models {
          }
 
          WallHolder = wallHolder;
-         ClickCommand = new DelegateCommand(clickCommandExecute);
+         ClickCommand = new DelegateCommand(() => OnClicked(this));
       }
 
-      private void clickCommandExecute() {
-         ClickHandler?.Invoke(this);
+      protected virtual void OnClicked(WallItem e) {
+         Clicked?.Invoke(this, e);
       }
    }
 }

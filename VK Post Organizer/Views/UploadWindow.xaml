@@ -1,0 +1,36 @@
+﻿<Window x:Class="vk.Views.UploadWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:dd="urn:gong-wpf-dragdrop"
+        xmlns:vm="clr-namespace:vk.ViewModels"
+        xmlns:local="clr-namespace:vk.Views"
+        mc:Ignorable="d"
+        Icon="/Resources/32x32.ico"
+        WindowStartupLocation="CenterScreen"
+        Title="Upload" 
+        MinHeight="500" MinWidth="500"
+        Height="500"
+        Width="500"
+        Background="#edeef0">
+    <Window.DataContext>
+        <vm:UploadVM/>
+    </Window.DataContext>
+    <Grid>
+        <ListBox 
+            Height="200"
+            Width="200"
+            dd:DragDrop.IsDragSource="True" 
+                 dd:DragDrop.IsDropTarget="True" 
+                 dd:DragDrop.DropHandler="{Binding}">
+            <ListBoxItem Content="test subject 1"></ListBoxItem>
+            <ListBoxItem Content="test subject 2"></ListBoxItem>
+            <ListBoxItem Content="test subject 3"></ListBoxItem>
+            <ListBoxItem Content="test subject 4"></ListBoxItem>
+            <ListBoxItem Content="test subject 5"></ListBoxItem>
+            <ListBoxItem Content="test subject 6"></ListBoxItem>
+            <ListBoxItem Content="test subject 7"></ListBoxItem>
+        </ListBox>
+    </Grid>
+</Window>

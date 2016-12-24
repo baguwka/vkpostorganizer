@@ -1,15 +1,20 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Data_Persistence_Provider;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
 using Microsoft.Practices.Unity;
+using Utilities;
 using vk.Models;
 using vk.Models.VkApi;
 using vk.Models.VkApi.Entities;
+using vk.Utils;
 using vk.Views;
 
 namespace vk.ViewModels {
@@ -17,19 +22,50 @@ namespace vk.ViewModels {
       private string _content;
       private ImageSource _profilePhoto;
       private bool _isAuthorized;
-      private bool _isGroupSelected;
+      private bool _isWallShowing;
+      private PostType _currentPostTypeFilter;
+      private bool _canTestPost;
+      private int _testingGroup;
+      private int _missingPosts;
+      private int _postCount;
+      private int _repostCount;
+      private int _totalPostCount;
+      private string _infoPanel;
 
-      public WallList WallList { get; }
-      public WallInfo WallInfo { get; }
+      public WallList ListOfAvaliableWalls { get; }
+      public WallVM Wall { get; }
 
       private const string DEFAULT_AVATAR =
          "pack://application:,,,/VKPostOrganizer;component/Resources/default_avatar.png";
 
-      public ICommand ConfigureContentCommand { get; set; }
+      public ICommand ConfigureScheduleCommand { get; set; }
       public ICommand BackCommand { get; set; }
+      public ICommand RefreshCommand { get; set; }
+      public ICommand TestPostCommand { get; set; }
       public ICommand AuthorizeCommand { get; set; }
+      public ICommand ApplyScheduleCommand { get; set; }
 
       public ICommand LogOutCommand { get; set; }
+
+      public IEnumerable<ValueDescription> PostTypes => EnumHelper.GetAllValuesAndDescriptions<PostType>();
+
+      public PostType CurrentPostTypeFilter {
+         get { return _currentPostTypeFilter; }
+         set {
+            SetProperty(ref _currentPostTypeFilter, value);
+            applyFilter(_currentPostTypeFilter);
+         }
+      }
+
+      public int TestingGroup {
+         get { return _testingGroup; }
+         set { SetProperty(ref _testingGroup, value); }
+      }
+
+      public bool CanTestPost {
+         get { return _canTestPost; }
+         set { SetProperty(ref _canTestPost, value); }
+      }
 
       public string Content {
          get { return _content; }
@@ -46,41 +82,140 @@ namespace vk.ViewModels {
          set { SetProperty(ref _isAuthorized, value); }
       }
 
-      public bool IsGroupSelected {
-         get { return _isGroupSelected; }
-         set { SetProperty(ref _isGroupSelected, value); }
+      public bool IsWallShowing {
+         get { return _isWallShowing; }
+         set {
+            SetProperty(ref _isWallShowing, value);
+            if (value == false) {
+               CanTestPost = false;
+            }
+         }
       }
 
+      public int TotalPostCount {
+         get { return _totalPostCount; }
+         set { SetProperty(ref _totalPostCount, value); }
+      }
+
+      public int RepostCount {
+         get { return _repostCount; }
+         set { SetProperty(ref _repostCount, value); }
+      }
+
+      public int PostCount {
+         get { return _postCount; }
+         set { SetProperty(ref _postCount, value); }
+      }
+
+      public int MissingPosts {
+         get { return _missingPosts; }
+         set { SetProperty(ref _missingPosts, value); }
+      }
+
+      public string InfoPanel {
+         get { return _infoPanel; }
+         set { SetProperty(ref _infoPanel, value); }
+      }
+
+
       public MainVM() {
-         ConfigureContentCommand = new DelegateCommand(configureContentCommandExecute);
+         ConfigureScheduleCommand = new DelegateCommand(configureScheduleCommandExecute);
          BackCommand = new DelegateCommand(backCommandExecute);
+         RefreshCommand = new DelegateCommand(refreshCommandExecute);
          AuthorizeCommand = new DelegateCommand(authorizeCommandExecute);
+         TestPostCommand = new DelegateCommand(testPostCommandExecute);
 
          LogOutCommand = new DelegateCommand(logOutCommandExecute);
 
-         WallList = App.Container.Resolve<WallList>();
-         WallInfo = App.Container.Resolve<WallInfo>();
+         ApplyScheduleCommand = new DelegateCommand(applyScheduleCommandExecute);
 
-         WallList.ItemClicked += onGroupItemClicked;
+         ListOfAvaliableWalls = App.Container.Resolve<WallList>();
+         Wall = App.Container.Resolve<WallVM>();
+
+         Wall.Items.CollectionChanged += (sender, args) => {
+            var realPosts = Wall.Items.Where(post => post.IsExisting).ToList();
+            TotalPostCount = realPosts.Count();
+            RepostCount = realPosts.Count(post => post.PostType == PostType.Repost);
+            PostCount = realPosts.Count(post => post.PostType == PostType.Post);
+            MissingPosts = Wall.Items.Count(post => post.PostType == PostType.Missing);
+
+            InfoPanel = $"Total: {TotalPostCount} ({TotalPostCount + MissingPosts})\nPosts: {PostCount}\nReposts: {RepostCount}\nMissing {MissingPosts}";
+         };
+
+         ListOfAvaliableWalls.ItemClicked += onGroupItemClicked;
+
+         CurrentPostTypeFilter = PostType.All;
+
+         CurrentSchedule = new Schedule();
+      }
+
+      private void applyScheduleCommandExecute() {
+         Wall?.PullWithScheduleHightlight(CurrentPostTypeFilter.GetFilter(), CurrentSchedule);
+      }
+
+
+      public Schedule CurrentSchedule { get; set; }
+
+
+      private void testPostCommandExecute() {
+         var upload = new UploadWindow(Wall.Items, null);
+         upload.ShowDialog();
+
+         //if (TestingGroup != Wall.WallHolder.ID) {
+         //   var groupsGet = App.Container.Resolve<GroupsGetById>();
+         //   var response = groupsGet.Get(TestingGroup);
+         //   var group = response.Response.FirstOrDefault();
+
+         //   MessageBox.Show($"You're only available to post in \"{group?.Name}\" wall in testing purposes.", "Cant post here",
+         //      MessageBoxButton.OK, MessageBoxImage.Error);
+         //   return;
+         //}
+
+         //var wallPost = App.Container.Resolve<WallPost>();
+
+         //try {
+         //   var date = new DateTime(2016, 12, 22, 18, 30, 0);
+         //   for (int i = 0; i < 150; i++) {
+         //      date = date.AddHours(1);
+         //      var unixTimestamp = UnixTimeConverter.ToUnix(date);
+         //      var post = wallPost.Post(Wall.WallHolder.ID, $"Тестовая пустая отложка номер {i}", false, true, unixTimestamp);
+         //   }
+
+         //   refreshCommandExecute();
+         //}
+         //catch (VkException ex) {
+         //   MessageBox.Show(ex.Message);
+         //}
+      }
+
+      private void applyFilter(PostType currentPostTypeFilter) {
+         if (!IsWallShowing) return;
+
+         Wall?.PullWithScheduleHightlight(currentPostTypeFilter.GetFilter(), CurrentSchedule);
       }
 
       private void onGroupItemClicked(object sender, WallItem wallItem) {
-         IsGroupSelected = true;
+         IsWallShowing = true;
+         CanTestPost = TestingGroup == wallItem.WallHolder.ID;
+
          try {
-            WallInfo.Load(wallItem.WallHolder);
+            Wall.PullWithScheduleHightlight(wallItem.WallHolder, CurrentPostTypeFilter.GetFilter(), CurrentSchedule);
          }
          catch (VkException ex) {
-            IsGroupSelected = false;
+            IsWallShowing = false;
+
             MessageBox.Show(ex.Message, "Error occured", MessageBoxButton.OK, MessageBoxImage.Error);
          }
       }
 
-      private void configureContentCommandExecute() {
-         var configureContentView = new ConfigureContentView();
+      private void configureScheduleCommandExecute() {
+         var configureContentView = new ScheduleWindow();
          configureContentView.ShowDialog();
       }
 
-      private void fillGroupCollection() {
+      private void fillWallList() {
+         if (!IsAuthorized) return;
+
          var methodGroupsGet = App.Container.Resolve<GroupsGet>();
          var groups = methodGroupsGet.Get().Collection;
          if (groups == null) {
@@ -88,21 +223,37 @@ namespace vk.ViewModels {
             return;
          }
 
-         WallList.Clear();
+         ListOfAvaliableWalls.Clear();
 
          var userget = App.Container.Resolve<UsersGet>();
-         var user = userget.Get();
-         
-         WallList.Add(WallList.InstantiateItem(user.Users[0]));
+         var user = userget.Get().Users[0];
+
+         //todo: get rid of workaround
+         var item = new WallItem(new EmptyWallHolder {
+            Name = user.Name, Description = user.Description, Photo200 = user.Photo200, Photo50 = user.Photo50
+         });
+
+         ListOfAvaliableWalls.Add(item);
 
          foreach (var group in groups.Groups) {
-            WallList.Add(WallList.InstantiateItem(group));
+            ListOfAvaliableWalls.Add(new WallItem(group));
          }
       }
 
       private void backCommandExecute() {
-         IsGroupSelected = false;
-         WallInfo.Clear();
+         IsWallShowing = false;
+         Wall.Clear();
+      }
+
+      private void refreshCommandExecute() {
+         if (!IsAuthorized) return;
+         Messenger.Broadcast("Refresh");
+         if (IsWallShowing) {
+            Wall.PullWithScheduleHightlight(CurrentPostTypeFilter.GetFilter(), CurrentSchedule);
+         }
+         else {
+            fillWallList();
+         }
       }
 
       private void authorizeIfAlreadyLoggined() {
@@ -111,33 +262,57 @@ namespace vk.ViewModels {
             var values = cookies.Split(';');
 
             if (values.Where(s => s.IndexOf('=') > 0).Any(s => s.Substring(0, s.IndexOf('=')).Trim() == "remixsid")) {
-               Authorize();
+               Authorize(false);
             }
          }
       }
 
-      public void Authorize() {
+      public void Authorize(bool clearCookies) {
          var accessToken = new AccessToken();
          App.Container.RegisterInstance(accessToken);
-         var authWindow = new AuthView(accessToken);
+         var authWindow = new AuthView(accessToken, clearCookies);
          authWindow.ShowDialog();
 
-         var methodUsersGet = App.Container.Resolve<UsersGet>();
-         var user = methodUsersGet.Get().Users.First();
+         if (string.IsNullOrEmpty(accessToken.Token)) {
+            MessageBox.Show("No access token aquired", "Error while authorization occured", MessageBoxButton.OK,
+               MessageBoxImage.Error);
+            IsAuthorized = false;
+            return;
+         }
 
-         Content = $"You logged as\n{user.FirstName} {user.LastName}";
-         SetUpAvatar(user.Photo50);
+         try {
+            var methodUsersGet = App.Container.Resolve<UsersGet>();
+            var users = methodUsersGet.Get();
 
-         IsAuthorized = true;
+            var user = users.Users.FirstOrDefault();
+            if (user == null) {
+               MessageBox.Show("Cant find user", "Error while authoriazation occured", MessageBoxButton.OK, MessageBoxImage.Error);
+               IsAuthorized = false;
+               return;
+            }
 
-         fillGroupCollection();
+            Content = $"You logged as\n{user.FirstName} {user.LastName}";
+            SetUpAvatar(user.Photo50);
+
+            IsAuthorized = true;
+
+            fillWallList();
+         }
+         catch (VkException ex) {
+            MessageBox.Show(ex.Message, $"Error while authoriazation occured\n{ex.Message}", MessageBoxButton.OK, MessageBoxImage.Error);
+            IsAuthorized = false;
+         }
       }
 
       public void Deauthorize() {
-         WallList.Clear();
+         IsWallShowing = false;
+         ListOfAvaliableWalls.Clear();
          IsAuthorized = false;
          Content = "";
          SetUpAvatar(DEFAULT_AVATAR);
+
+         var accessToken = new AccessToken();
+         App.Container.RegisterInstance(accessToken);
 
          var expiration = DateTime.UtcNow - TimeSpan.FromDays(1);
          string cookie = $"remixsid=; expires={expiration.ToString("R")}; path=/; domain=.vk.com";
@@ -155,7 +330,17 @@ namespace vk.ViewModels {
       }
 
       private void authorizeCommandExecute() {
-         Authorize();
+         Authorize(true);
+      }
+
+      public void ImportFiles(IEnumerable<string> files) {
+         //var sb = new StringBuilder();
+         //foreach (var file in files) {
+         //   sb.AppendLine(file);
+         //}
+         var upload = new UploadWindow(Wall.Items, files);
+         upload.ShowDialog();
+         //MessageBox.Show($"Importing\n{sb}");
       }
 
       private void logOutCommandExecute() {
@@ -167,17 +352,30 @@ namespace vk.ViewModels {
       }
 
       public void OnLoad() {
+         MainVMSaveInfo data;
+         if (SaveLoaderHelper.TryLoad("MainVM", out data)) {
+            TestingGroup = data.TestingGroup;
+         }
+
          SetUpAvatar(DEFAULT_AVATAR);
 
          authorizeIfAlreadyLoggined();
       }
 
       public void OnClosing() {
-         throw new NotImplementedException();
+         SaveLoaderHelper.Save("MainVM", new MainVMSaveInfo(TestingGroup));
       }
 
       public void OnClosed() {
-         throw new NotImplementedException();
       }
+   }
+
+   [Serializable]
+   public class MainVMSaveInfo : CommonSaveData {
+      public MainVMSaveInfo(int testingGroup) {
+         TestingGroup = testingGroup;
+      }
+
+      public int TestingGroup { get; set; }
    }
 }
