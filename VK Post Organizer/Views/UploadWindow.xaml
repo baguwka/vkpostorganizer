@@ -14,11 +14,11 @@
         Height="500"
         Width="500"
         Background="#edeef0">
-    <Window.DataContext>
+    <!--<Window.DataContext>
         <vm:UploadVM/>
-    </Window.DataContext>
+    </Window.DataContext>-->
     <Grid>
-        <ListBox 
+        <!--<ListBox 
             Height="200"
             Width="200"
             dd:DragDrop.IsDragSource="True" 
@@ -31,6 +31,6 @@
             <ListBoxItem Content="test subject 5"></ListBoxItem>
             <ListBoxItem Content="test subject 6"></ListBoxItem>
             <ListBoxItem Content="test subject 7"></ListBoxItem>
-        </ListBox>
+        </ListBox>-->
     </Grid>
 </Window>
