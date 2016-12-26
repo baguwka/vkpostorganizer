@@ -8,29 +8,53 @@
         xmlns:local="clr-namespace:vk.Views"
         mc:Ignorable="d"
         Icon="/Resources/32x32.ico"
+        
+        AllowDrop="True"
+        Drop="UploadWindow_OnDrop"
+        
         WindowStartupLocation="CenterScreen"
         Title="Upload" 
         MinHeight="500" MinWidth="500"
         Height="500"
         Width="500"
         Background="#edeef0">
-    <!--<Window.DataContext>
+    <Window.DataContext>
         <vm:UploadVM/>
-    </Window.DataContext>-->
+    </Window.DataContext>
     <Grid>
-        <!--<ListBox 
+        <StackPanel Orientation="Horizontal">
+            <ListBox 
             Height="200"
             Width="200"
+            AllowDrop="True"
+                Drop="UploadWindow_OnDrop"
             dd:DragDrop.IsDragSource="True" 
                  dd:DragDrop.IsDropTarget="True" 
-                 dd:DragDrop.DropHandler="{Binding}">
-            <ListBoxItem Content="test subject 1"></ListBoxItem>
-            <ListBoxItem Content="test subject 2"></ListBoxItem>
-            <ListBoxItem Content="test subject 3"></ListBoxItem>
-            <ListBoxItem Content="test subject 4"></ListBoxItem>
-            <ListBoxItem Content="test subject 5"></ListBoxItem>
-            <ListBoxItem Content="test subject 6"></ListBoxItem>
-            <ListBoxItem Content="test subject 7"></ListBoxItem>
-        </ListBox>-->
+                 dd:DragDrop.DropHandler="{Binding}"
+            ItemsSource="{Binding Slots}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Post.DateString}"></TextBlock>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <ListBox 
+            Height="200"
+            Width="200"
+            AllowDrop="True"
+                Drop="UploadWindow_OnDrop"
+            dd:DragDrop.IsDragSource="True" 
+                 dd:DragDrop.IsDropTarget="True" 
+                 dd:DragDrop.DropHandler="{Binding}"
+            ItemsSource="{Binding Files}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}"></TextBlock>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <Button Command="{Binding OpenFilesCommand}" Content="open files"></Button>
+        </StackPanel>
     </Grid>
 </Window>

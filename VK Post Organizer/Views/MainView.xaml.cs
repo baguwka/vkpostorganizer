@@ -35,13 +35,6 @@ namespace vk.Views {
 
       private void onInitialized(object sender, EventArgs e) {
       }
-
-      private void onDrop(object sender, DragEventArgs e) {
-         if (e.Data.GetDataPresent(DataFormats.FileDrop)) {
-            var files = (string[])e.Data.GetData(DataFormats.FileDrop);
-            ((MainVM)getViewModel).ImportFiles(files);
-         }
-      }
    }
 
    [Serializable]

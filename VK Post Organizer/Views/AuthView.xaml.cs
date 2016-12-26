@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Reflection;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Navigation;
 using JetBrains.Annotations;
 using vk.Models.VkApi;
@@ -16,6 +18,7 @@ namespace vk.Views {
 
       public AuthView([NotNull] AccessToken token, bool clearCookies) {
          InitializeComponent();
+         HideScriptErrors(InternalWebBrowser, true);
          _token = token;
 
          Loaded += (sender, args) => {
@@ -33,6 +36,17 @@ namespace vk.Views {
          };
 
          Closing += (sender, args) => InternalWebBrowser.MessageHook -= internalWebBrowserOnMessageHook;
+      }
+
+      public static void HideScriptErrors(WebBrowser wb, bool hide) {
+         var fiComWebBrowser = typeof(WebBrowser).GetField("_axIWebBrowser2", BindingFlags.Instance | BindingFlags.NonPublic);
+         if (fiComWebBrowser == null) return;
+         var objComWebBrowser = fiComWebBrowser.GetValue(wb);
+         if (objComWebBrowser == null) {
+            wb.Loaded += (o, s) => HideScriptErrors(wb, hide); //In case we are to early
+            return;
+         }
+         objComWebBrowser.GetType().InvokeMember("Silent", BindingFlags.SetProperty, null, objComWebBrowser, new object[] { hide });
       }
 
       private static void deleteCookies() {

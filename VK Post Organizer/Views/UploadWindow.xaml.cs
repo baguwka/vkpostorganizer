@@ -5,23 +5,47 @@ using JetBrains.Annotations;
 using vk.ViewModels;
 
 namespace vk.Views {
+   public class UploadInfo {
+      [NotNull]
+      public IEnumerable<PostControl> Slots { get; private set; }
+
+      [NotNull]
+      public IEnumerable<string> Files { get; private set; }
+
+      public int WallID { get; private set; }
+
+      public UploadInfo([NotNull] IEnumerable<PostControl> slots, [CanBeNull] IEnumerable<string> files, int wallID) {
+         if (slots == null) {
+            throw new ArgumentNullException(nameof(slots));
+         }
+
+         Slots = slots;
+         Files = files ?? new List<string>();
+         WallID = wallID;
+      }
+   }
+
    /// <summary>
    /// Interaction logic for UploadWindow.xaml
    /// </summary>
    public partial class UploadWindow : Window {
       private IVM getViewModel => (IVM)DataContext;
 
-
-      public UploadWindow([NotNull] IEnumerable<PostControl> slots, [CanBeNull] IEnumerable<string> files) {
-         if (slots == null) {
-            throw new ArgumentNullException(nameof(slots));
+      public UploadWindow([NotNull] UploadInfo info) {
+         if (info == null) {
+            throw new ArgumentNullException(nameof(info));
          }
 
          InitializeComponent();
 
-         //var vm = (UploadVM)getViewModel;
+         var vm = (UploadVM)getViewModel;
+         vm.PrepareImages(info);
+      }
 
-         //vm.PrepareImages(slots, files);
+      private void UploadWindow_OnDrop(object sender, DragEventArgs e) {
+         var files = (string[])e.Data.GetData(DataFormats.FileDrop);
+         ((UploadVM)getViewModel).ImportFiles(files);
+         e.Handled = true;
       }
    }
 }

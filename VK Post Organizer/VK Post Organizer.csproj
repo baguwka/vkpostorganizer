@@ -76,9 +76,19 @@
   <PropertyGroup>
     <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>VK Post Organizer_TemporaryKey.pfx</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Data Persistence Provider">
       <HintPath>..\packages\Data Persistence Provider.dll</HintPath>
+    </Reference>
+    <Reference Include="GongSolutions.Wpf.DragDrop, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\gong-wpf-dragdrop.1.0.0\lib\net45\GongSolutions.Wpf.DragDrop.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="JetBrains.Annotations, Version=10.2.1.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <HintPath>..\packages\JetBrains.Annotations.10.2.1\lib\net\JetBrains.Annotations.dll</HintPath>
@@ -141,7 +151,13 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Converter\PostMarkToColorConverter.cs" />
+    <Compile Include="Converter\PostTypeToBoolConverter.cs" />
+    <Compile Include="Converter\PostTypeToVisibilityConverter.cs" />
     <Compile Include="Models\AppDataFolderProvider.cs" />
+    <Compile Include="Models\Files\ExtensionChecker.cs" />
+    <Compile Include="Models\Files\FileFilter.cs" />
+    <Compile Include="Utils\GroupNameCache.cs" />
+    <Compile Include="Models\Files\ImageExtensionChecker.cs" />
     <Compile Include="Models\UrlHelper\DocumentPreviewUrlObtainer.cs" />
     <Compile Include="Models\UrlHelper\PhotoUrlObtainer.cs" />
     <Compile Include="Models\VkApi\Entities\Document.cs" />
@@ -270,9 +286,7 @@
   <ItemGroup>
     <Resource Include="Resources\default_avatar.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Models\DataPersistance\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Resource Include="Resources\16x16 icon.ico" />
   </ItemGroup>

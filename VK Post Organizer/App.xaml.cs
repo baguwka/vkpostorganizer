@@ -1,7 +1,10 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
+using System.Windows.Threading;
 using Data_Persistence_Provider;
 using Microsoft.Practices.Unity;
 using vk.Models;
+using vk.Models.Files;
 using vk.Views;
 
 namespace vk {
@@ -15,6 +18,9 @@ namespace vk {
       }
 
       private void CompositionRoot(object sender, StartupEventArgs e) {
+         Current.DispatcherUnhandledException += CurrentOnDispatcherUnhandledException;
+         Current.ShutdownMode = ShutdownMode.OnMainWindowClose;
+
          Container = new UnityContainer();
 
          Container.RegisterType<ISerializer, SaveLoadJsonSerializer>();
@@ -25,8 +31,21 @@ namespace vk {
          Container.RegisterType<IWallHolder, EmptyWallHolder>();
          Container.RegisterType<EmptyWallHolder>(new ContainerControlledLifetimeManager());
 
+         Container.RegisterType<ImageExtensionChecker>(new ContainerControlledLifetimeManager());
+
          var window = new MainView();
          window.Show();
+      }
+
+      private void CurrentOnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e) {
+         MessageBox.Show($"{e.Exception.Message}\n\n See dump at Windows Application Event Log.\nStack Trace:{e.Exception.StackTrace}", 
+            "Exception occured", MessageBoxButton.OK, MessageBoxImage.Error);
+
+#if !DEBUG
+         e.Handled = true;
+#endif
+
+         Environment.FailFast("Exception occured", e.Exception);
       }
    }
 }

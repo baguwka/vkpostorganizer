@@ -6,6 +6,7 @@ using Microsoft.Practices.Prism.Mvvm;
 using vk.Models;
 using vk.Models.UrlHelper;
 using vk.Models.VkApi.Entities;
+using vk.Utils;
 
 namespace vk.ViewModels {
    public class PostControl : BindableBase {
@@ -29,6 +30,7 @@ namespace vk.ViewModels {
          set { SetProperty(ref _mark, value); }
       }
 
+      public ICommand OpenPost { get; set; }
       public ICommand ExpandToggleCommand { get; set; }
 
       public bool IsExisting { get; set; }
@@ -57,6 +59,7 @@ namespace vk.ViewModels {
          Post = post;
 
          ExpandToggleCommand = new DelegateCommand(ExpandToggle);
+         OpenPost = new DelegateCommand(openPostCommand);
 
          var prev = Post.CopyHistory?.FirstOrDefault();
          if (prev == null) {
@@ -65,12 +68,18 @@ namespace vk.ViewModels {
             return;
          }
 
+         var groupName = GroupNameCache.GetGroupName(prev.OwnerId);
+
          PostType = PostType.Repost;
          Post.ID = prev.ID;
-         Post.Text = prev.Text;
+         Post.Text = $"{groupName.Substring(0, 10)} {prev.Text}";
          Post.Attachments = prev.Attachments;
 
          loadImages();
+      }
+
+      private void openPostCommand() {
+         System.Diagnostics.Process.Start($"https://vk.com/wall{Post.OwnerId}_{Post.ID}");
       }
 
       private void ExpandToggle() {

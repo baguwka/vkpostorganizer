@@ -12,6 +12,7 @@ using Microsoft.Practices.Prism.Mvvm;
 using Microsoft.Practices.Unity;
 using Utilities;
 using vk.Models;
+using vk.Models.Files;
 using vk.Models.VkApi;
 using vk.Models.VkApi.Entities;
 using vk.Utils;
@@ -41,7 +42,7 @@ namespace vk.ViewModels {
       public ICommand ConfigureScheduleCommand { get; set; }
       public ICommand BackCommand { get; set; }
       public ICommand RefreshCommand { get; set; }
-      public ICommand TestPostCommand { get; set; }
+      public ICommand UploadCommand { get; set; }
       public ICommand AuthorizeCommand { get; set; }
       public ICommand ApplyScheduleCommand { get; set; }
 
@@ -123,7 +124,7 @@ namespace vk.ViewModels {
          BackCommand = new DelegateCommand(backCommandExecute);
          RefreshCommand = new DelegateCommand(refreshCommandExecute);
          AuthorizeCommand = new DelegateCommand(authorizeCommandExecute);
-         TestPostCommand = new DelegateCommand(testPostCommandExecute);
+         UploadCommand = new DelegateCommand(uploadCommandExecute);
 
          LogOutCommand = new DelegateCommand(logOutCommandExecute);
 
@@ -157,35 +158,23 @@ namespace vk.ViewModels {
       public Schedule CurrentSchedule { get; set; }
 
 
-      private void testPostCommandExecute() {
-         var upload = new UploadWindow(Wall.Items, null);
+      public bool IsUploadAllowed() {
+         if (TestingGroup != Wall.WallHolder.ID) {
+            MessageBox.Show($"You're only available to post in \"{GroupNameCache.GetGroupName(TestingGroup)}\" wall in safety purposes.", "Cant upload here",
+               MessageBoxButton.OK, MessageBoxImage.Error);
+            
+            return false;
+         }
+         return true;
+      }
+
+      private void uploadCommandExecute() {
+         if (IsUploadAllowed() == false) {
+            return;
+         }
+
+         var upload = new UploadWindow(new UploadInfo(Wall.Items, null, Wall.WallHolder.ID));
          upload.ShowDialog();
-
-         //if (TestingGroup != Wall.WallHolder.ID) {
-         //   var groupsGet = App.Container.Resolve<GroupsGetById>();
-         //   var response = groupsGet.Get(TestingGroup);
-         //   var group = response.Response.FirstOrDefault();
-
-         //   MessageBox.Show($"You're only available to post in \"{group?.Name}\" wall in testing purposes.", "Cant post here",
-         //      MessageBoxButton.OK, MessageBoxImage.Error);
-         //   return;
-         //}
-
-         //var wallPost = App.Container.Resolve<WallPost>();
-
-         //try {
-         //   var date = new DateTime(2016, 12, 22, 18, 30, 0);
-         //   for (int i = 0; i < 150; i++) {
-         //      date = date.AddHours(1);
-         //      var unixTimestamp = UnixTimeConverter.ToUnix(date);
-         //      var post = wallPost.Post(Wall.WallHolder.ID, $"Тестовая пустая отложка номер {i}", false, true, unixTimestamp);
-         //   }
-
-         //   refreshCommandExecute();
-         //}
-         //catch (VkException ex) {
-         //   MessageBox.Show(ex.Message);
-         //}
       }
 
       private void applyFilter(PostType currentPostTypeFilter) {
@@ -336,16 +325,6 @@ namespace vk.ViewModels {
 
       private void authorizeCommandExecute() {
          Authorize(true);
-      }
-
-      public void ImportFiles(IEnumerable<string> files) {
-         //var sb = new StringBuilder();
-         //foreach (var file in files) {
-         //   sb.AppendLine(file);
-         //}
-         var upload = new UploadWindow(Wall.Items, files);
-         upload.ShowDialog();
-         //MessageBox.Show($"Importing\n{sb}");
       }
 
       private void logOutCommandExecute() {
