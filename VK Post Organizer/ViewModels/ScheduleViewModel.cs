@@ -6,7 +6,7 @@ using Microsoft.Practices.Prism.Mvvm;
 using vk.Models;
 
 namespace vk.ViewModels {
-   public class ScheduleVM : BindableBase, IVM {
+   public class ScheduleViewModel : BindableBase, IViewModel {
       private bool _isAnyItemSelected;
       private ScheduleItem _selectedItem;
       private ScheduleItem _editableItem;
@@ -41,7 +41,7 @@ namespace vk.ViewModels {
       public static IEnumerable<int> Hours => Enumerable.Range(0, 24);
       public static IEnumerable<int> Minutes => Enumerable.Range(0, 60);
 
-      public ScheduleVM() {
+      public ScheduleViewModel() {
          EditableItem = new ScheduleItem(12, 00);
 
          Items = new SmartCollection<ScheduleItem>();

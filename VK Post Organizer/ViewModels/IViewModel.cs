@@ -1,5 +1,5 @@
 ﻿namespace vk.ViewModels {
-   public interface IVM {
+   public interface IViewModel {
       void OnLoad();
       void OnClosing();
       void OnClosed();

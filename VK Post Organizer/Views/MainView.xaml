@@ -16,7 +16,7 @@
         Loaded="onLoaded"
         Closing="onClosing" Background="#edeef0">
     <Window.DataContext>
-        <vm:MainVM/>
+        <vm:MainViewModel/>
     </Window.DataContext>
     
     <Grid Margin="10">
@@ -160,10 +160,10 @@
                 <Button Margin="5,0,5,0" Height="25" Grid.Column="1" Content="Refresh" Style="{StaticResource VkCommon}" Command="{Binding RefreshCommand}"
                         Visibility="{Binding IsAuthorized, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}"/>
                 
-                <!--<Button Margin="5,0,5,0" Height="25" Visibility="{Binding IsWallShowing, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}"
+                <Button Margin="5,0,5,0" Height="25" Visibility="{Binding IsWallShowing, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}"
                 Grid.Column="2" Content="Upload" Style="{StaticResource VkBlue}" Command="{Binding UploadCommand}"/>
                 
-                <TextBox Margin="5,0,5,0" Grid.Column="3" VerticalContentAlignment="Center" Style="{StaticResource VkTextBox}" Text="{Binding TestingGroup, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>-->
+                <TextBox Margin="5,0,5,0" Grid.Column="3" VerticalContentAlignment="Center" Style="{StaticResource VkTextBox}" Text="{Binding TestingGroup, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
             </Grid>
         </Border>
     </Grid>

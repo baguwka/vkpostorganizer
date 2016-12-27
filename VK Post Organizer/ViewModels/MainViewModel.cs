@@ -19,7 +19,7 @@ using vk.Utils;
 using vk.Views;
 
 namespace vk.ViewModels {
-   class MainVM : BindableBase, IVM {
+   class MainViewModel : BindableBase, IViewModel {
       private string _content;
       private ImageSource _profilePhoto;
       private bool _isAuthorized;
@@ -34,7 +34,7 @@ namespace vk.ViewModels {
       private string _infoPanel;
 
       public WallList ListOfAvaliableWalls { get; }
-      public WallVM Wall { get; }
+      public WallVewModel Wall { get; }
 
       private const string DEFAULT_AVATAR =
          "pack://application:,,,/VKPostOrganizer;component/Resources/default_avatar.png";
@@ -119,7 +119,7 @@ namespace vk.ViewModels {
       }
 
 
-      public MainVM() {
+      public MainViewModel() {
          ConfigureScheduleCommand = new DelegateCommand(configureScheduleCommandExecute);
          BackCommand = new DelegateCommand(backCommandExecute);
          RefreshCommand = new DelegateCommand(refreshCommandExecute);
@@ -131,7 +131,7 @@ namespace vk.ViewModels {
          ApplyScheduleCommand = new DelegateCommand(applyScheduleCommandExecute);
 
          ListOfAvaliableWalls = App.Container.Resolve<WallList>();
-         Wall = App.Container.Resolve<WallVM>();
+         Wall = App.Container.Resolve<WallVewModel>();
 
          Wall.Items.CollectionChanged += (sender, args) => {
             var realPosts = Wall.Items.Where(post => post.IsExisting).ToList();

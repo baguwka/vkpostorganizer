@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using System.Windows.Input;
 using GongSolutions.Wpf.DragDrop;
 using Microsoft.Practices.Prism.Commands;
@@ -11,7 +10,7 @@ using vk.Models.Files;
 using vk.Views;
 
 namespace vk.ViewModels {
-   public class UploadVM : BindableBase, IVM, IDropTarget {
+   public class UploadViewModel : BindableBase, IViewModel, IDropTarget {
       public ICommand UploadCommand { get; set; }
       public ICommand OpenFilesCommand { get; set; }
 
@@ -31,7 +30,7 @@ namespace vk.ViewModels {
          Files.AddRange(filter.FilterOut(files));
       }
 
-      public UploadVM() {
+      public UploadViewModel() {
          Slots = new SmartCollection<PostControl>();
          Files = new SmartCollection<string>();
 
@@ -68,9 +67,11 @@ namespace vk.ViewModels {
       }
 
       public void DragOver(IDropInfo dropInfo) {
+
       }
 
       public void Drop(IDropInfo dropInfo) {
+
       }
 
 
@@ -99,5 +100,9 @@ namespace vk.ViewModels {
       //catch (VkException ex) {
       //   MessageBox.Show(ex.Message);
       //}
+   }
+
+   public class UploadSlotItem {
+      
    }
 }

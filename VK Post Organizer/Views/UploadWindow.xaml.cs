@@ -29,7 +29,7 @@ namespace vk.Views {
    /// Interaction logic for UploadWindow.xaml
    /// </summary>
    public partial class UploadWindow : Window {
-      private IVM getViewModel => (IVM)DataContext;
+      private IViewModel getViewModel => (IViewModel)DataContext;
 
       public UploadWindow([NotNull] UploadInfo info) {
          if (info == null) {
@@ -38,13 +38,13 @@ namespace vk.Views {
 
          InitializeComponent();
 
-         var vm = (UploadVM)getViewModel;
+         var vm = (UploadViewModel)getViewModel;
          vm.PrepareImages(info);
       }
 
       private void UploadWindow_OnDrop(object sender, DragEventArgs e) {
          var files = (string[])e.Data.GetData(DataFormats.FileDrop);
-         ((UploadVM)getViewModel).ImportFiles(files);
+         ((UploadViewModel)getViewModel).ImportFiles(files);
          e.Handled = true;
       }
    }

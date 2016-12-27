@@ -6,7 +6,7 @@ using vk.ViewModels;
 
 namespace vk.Views {
    public partial class MainView : Window {
-      private IVM getViewModel => (IVM)DataContext;
+      private IViewModel getViewModel => (IViewModel)DataContext;
 
       public MainView() {
          InitializeComponent();

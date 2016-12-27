@@ -19,7 +19,7 @@
         Width="500"
         Background="#edeef0">
     <Window.DataContext>
-        <vm:UploadVM/>
+        <vm:UploadViewModel/>
     </Window.DataContext>
     <Grid>
         <StackPanel Orientation="Horizontal">

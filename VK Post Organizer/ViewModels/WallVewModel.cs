@@ -15,11 +15,11 @@ using vk.Utils;
 
 namespace vk.ViewModels {
    [UsedImplicitly]
-   public class WallVM : BindableBase {
+   public class WallVewModel : BindableBase {
       private IWallHolder _wallHolder;
       private SmartCollection<PostControl> _items;
 
-      public WallVM([NotNull] IWallHolder wallHolder) {
+      public WallVewModel([NotNull] IWallHolder wallHolder) {
          if (wallHolder == null) {
             throw new ArgumentNullException(nameof(wallHolder));
          }
