@@ -7,21 +7,18 @@ using vk.ViewModels;
 namespace vk.Views {
    public class UploadInfo {
       [NotNull]
-      public IEnumerable<PostControl> Slots { get; private set; }
+      public WallControl Wall { get; private set; }
 
       [NotNull]
       public IEnumerable<string> Files { get; private set; }
 
-      public int WallID { get; private set; }
-
-      public UploadInfo([NotNull] IEnumerable<PostControl> slots, [CanBeNull] IEnumerable<string> files, int wallID) {
-         if (slots == null) {
-            throw new ArgumentNullException(nameof(slots));
+      public UploadInfo([NotNull] WallControl wall, [CanBeNull] IEnumerable<string> files) {
+         if (wall == null) {
+            throw new ArgumentNullException(nameof(wall));
          }
 
-         Slots = slots;
+         Wall = wall;
          Files = files ?? new List<string>();
-         WallID = wallID;
       }
    }
 
@@ -43,6 +40,16 @@ namespace vk.Views {
       }
 
       private void UploadWindow_OnDrop(object sender, DragEventArgs e) {
+         var files = (string[])e.Data.GetData(DataFormats.FileDrop);
+         ((UploadViewModel)getViewModel).ImportFiles(files);
+         e.Handled = true;
+      }
+
+      private void onCloseClick(object sender, RoutedEventArgs e) {
+         this.Close();
+      }
+
+      private void onFilesDrop(object sender, DragEventArgs e) {
          var files = (string[])e.Data.GetData(DataFormats.FileDrop);
          ((UploadViewModel)getViewModel).ImportFiles(files);
          e.Handled = true;

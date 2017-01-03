@@ -71,7 +71,6 @@ namespace vk.ViewModels {
          var groupName = GroupNameCache.GetGroupName(prev.OwnerId);
 
          PostType = PostType.Repost;
-         Post.ID = prev.ID;
          Post.Text = $"{groupName.Substring(0, 10)} {prev.Text}";
          Post.Attachments = prev.Attachments;
 

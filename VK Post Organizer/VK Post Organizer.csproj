@@ -156,6 +156,8 @@
     <Compile Include="Models\AppDataFolderProvider.cs" />
     <Compile Include="Models\Files\ExtensionChecker.cs" />
     <Compile Include="Models\Files\FileFilter.cs" />
+    <Compile Include="Models\VkApi\PhotosGetWallUploadSever.cs" />
+    <Compile Include="Models\VkApi\PhotosSaveWallPhoto.cs" />
     <Compile Include="Utils\GroupNameCache.cs" />
     <Compile Include="Models\Files\ImageExtensionChecker.cs" />
     <Compile Include="Models\UrlHelper\DocumentPreviewUrlObtainer.cs" />
@@ -180,7 +182,7 @@
     <Compile Include="ViewModels\ScheduleNameEditViewModel.cs" />
     <Compile Include="ViewModels\ScheduleViewModel.cs" />
     <Compile Include="ViewModels\UploadViewModel.cs" />
-    <Compile Include="ViewModels\WallVewModel.cs" />
+    <Compile Include="ViewModels\WallControl.cs" />
     <Compile Include="Models\WallItem.cs" />
     <Compile Include="Models\WallList.cs" />
     <Compile Include="ViewModels\PostControl.cs" />

@@ -15,11 +15,11 @@ using vk.Utils;
 
 namespace vk.ViewModels {
    [UsedImplicitly]
-   public class WallVewModel : BindableBase {
+   public class WallControl : BindableBase {
       private IWallHolder _wallHolder;
       private SmartCollection<PostControl> _items;
 
-      public WallVewModel([NotNull] IWallHolder wallHolder) {
+      public WallControl([NotNull] IWallHolder wallHolder) {
          if (wallHolder == null) {
             throw new ArgumentNullException(nameof(wallHolder));
          }
@@ -50,7 +50,7 @@ namespace vk.ViewModels {
          }
 
          Clear();
-         Items.AddRange(pull(WallHolder));
+         Items.AddRange(Pull(WallHolder));
       }
 
       public void Pull([NotNull] IPostFilter filter) {
@@ -64,12 +64,12 @@ namespace vk.ViewModels {
 
          Clear();
          var tempList = new List<PostControl>();
-         tempList.AddRange(pull(WallHolder));
+         tempList.AddRange(Pull(WallHolder));
          tempList = filter.FilterPosts(tempList).ToList();
          Items.AddRange(tempList);
       }
 
-      private IEnumerable<PostControl> pull([NotNull] IWallHolder wallHolder) {
+      public IEnumerable<PostControl> Pull([NotNull] IWallHolder wallHolder) {
          if (wallHolder == null) {
             throw new ArgumentNullException(nameof(wallHolder));
          }
@@ -125,7 +125,7 @@ namespace vk.ViewModels {
 
          var tempList = new List<PostControl>();
 
-         tempList.AddRange(pull(WallHolder));
+         tempList.AddRange(Pull(WallHolder));
 
          tempList.Where(i => IsDateMatchTheSchedule(i.Post.DateUnix, schedule)).ForEach(i => i.Mark = PostMark.Good);
 

@@ -19,5 +19,12 @@ namespace vk.Models {
             return wc.DownloadString(address);
          }
       }
+
+      public byte[] UploadFile(string url, string method, string path) {
+         using (var wc = new WebClient()) {
+            wc.Encoding = Encoding.UTF8;
+            return wc.UploadFile(url, method, path);
+         }
+      }
    }
 }

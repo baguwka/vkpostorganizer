@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -12,7 +11,6 @@ using Microsoft.Practices.Prism.Mvvm;
 using Microsoft.Practices.Unity;
 using Utilities;
 using vk.Models;
-using vk.Models.Files;
 using vk.Models.VkApi;
 using vk.Models.VkApi.Entities;
 using vk.Utils;
@@ -26,7 +24,6 @@ namespace vk.ViewModels {
       private bool _isWallShowing;
       private PostType _currentPostTypeFilter;
       private bool _canTestPost;
-      private int _testingGroup;
       private int _missingPosts;
       private int _postCount;
       private int _repostCount;
@@ -34,7 +31,7 @@ namespace vk.ViewModels {
       private string _infoPanel;
 
       public WallList ListOfAvaliableWalls { get; }
-      public WallVewModel Wall { get; }
+      public WallControl Wall { get; }
 
       private const string DEFAULT_AVATAR =
          "pack://application:,,,/VKPostOrganizer;component/Resources/default_avatar.png";
@@ -56,11 +53,6 @@ namespace vk.ViewModels {
             SetProperty(ref _currentPostTypeFilter, value);
             applyFilter(_currentPostTypeFilter);
          }
-      }
-
-      public int TestingGroup {
-         get { return _testingGroup; }
-         set { SetProperty(ref _testingGroup, value); }
       }
 
       public bool CanTestPost {
@@ -131,7 +123,7 @@ namespace vk.ViewModels {
          ApplyScheduleCommand = new DelegateCommand(applyScheduleCommandExecute);
 
          ListOfAvaliableWalls = App.Container.Resolve<WallList>();
-         Wall = App.Container.Resolve<WallVewModel>();
+         Wall = App.Container.Resolve<WallControl>();
 
          Wall.Items.CollectionChanged += (sender, args) => {
             var realPosts = Wall.Items.Where(post => post.IsExisting).ToList();
@@ -148,6 +140,8 @@ namespace vk.ViewModels {
          CurrentPostTypeFilter = PostType.All;
 
          CurrentSchedule = new Schedule();
+
+         Messenger.AddListener("refresh", refreshWall);
       }
 
       private void applyScheduleCommandExecute() {
@@ -159,12 +153,12 @@ namespace vk.ViewModels {
 
 
       public bool IsUploadAllowed() {
-         if (TestingGroup != Wall.WallHolder.ID) {
-            MessageBox.Show($"You're only available to post in \"{GroupNameCache.GetGroupName(TestingGroup)}\" wall in safety purposes.", "Cant upload here",
-               MessageBoxButton.OK, MessageBoxImage.Error);
+         //if (TestingGroup != Wall.WallHolder.ID) {
+         //   MessageBox.Show($"You're only available to post in \"{GroupNameCache.GetGroupName(TestingGroup)}\" wall in safety purposes.", "Cant upload here",
+         //      MessageBoxButton.OK, MessageBoxImage.Error);
             
-            return false;
-         }
+         //   return false;
+         //}
          return true;
       }
 
@@ -173,8 +167,8 @@ namespace vk.ViewModels {
             return;
          }
 
-         var upload = new UploadWindow(new UploadInfo(Wall.Items, null, Wall.WallHolder.ID));
-         upload.ShowDialog();
+         var upload = new UploadWindow(new UploadInfo(new WallControl(Wall.WallHolder), null));
+         upload.Show();
       }
 
       private void applyFilter(PostType currentPostTypeFilter) {
@@ -185,7 +179,6 @@ namespace vk.ViewModels {
 
       private void onGroupItemClicked(object sender, WallItem wallItem) {
          IsWallShowing = true;
-         CanTestPost = TestingGroup == wallItem.WallHolder.ID;
 
          try {
             Wall.PullWithScheduleHightlight(wallItem.WallHolder, CurrentPostTypeFilter.GetFilter(), CurrentSchedule);
@@ -236,7 +229,11 @@ namespace vk.ViewModels {
 
       private void refreshCommandExecute() {
          if (!IsAuthorized) return;
-         Messenger.Broadcast("Refresh");
+         Messenger.Broadcast("refresh");
+         refreshWall();
+      }
+
+      private void refreshWall() {
          if (IsWallShowing) {
             Wall.PullWithScheduleHightlight(CurrentPostTypeFilter.GetFilter(), CurrentSchedule);
          }
@@ -338,7 +335,7 @@ namespace vk.ViewModels {
       public void OnLoad() {
          MainVMSaveInfo data;
          if (SaveLoaderHelper.TryLoad("MainVM", out data)) {
-            TestingGroup = data.TestingGroup;
+            //TestingGroup = data.TestingGroup;
          }
 
          SetUpAvatar(DEFAULT_AVATAR);
@@ -347,7 +344,7 @@ namespace vk.ViewModels {
       }
 
       public void OnClosing() {
-         SaveLoaderHelper.Save("MainVM", new MainVMSaveInfo(TestingGroup));
+         SaveLoaderHelper.Save("MainVM", new MainVMSaveInfo());
       }
 
       public void OnClosed() {
@@ -356,10 +353,8 @@ namespace vk.ViewModels {
 
    [Serializable]
    public class MainVMSaveInfo : CommonSaveData {
-      public MainVMSaveInfo(int testingGroup) {
-         TestingGroup = testingGroup;
+      public MainVMSaveInfo() {
       }
-
-      public int TestingGroup { get; set; }
+      
    }
 }

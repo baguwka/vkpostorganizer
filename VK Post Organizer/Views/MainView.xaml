@@ -163,7 +163,6 @@
                 <Button Margin="5,0,5,0" Height="25" Visibility="{Binding IsWallShowing, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}"
                 Grid.Column="2" Content="Upload" Style="{StaticResource VkBlue}" Command="{Binding UploadCommand}"/>
                 
-                <TextBox Margin="5,0,5,0" Grid.Column="3" VerticalContentAlignment="Center" Style="{StaticResource VkTextBox}" Text="{Binding TestingGroup, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
             </Grid>
         </Border>
     </Grid>

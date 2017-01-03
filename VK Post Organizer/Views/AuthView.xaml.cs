@@ -13,7 +13,7 @@ namespace vk.Views {
    public partial class AuthView : Window {
       private readonly AccessToken _token;
 
-      private const string SCOPES = "offline,wall,groups";
+      private const string SCOPES = "offline,wall,groups,photos";
       private const string CLIENT_ID = "5730368";
 
       public AuthView([NotNull] AccessToken token, bool clearCookies) {
