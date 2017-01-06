@@ -125,6 +125,11 @@ namespace vk.ViewModels {
          ListOfAvaliableWalls = App.Container.Resolve<WallList>();
          Wall = App.Container.Resolve<WallControl>();
 
+         Wall.UploadRequested += (sender, control) => {
+            var upload = new UploadWindow(new UploadInfo(new WallControl(Wall.WallHolder), null, control.Post.DateUnix));
+            upload.Show();
+         };
+
          Wall.Items.CollectionChanged += (sender, args) => {
             var realPosts = Wall.Items.Where(post => post.IsExisting).ToList();
             TotalPostCount = realPosts.Count();
@@ -286,6 +291,8 @@ namespace vk.ViewModels {
             SetUpAvatar(user.Photo50);
 
             IsAuthorized = true;
+
+            App.Container.Resolve<StatsTrackVisitor>().Track();
 
             fillWallList();
          }

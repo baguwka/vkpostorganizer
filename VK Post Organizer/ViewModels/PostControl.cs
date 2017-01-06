@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Windows.Input;
+using JetBrains.Annotations;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
 using vk.Models;
@@ -9,11 +10,13 @@ using vk.Models.VkApi.Entities;
 using vk.Utils;
 
 namespace vk.ViewModels {
+   [UsedImplicitly]
    public class PostControl : BindableBase {
       private bool _expanded;
       private PostMark _mark;
       private PostType _postType;
       public Post Post { get; }
+      public event EventHandler UploadRequested;
 
       public SmartCollection<ImageItem> Images { get; }
 
@@ -32,6 +35,7 @@ namespace vk.ViewModels {
 
       public ICommand OpenPost { get; set; }
       public ICommand ExpandToggleCommand { get; set; }
+      public ICommand UploadAtThisDateCommand { get; set; }
 
       public bool IsExisting { get; set; }
 
@@ -60,6 +64,7 @@ namespace vk.ViewModels {
 
          ExpandToggleCommand = new DelegateCommand(ExpandToggle);
          OpenPost = new DelegateCommand(openPostCommand);
+         UploadAtThisDateCommand = new DelegateCommand(uploadAtThisDateCommandExecute);
 
          var prev = Post.CopyHistory?.FirstOrDefault();
          if (prev == null) {
@@ -75,6 +80,10 @@ namespace vk.ViewModels {
          Post.Attachments = prev.Attachments;
 
          loadImages();
+      }
+
+      private void uploadAtThisDateCommandExecute() {
+         OnUploadRequested();
       }
 
       private void openPostCommand() {
@@ -95,6 +104,10 @@ namespace vk.ViewModels {
 
       public void Collapse() {
          Expanded = false;
+      }
+
+      protected virtual void OnUploadRequested() {
+         UploadRequested?.Invoke(this, EventArgs.Empty);
       }
    }
 

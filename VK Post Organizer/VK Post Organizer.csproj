@@ -150,14 +150,16 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converter\InverseBooleanConverter.cs" />
     <Compile Include="Converter\PostMarkToColorConverter.cs" />
     <Compile Include="Converter\PostTypeToBoolConverter.cs" />
-    <Compile Include="Converter\PostTypeToVisibilityConverter.cs" />
+    <Compile Include="Converter\MissingPostIsHiddenConverter.cs" />
     <Compile Include="Models\AppDataFolderProvider.cs" />
     <Compile Include="Models\Files\ExtensionChecker.cs" />
     <Compile Include="Models\Files\FileFilter.cs" />
     <Compile Include="Models\VkApi\PhotosGetWallUploadSever.cs" />
     <Compile Include="Models\VkApi\PhotosSaveWallPhoto.cs" />
+    <Compile Include="Models\VkApi\StatsTrackVisitor.cs" />
     <Compile Include="Utils\GroupNameCache.cs" />
     <Compile Include="Models\Files\ImageExtensionChecker.cs" />
     <Compile Include="Models\UrlHelper\DocumentPreviewUrlObtainer.cs" />

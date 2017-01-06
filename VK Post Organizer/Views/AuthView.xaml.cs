@@ -13,7 +13,7 @@ namespace vk.Views {
    public partial class AuthView : Window {
       private readonly AccessToken _token;
 
-      private const string SCOPES = "offline,wall,groups,photos";
+      private const string SCOPES = "offline,wall,groups,photos,docs";
       private const string CLIENT_ID = "5730368";
 
       public AuthView([NotNull] AccessToken token, bool clearCookies) {
@@ -68,7 +68,7 @@ namespace vk.Views {
          if (url.Contains("access_token") && url.Contains("#")) {
             var response = url.Split('=', '&');
             _token.Token = response[1];
-            //_token.UserID = int.Parse(response[5]);
+            _token.UserID = int.Parse(response[5]);
             DialogResult = true;
             this.Close();
          }

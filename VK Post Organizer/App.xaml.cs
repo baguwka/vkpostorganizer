@@ -5,6 +5,7 @@ using Data_Persistence_Provider;
 using Microsoft.Practices.Unity;
 using vk.Models;
 using vk.Models.Files;
+using vk.Models.VkApi;
 using vk.Views;
 
 namespace vk {
@@ -32,6 +33,8 @@ namespace vk {
          Container.RegisterType<EmptyWallHolder>(new ContainerControlledLifetimeManager());
 
          Container.RegisterType<ImageExtensionChecker>(new ContainerControlledLifetimeManager());
+
+         Container.RegisterType<StatsTrackVisitor>(new ContainerControlledLifetimeManager());
 
          var window = new MainView();
          window.Show();

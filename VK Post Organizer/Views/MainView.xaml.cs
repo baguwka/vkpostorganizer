@@ -15,7 +15,6 @@ namespace vk.Views {
             MainWindow.Width = data.Width;
             MainWindow.Height = data.Heigth;
          }
-
       }
 
       private void onLoaded(object sender, RoutedEventArgs e) {

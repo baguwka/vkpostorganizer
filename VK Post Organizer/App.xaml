@@ -7,14 +7,33 @@
     <Application.Resources>
 
         <converters:PostMarkToColorConverter x:Key="PostMarkToColorConverter"/>
-        <converters:PostTypeToVisibilityConverter x:Key="PostTypeToVisibilityConverter"/>
+        <converters:MissingPostIsHiddenConverter x:Key="MissingPostIsHiddenConverter"/>
+        <converters:MissingPostIsShowingConverter x:Key="MissingPostIsShowingConverter"/>
         <converters:PostTypeToBoolConverter x:Key="PostTypeToBoolConverter"/>
         <converters:BoolToVisibilityHiddenConverter x:Key="BoolToVisibilityConverterHide"/>
         <converters:BoolToVisibilityCollapsedConverter x:Key="BoolToVisibilityConverter"/>
+        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
         <converters:BoolToVisibilityNegativeCollapsedConverter x:Key="BoolToVisibilityNegativeConverter"/>
 
 
 
+        <Style TargetType="{x:Type ProgressBar}" x:Key="VkProgressBar">
+            <Setter Property="Foreground">
+                <Setter.Value>
+                    <LinearGradientBrush EndPoint="0,0" StartPoint="32,8" 
+                     MappingMode="Absolute" SpreadMethod="Repeat">
+                        <GradientStop Color="#6B8DB3" Offset="0" />
+                        <GradientStop Color="#6B8DB3" Offset="0.5" />
+                        <GradientStop Color="#557AA4" Offset="0.5" />
+                        <GradientStop Color="#557AA4" Offset="1" />
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Background" Value="White"></Setter>
+            <Setter Property="BorderThickness" Value="1"></Setter>
+            <Setter Property="BorderBrush" Value="#CFDAE5"></Setter>
+
+        </Style>
 
         <Style TargetType="{x:Type Label}" x:Key="VkLabel">
             <Setter Property="Foreground" Value="#4a7198"></Setter>

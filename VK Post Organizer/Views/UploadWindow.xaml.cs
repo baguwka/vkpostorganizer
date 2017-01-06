@@ -8,16 +8,18 @@ namespace vk.Views {
    public class UploadInfo {
       [NotNull]
       public WallControl Wall { get; private set; }
+      public int DateOverride { get; private set; }
 
       [NotNull]
       public IEnumerable<string> Files { get; private set; }
 
-      public UploadInfo([NotNull] WallControl wall, [CanBeNull] IEnumerable<string> files) {
+      public UploadInfo([NotNull] WallControl wall, [CanBeNull] IEnumerable<string> files, int dateOverride = -1) {
          if (wall == null) {
             throw new ArgumentNullException(nameof(wall));
          }
 
          Wall = wall;
+         DateOverride = dateOverride;
          Files = files ?? new List<string>();
       }
    }

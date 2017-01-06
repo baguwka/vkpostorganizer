@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:vk.Views"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
-        Title="AuthView" Height="500" Width="800">
+        Title="AuthView" Height="700" Width="800">
     <Grid>
         <WebBrowser Name="InternalWebBrowser" 
                     Navigated="WebBrowser_OnNavigated"

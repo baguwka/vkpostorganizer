@@ -107,15 +107,18 @@
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="100"/>
                                             <ColumnDefinition/>
-                                            <ColumnDefinition Width="25"/>
+                                            <ColumnDefinition Width="100"/>
                                         </Grid.ColumnDefinitions>
                                         <Button Grid.Column="0" Height="25" Style="{StaticResource VkMimic}" Command="{Binding OpenPost}"
                                                 IsEnabled="{Binding PostType, Converter={StaticResource PostTypeToBoolConverter}}">
                                             <Label Height="25" Content="{Binding Post.DateString}"></Label>
                                         </Button>
                                         <Label Grid.Column="1" Height="25" Content="{Binding Post.Text}"></Label>
-                                        <Button Grid.Column="2" Height="25" Width="25" Content="+" Style="{StaticResource VkCommon}"
-                                                Visibility="{Binding PostType, Converter={StaticResource PostTypeToVisibilityConverter}}"
+                                        <Button Grid.Column="2" HorizontalAlignment="Right" Height="25" Width="100" Content="Upload" Style="{StaticResource VkCommon}"
+                                                Visibility="{Binding PostType, Converter={StaticResource MissingPostIsShowingConverter}}"
+                                                Command="{Binding UploadAtThisDateCommand}"/>
+                                        <Button Grid.Column="2" HorizontalAlignment="Right" Height="25" Width="25" Content="+" Style="{StaticResource VkCommon}"
+                                                Visibility="{Binding PostType, Converter={StaticResource MissingPostIsHiddenConverter}}"
                                                 Command="{Binding ExpandToggleCommand}"/>
                                     </Grid>
                                     <ItemsControl Margin="10" HorizontalAlignment="Center" ItemsSource="{Binding Images, UpdateSourceTrigger=PropertyChanged}" 

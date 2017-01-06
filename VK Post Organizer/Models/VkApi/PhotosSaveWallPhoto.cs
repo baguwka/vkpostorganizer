@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -12,9 +11,8 @@ namespace vk.Models.VkApi {
       public PhotosSaveWallPhoto([NotNull] AccessToken token, [NotNull] IWebClient webClient) : base(token, webClient) {
       }
 
-      public PhotosSaveWallPhotoResponse Save(int group_id, string uploadUrl, string imagePath) {
-         group_id = Math.Abs(group_id);
-         var uploadResponse = Encoding.UTF8.GetString(webClient.UploadFile(uploadUrl, "POST", imagePath));
+      public PhotosSaveWallPhotoResponse Save(int groupID, string uploadResponse) {
+         groupID = Math.Abs(groupID);
          var jsonedResponse = JsonConvert.DeserializeObject(uploadResponse) as JObject;
 
          if (jsonedResponse == null) {
@@ -25,7 +23,7 @@ namespace vk.Models.VkApi {
          var jphoto = jsonedResponse["photo"];
          var jhash = jsonedResponse["hash"];
 
-         var response = ExecuteMethod("photos.saveWallPhoto", $"group_id={group_id}" +
+         var response = ExecuteMethod("photos.saveWallPhoto", $"group_id={groupID}" +
                                                               $"&server={jserver}" +
                                                               $"&photo={jphoto}" +
                                                               $"&hash={jhash}");

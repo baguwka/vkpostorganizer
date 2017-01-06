@@ -31,10 +31,10 @@ namespace vk.Models.VkApi {
       public string UploadUrl { get; set; }
 
       [JsonProperty(PropertyName = "album_id")]
-      public string AlbumId { get; set; }
+      public int AlbumId { get; set; }
 
       [JsonProperty(PropertyName = "user_id")]
-      public string UserId { get; set; }
+      public int UserId { get; set; }
    }
 
 

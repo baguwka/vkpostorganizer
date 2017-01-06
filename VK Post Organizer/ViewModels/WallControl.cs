@@ -19,6 +19,8 @@ namespace vk.ViewModels {
       private IWallHolder _wallHolder;
       private SmartCollection<PostControl> _items;
 
+      public event EventHandler<PostControl> UploadRequested;
+
       public WallControl([NotNull] IWallHolder wallHolder) {
          if (wallHolder == null) {
             throw new ArgumentNullException(nameof(wallHolder));
@@ -80,10 +82,12 @@ namespace vk.ViewModels {
             var postList = new List<PostControl>();
 
             var posts1 = wall.Get(wallHolder.ID);
-            var posts2 = wall.Get(wallHolder.ID, 50, 100);
-
             postList.AddRange(posts1.Response.Wall.Select(p => new PostControl(p) { IsExisting = true }));
-            postList.AddRange(posts2.Response.Wall.Select(p => new PostControl(p) { IsExisting = true }));
+
+            if (postList.Count == 100) {
+               var posts2 = wall.Get(wallHolder.ID, 50, 100);
+               postList.AddRange(posts2.Response.Wall.Select(p => new PostControl(p) {IsExisting = true}));
+            }
 
             return postList;
          }
@@ -91,6 +95,10 @@ namespace vk.ViewModels {
             Clear();
             throw;
          }
+      }
+
+      private void onPostUploadRequested(object sender, EventArgs eventArgs) {
+         OnUploadRequested((PostControl)sender);
       }
 
       public void PullWithScheduleHightlight([NotNull] IPostFilter filter, [NotNull] Schedule schedule) {
@@ -134,7 +142,6 @@ namespace vk.ViewModels {
 
          int totalCount = tempList.Count;
 
-         //for (var day = 1; day <= totalDays + 10; day++) {
          while(totalCount < 150) { 
             var thisDayDate = nextDate;
             var thisDayPosts = tempList.Where(i => i.Post.Date.Date == thisDayDate.Date).ToList();
@@ -150,16 +157,18 @@ namespace vk.ViewModels {
 
                if (isTimeCorrectlyScheduled == false) {
                   totalCount++;
-                  tempList.Add(
-                     new PostControl(new Post {
-                        DateUnix = UnixTimeConverter.ToUnix(scheduledDate),
-                        ID = 0,
-                        Text = "Здесь должен быть пост."
-                     }) {
-                        Mark = PostMark.Bad,
-                        IsExisting = false,
-                        PostType = PostType.Missing
-                     });
+                  var post = new PostControl(new Post {
+                     DateUnix = UnixTimeConverter.ToUnix(scheduledDate),
+                     ID = 0,
+                     Text = "Здесь должен быть пост."
+                  }) {
+                     Mark = PostMark.Bad,
+                     IsExisting = false,
+                     PostType = PostType.Missing
+                  };
+
+                  post.UploadRequested += onPostUploadRequested;
+                  tempList.Add(post);
                }
             }
 
@@ -193,6 +202,7 @@ namespace vk.ViewModels {
       public void Clear() {
          foreach (var postItem in Items) {
             postItem.Clear();
+            postItem.UploadRequested -= onPostUploadRequested;
          }
          Items.Clear();
       }
@@ -207,6 +217,10 @@ namespace vk.ViewModels {
          foreach (var postItem in Items) {
             postItem.Collapse();
          }
+      }
+
+      protected virtual void OnUploadRequested(PostControl e) {
+         UploadRequested?.Invoke(this, e);
       }
    }
 }

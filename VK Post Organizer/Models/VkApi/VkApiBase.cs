@@ -4,13 +4,13 @@ using vk.Models.VkApi.Entities;
 
 namespace vk.Models.VkApi {
    public abstract class VkApiBase {
-      protected readonly IWebClient webClient;
-      private readonly AccessToken _token;
-
       public VkApiBase([NotNull] AccessToken token, [NotNull] IWebClient webClient) {
-         this.webClient = webClient;
-         _token = token;
+         WebClient = webClient;
+         Token = token;
       }
+
+      public IWebClient WebClient { get; }
+      public AccessToken Token { get; }
 
       protected void checkForErrors(string response) {
          if (response.Substring(2, 5) == "error") {
@@ -19,8 +19,15 @@ namespace vk.Models.VkApi {
          }
       }
 
-      public string ExecuteMethod(string method, string parameters) {
-         return webClient.DownloadString($"https://api.vk.com/method/{method}?{parameters}&access_token={_token.Token}&v=5.60");
+      public string ExecuteMethod(string method, string parameters = "") {
+         if (!string.IsNullOrEmpty(parameters)) {
+            parameters = $"&{parameters}";
+         }
+         return WebClient.DownloadString( "https://api.vk.com/method/" +
+                                         $"{method}" +
+                                         $"?access_token={Token.Token}" +
+                                         $"{parameters}" +
+                                          "&v=5.60");
       }
 
       protected Error deserializeError(string jsonString) {

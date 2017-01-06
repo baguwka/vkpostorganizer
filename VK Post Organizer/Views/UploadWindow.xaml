@@ -9,7 +9,7 @@
         mc:Ignorable="d"
         Icon="/Resources/32x32.ico"
         
-        AllowDrop="True"
+        AllowDrop="{Binding IsBusy, Converter={StaticResource InverseBooleanConverter}}"
         Drop="UploadWindow_OnDrop"
         
         WindowStartupLocation="CenterScreen"
@@ -21,7 +21,7 @@
     <Window.DataContext>
         <vm:UploadViewModel/>
     </Window.DataContext>
-    <Grid Margin="10">
+    <Grid Margin="10" IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBooleanConverter}}">
         <Grid.RowDefinitions>
             <RowDefinition/>
             <RowDefinition Height="35"/>
@@ -33,15 +33,30 @@
                 <TextBox Style="{StaticResource VkTextBox}" Text="{Binding Text}" Height="30"/>
                 <Separator/>
                 <Label Content="File path"></Label>
-                <Label Content="{Binding filepath}" Height="30"></Label>
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="{Binding filepath}" Height="30"></Label>
+                </StackPanel>
                 <Separator/>
 
-                <Border Style="{StaticResource VkBorder}" Height="200"
-                        Drop="onFilesDrop">
-                    <Label Content="Drag files here" VerticalAlignment="Center" HorizontalAlignment="Center"></Label>
+                <Border Style="{StaticResource VkBorder}" Height="200" Drop="onFilesDrop">
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Button Style="{StaticResource VkCommon}"
+                            Command="{Binding BrowseCommand}"
+                            Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityNegativeConverter}}"
+                            Width="150" Height="25" Content="Drag here or Browse" Margin="5,0,5,0"></Button>
+                        <Label Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityConverter}}"
+                           Content="Uploading, please wait..."
+                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                           FontSize="28"></Label>
+                    </StackPanel>
+                    <!--<Label Content="Drag files here" VerticalAlignment="Center" HorizontalAlignment="Center"></Label>-->
                 </Border>
                 <Separator/>
-                <Label Content="{Binding DateString}" Height="30"></Label>
+                <Label Content="{Binding DateString, UpdateSourceTrigger=PropertyChanged}" Height="30"></Label>
+                <ProgressBar Style="{StaticResource VkProgressBar}" 
+                             Minimum="0" Maximum="100"
+                             Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityConverter}}"
+                             Value="{Binding UploadProgress, UpdateSourceTrigger=PropertyChanged}" Height="25" Margin="1"/>
             </StackPanel>
         </Border>
         
