@@ -25,10 +25,10 @@ namespace vk.Models.VkApi {
 
 
          var response = ExecuteMethod("photos.saveWallPhoto", VkParameters.New()
-                                                   .AddParam("group_id", groupID)
-                                                   .AddParam("server", jserver)
-                                                   .AddParam("photo", jphoto)
-                                                   .AddParam("hash", jhash));
+                                                   .AddParameter("group_id", groupID)
+                                                   .AddParameter("server", jserver)
+                                                   .AddParameter("photo", jphoto)
+                                                   .AddParameter("hash", jhash));
 
          checkForErrors(response);
 

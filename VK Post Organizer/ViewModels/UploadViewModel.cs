@@ -231,6 +231,9 @@ namespace vk.ViewModels {
             var getUploadServerMethod = App.Container.Resolve<PhotosGetWallUploadSever>();
             var uploadServer = getUploadServerMethod.Get(-Wall.WallHolder.ID);
 
+            var attachments = new List<string>();
+            var wallPostMethod = App.Container.Resolve<WallPost>();
+
             if (!string.IsNullOrEmpty(filepath) || File.Exists(filepath)) {
 
                byte[] uploadBytes;
@@ -242,8 +245,6 @@ namespace vk.ViewModels {
                if (uploadBytes == null) return;
 
                var uploadResponse = Encoding.UTF8.GetString(uploadBytes);
-               var attachments = new List<string>();
-               var wallPostMethod = App.Container.Resolve<WallPost>();
 
                if (!string.IsNullOrEmpty(uploadResponse)) {
                   var savePhotoMethod = App.Container.Resolve<PhotosSaveWallPhoto>();
@@ -255,17 +256,17 @@ namespace vk.ViewModels {
                      attachments.AddRange(result.Response.Select(photoResponse => $"photo{userId}_{photoResponse.Id}"));
                   }
                }
-
-               wallPostMethod.Post(-Wall.WallHolder.ID, Text, false, true, DateUnix, attachments);
-
-               Text = "";
-               filepath = "";
-
-               Messenger.Broadcast("refresh");
-               getNextDate();
-
-               IsBusy = false;
             }
+
+            wallPostMethod.Post(-Wall.WallHolder.ID, Text, false, true, DateUnix, attachments);
+
+            Text = "";
+            filepath = "";
+
+            Messenger.Broadcast("refresh");
+            getNextDate();
+
+            IsBusy = false;
          }
          catch (VkException ex) {
             MessageBox.Show(ex.Message);

@@ -28,15 +28,16 @@ namespace vk.Models.VkApi {
          if (attachments != null) {
             attachmentsString = string.Join(",", attachments);
          }
+         var parameters = VkParameters.New()
+            .AddParameter("owner_id", wallId)
+            .AddParameter("filter", "postponed")
+            .AddParameter("publish_date", date)
+            .AddParameter("signed", signedInt)
+            .AddParameter("from_group", fromGroupInt)
+            .AddParameter("attachments", attachmentsString);
 
-         var response = ExecuteMethod("wall.post", VkParameters.New()
-                                                   .AddParam("owner_id", wallId)
-                                                   .AddParam("filter", "postponed")
-                                                   .AddParam("publish_date", date)
-                                                   .AddParam("signed", signedInt)
-                                                   .AddParam("from_group", fromGroupInt)
-                                                   .AddParam("message", message)
-                                                   .AddParam("attachments", attachmentsString));
+         parameters.AddParameter("message", message);
+         var response = ExecuteMethod("wall.post", parameters);
 
          checkForErrors(response);
 

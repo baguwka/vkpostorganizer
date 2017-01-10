@@ -11,7 +11,7 @@ namespace vk.Models.VkApi {
 
       public UsersGetResponse Get() {
          var response = ExecuteMethod("users.get", VkParameters.New()
-                                                   .AddParam("fields", "first_name,last_name,photo_50"));
+                                                   .AddParameter("fields", "first_name,last_name,photo_50"));
 
          checkForErrors(response);
 

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Specialized;
+using System.Linq;
 using System.Web;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
@@ -24,16 +26,16 @@ namespace vk.Models.VkApi {
       public string ExecuteMethod(string method, VkParameters parameters = null) {
          var uriBuilder = new UriBuilder($"https://api.vk.com/method/{method}");
 
-         var uriParameters = HttpUtility.ParseQueryString(string.Empty);
+         var uriParameters = new NameValueCollection();
 
          if (parameters != null) {
-            uriParameters = HttpUtility.ParseQueryString(parameters.Parameters.ToString());
+            uriParameters.Add(parameters.Query);
          }
 
-         uriParameters.Add("access_token", Token.Token);
-         uriParameters.Add("v", "5.60");
+         uriParameters["access_token"] = Token.Token;
+         uriParameters["v"] = "5.60";
 
-         uriBuilder.Query = uriParameters.ToString();
+         uriBuilder.Query = string.Join("&", uriParameters.AllKeys.Select(key => $"{key}={HttpUtility.UrlEncode(uriParameters[key])}"));
 
          var finalUri = uriBuilder.Uri;
 

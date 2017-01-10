@@ -14,10 +14,10 @@ namespace vk.Models.VkApi {
          id = -Math.Abs(id);
 
          var response = ExecuteMethod("wall.get", VkParameters.New()
-                                                   .AddParam("owner_id", id)
-                                                   .AddParam("filter", "postponed")
-                                                   .AddParam("offset", offset)
-                                                   .AddParam("count", count));
+                                                   .AddParameter("owner_id", id)
+                                                   .AddParameter("filter", "postponed")
+                                                   .AddParameter("offset", offset)
+                                                   .AddParameter("count", count));
 
          checkForErrors(response);
 

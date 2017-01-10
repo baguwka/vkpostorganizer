@@ -11,7 +11,7 @@ namespace vk.Models.VkApi {
       public UploadServerInfo Get(int groupId) {
          groupId = Math.Abs(groupId);
 
-         var response = ExecuteMethod("photos.getWallUploadServer", VkParameters.New().AddParam("group_id", groupId));
+         var response = ExecuteMethod("photos.getWallUploadServer", VkParameters.New().AddParameter("group_id", groupId));
 
          checkForErrors(response);
 
