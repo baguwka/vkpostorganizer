@@ -1,4 +1,6 @@
-﻿using JetBrains.Annotations;
+﻿using System;
+using System.Web;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 using vk.Models.VkApi.Entities;
 
@@ -19,19 +21,23 @@ namespace vk.Models.VkApi {
          }
       }
 
-      public string ExecuteMethod(string method, VkParam parameters) {
-         return ExecuteMethod(method, parameters.Result());
-      }
+      public string ExecuteMethod(string method, VkParameters parameters = null) {
+         var uriBuilder = new UriBuilder($"https://api.vk.com/method/{method}");
 
-      public string ExecuteMethod(string method, string parameters = "") {
-         //if (!string.IsNullOrEmpty(parameters)) {
-         //   parameters = $"&{parameters}";
-         //}
-         return WebClient.DownloadString( "https://api.vk.com/method/" +
-                                         $"{method}" +
-                                         $"?access_token={Token.Token}" +
-                                         $"{parameters}" +
-                                          "&v=5.60");
+         var uriParameters = HttpUtility.ParseQueryString(string.Empty);
+
+         if (parameters != null) {
+            uriParameters = HttpUtility.ParseQueryString(parameters.Parameters.ToString());
+         }
+
+         uriParameters.Add("access_token", Token.Token);
+         uriParameters.Add("v", "5.60");
+
+         uriBuilder.Query = uriParameters.ToString();
+
+         var finalUri = uriBuilder.Uri;
+
+         return WebClient.DownloadString(finalUri);
       }
 
       protected Error deserializeError(string jsonString) {

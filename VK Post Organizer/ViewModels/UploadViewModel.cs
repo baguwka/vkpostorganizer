@@ -139,7 +139,10 @@ namespace vk.ViewModels {
 
       public string ProxyServer {
          get { return _proxyServer; }
-         set { SetProperty(ref _proxyServer, value); }
+         set {
+            var uri = new UriBuilder(value).Uri;
+            SetProperty(ref _proxyServer, uri.ToString());
+         }
       }
 
       public bool IsImageContentType(string contentType) {

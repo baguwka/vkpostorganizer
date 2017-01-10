@@ -29,7 +29,7 @@ namespace vk.Models.VkApi {
             attachmentsString = string.Join(",", attachments);
          }
 
-         var response = ExecuteMethod("wall.post", VkParam.New()
+         var response = ExecuteMethod("wall.post", VkParameters.New()
                                                    .AddParam("owner_id", wallId)
                                                    .AddParam("filter", "postponed")
                                                    .AddParam("publish_date", date)

@@ -9,7 +9,7 @@ namespace vk.Models.VkApi {
       }
 
       public GroupsGetByIdResponse Get(int id, string fields = "") {
-         var response = ExecuteMethod("groups.getById", VkParam.New()
+         var response = ExecuteMethod("groups.getById", VkParameters.New()
                                                    .AddParam("group_id", id)
                                                    .AddParam("fields", fields));
          checkForErrors(response);

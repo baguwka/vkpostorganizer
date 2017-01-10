@@ -24,7 +24,7 @@ namespace vk.Models.VkApi {
          var jhash = jsonedResponse["hash"];
 
 
-         var response = ExecuteMethod("photos.saveWallPhoto", VkParam.New()
+         var response = ExecuteMethod("photos.saveWallPhoto", VkParameters.New()
                                                    .AddParam("group_id", groupID)
                                                    .AddParam("server", jserver)
                                                    .AddParam("photo", jphoto)

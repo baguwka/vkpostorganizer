@@ -13,7 +13,7 @@ namespace vk.Models.VkApi {
       public WallGetResponse Get(int id, int count = 100, int offset = 0) {
          id = -Math.Abs(id);
 
-         var response = ExecuteMethod("wall.get", VkParam.New()
+         var response = ExecuteMethod("wall.get", VkParameters.New()
                                                    .AddParam("owner_id", id)
                                                    .AddParam("filter", "postponed")
                                                    .AddParam("offset", offset)
