@@ -1,10 +1,12 @@
 using System;
+using System.Threading.Tasks;
 
 namespace vk.Models {
    public interface IWebClient {
-      string DownloadString(Uri address);
-      string DownloadString(string address);
+      string DownloadString(Uri adress);
+      string DownloadString(string adress);
 
-      byte[] UploadFile(string url, string method, string path);
+      Task<string> DownloadStringAsync(Uri adress);
+      Task<string> DownloadStringAsync(string adress);
    }
 }

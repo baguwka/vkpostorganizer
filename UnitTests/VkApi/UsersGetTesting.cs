@@ -5,6 +5,7 @@ using vk.Models;
 using vk.Models.VkApi;
 
 namespace UnitTests.VkApi {
+
    [TestFixture]
    public class UsersGetTesting {
 

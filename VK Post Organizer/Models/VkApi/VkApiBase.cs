@@ -19,10 +19,14 @@ namespace vk.Models.VkApi {
          }
       }
 
+      public string ExecuteMethod(string method, VkParam parameters) {
+         return ExecuteMethod(method, parameters.Result());
+      }
+
       public string ExecuteMethod(string method, string parameters = "") {
-         if (!string.IsNullOrEmpty(parameters)) {
-            parameters = $"&{parameters}";
-         }
+         //if (!string.IsNullOrEmpty(parameters)) {
+         //   parameters = $"&{parameters}";
+         //}
          return WebClient.DownloadString( "https://api.vk.com/method/" +
                                          $"{method}" +
                                          $"?access_token={Token.Token}" +

@@ -16,7 +16,7 @@
         Title="Upload" 
         MinHeight="500" MinWidth="500"
         Height="500"
-        Width="500"
+        Width="700"
         Background="#edeef0">
     <Window.DataContext>
         <vm:UploadViewModel/>
@@ -26,38 +26,62 @@
             <RowDefinition/>
             <RowDefinition Height="35"/>
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
 
         <Border Grid.Row="0" Style="{StaticResource VkBorder}" Margin="0,0,0,10">
-            <StackPanel Orientation="Vertical">
-                <Label Content="Text"></Label>
-                <TextBox Style="{StaticResource VkTextBox}" Text="{Binding Text}" Height="30"/>
-                <Separator/>
-                <Label Content="File path"></Label>
-                <StackPanel Orientation="Horizontal">
-                    <Label Content="{Binding filepath}" Height="30"></Label>
-                </StackPanel>
-                <Separator/>
+            <Grid Margin="5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition/>
+                    <RowDefinition Height="80"/>
+                </Grid.RowDefinitions>
+                <TextBox Grid.Row="0" Style="{StaticResource VkTextBox}" 
+                         FontSize="16" Text="{Binding Text}" Height="30"/>
 
-                <Border Style="{StaticResource VkBorder}" Height="200" Drop="onFilesDrop">
+                <Border Grid.Row="1" Style="{StaticResource VkBorder}" Height="200" Drop="onFilesDrop" Margin="0,5,0,5">
                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                         <Button Style="{StaticResource VkCommon}"
                             Command="{Binding BrowseCommand}"
                             Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityNegativeConverter}}"
-                            Width="150" Height="25" Content="Drag here or Browse" Margin="5,0,5,0"></Button>
+                            Width="200" Height="25" Content="Drag here, browse or pass url" Margin="5,3,5,3"></Button>
+
+                        <TextBox Style="{StaticResource VkTextBox}" 
+                            Text="{Binding ProxyServer, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityNegativeConverter}}"
+                            Width="200" Height="25"  Margin="5,3,5,3"></TextBox>
+                        
+                        <TextBox Style="{StaticResource VkTextBox}" 
+                            Text="{Binding UrlOfImageToDownload, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityNegativeConverter}}"
+                            Width="400" Height="25"  Margin="5,3,5,3"></TextBox>
+                        
                         <Label Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityConverter}}"
                            Content="Uploading, please wait..."
                            HorizontalAlignment="Center" VerticalAlignment="Center"
                            FontSize="28"></Label>
+                        <Label Content="{Binding filepath}" Height="30"></Label>
                     </StackPanel>
-                    <!--<Label Content="Drag files here" VerticalAlignment="Center" HorizontalAlignment="Center"></Label>-->
                 </Border>
-                <Separator/>
-                <Label Content="{Binding DateString, UpdateSourceTrigger=PropertyChanged}" Height="30"></Label>
-                <ProgressBar Style="{StaticResource VkProgressBar}" 
-                             Minimum="0" Maximum="100"
+                
+                <Grid Grid.Row="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Label Style="{StaticResource VkLabel}" Content="{Binding ProgressString}" Height="30"
+                           HorizontalAlignment="Right" Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityConverter}}"></Label>
+
+                    <ProgressBar Grid.Row="1" Style="{StaticResource VkProgressBar}" 
+                             Minimum="0" Maximum="50" 
                              Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityConverter}}"
                              Value="{Binding UploadProgress, UpdateSourceTrigger=PropertyChanged}" Height="25" Margin="1"/>
-            </StackPanel>
+                    
+                    <Label Grid.Row="2" Content="{Binding DateString}" Height="30" Style="{StaticResource VkLabel}" HorizontalAlignment="Left"></Label>
+                </Grid>
+            </Grid>
         </Border>
         
         <Border Grid.Row="1" Style="{StaticResource VkBorder}">

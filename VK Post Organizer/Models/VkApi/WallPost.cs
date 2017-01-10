@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 
@@ -7,6 +6,14 @@ namespace vk.Models.VkApi {
    [UsedImplicitly]
    public class WallPost : VkApiBase {
       public WallPost([NotNull] AccessToken token, [NotNull] IWebClient webClient) : base(token, webClient) {
+      }
+
+      protected string addParam(string paramName, string paramValue) {
+         return !string.IsNullOrEmpty(paramValue) ? $"&{paramName}={paramValue}" : string.Empty;
+      }
+
+      protected string addParam(string paramName, int paramValue) {
+         return addParam(paramName, paramValue.ToString());
       }
 
       public WallPostResponse Post(int wallId, string message, bool signed, bool fromGroup, int date, IEnumerable<string> attachments = null) {
@@ -18,12 +25,18 @@ namespace vk.Models.VkApi {
 
          var attachmentsString = "";
 
-         if (attachments != null && attachments.Any()) {
-            attachmentsString = "&attachments=" + string.Join(",", attachments);
+         if (attachments != null) {
+            attachmentsString = string.Join(",", attachments);
          }
 
-         var response = ExecuteMethod("wall.post", $"owner_id={wallId}&filter=postponed&publish_date={date}&signed={signedInt}" +
-                                                   $"&from_group={fromGroupInt}&message={message}{attachmentsString}");
+         var response = ExecuteMethod("wall.post", VkParam.New()
+                                                   .AddParam("owner_id", wallId)
+                                                   .AddParam("filter", "postponed")
+                                                   .AddParam("publish_date", date)
+                                                   .AddParam("signed", signedInt)
+                                                   .AddParam("from_group", fromGroupInt)
+                                                   .AddParam("message", message)
+                                                   .AddParam("attachments", attachmentsString));
 
          checkForErrors(response);
 

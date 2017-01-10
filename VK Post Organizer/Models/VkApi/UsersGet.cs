@@ -10,8 +10,11 @@ namespace vk.Models.VkApi {
       }
 
       public UsersGetResponse Get() {
-         var response = ExecuteMethod("users.get", "fields=first_name,last_name,photo_50");
+         var response = ExecuteMethod("users.get", VkParam.New()
+                                                   .AddParam("fields", "first_name,last_name,photo_50"));
+
          checkForErrors(response);
+
          return JsonConvert.DeserializeObject<UsersGetResponse>(response);
       }
    }

@@ -23,10 +23,12 @@ namespace vk.Models.VkApi {
          var jphoto = jsonedResponse["photo"];
          var jhash = jsonedResponse["hash"];
 
-         var response = ExecuteMethod("photos.saveWallPhoto", $"group_id={groupID}" +
-                                                              $"&server={jserver}" +
-                                                              $"&photo={jphoto}" +
-                                                              $"&hash={jhash}");
+
+         var response = ExecuteMethod("photos.saveWallPhoto", VkParam.New()
+                                                   .AddParam("group_id", groupID)
+                                                   .AddParam("server", jserver)
+                                                   .AddParam("photo", jphoto)
+                                                   .AddParam("hash", jhash));
 
          checkForErrors(response);
 

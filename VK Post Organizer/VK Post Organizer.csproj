@@ -125,6 +125,10 @@
       <HintPath>..\packages\Unity.4.0.1\lib\net45\Microsoft.Practices.Unity.RegistrationByConvention.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="MimeTypeMap, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MediaTypeMap.2.1.0.0\lib\net40\MimeTypeMap.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -160,6 +164,7 @@
     <Compile Include="Models\VkApi\PhotosGetWallUploadSever.cs" />
     <Compile Include="Models\VkApi\PhotosSaveWallPhoto.cs" />
     <Compile Include="Models\VkApi\StatsTrackVisitor.cs" />
+    <Compile Include="Models\VkApi\VkParam.cs" />
     <Compile Include="Utils\GroupNameCache.cs" />
     <Compile Include="Models\Files\ImageExtensionChecker.cs" />
     <Compile Include="Models\UrlHelper\DocumentPreviewUrlObtainer.cs" />
@@ -178,6 +183,8 @@
     <Compile Include="Utils\EnumExtensions.cs" />
     <Compile Include="Utils\EnumHelper.cs" />
     <Compile Include="Models\Filter\IPostFilter.cs" />
+    <Compile Include="Utils\SizeHelper.cs" />
+    <Compile Include="Utils\MimeTypeLibrary.cs" />
     <Compile Include="Utils\UnixTimeConverter.cs" />
     <Compile Include="Models\UrlHelper\IImageUrlObtainer.cs" />
     <Compile Include="ViewModels\ImageItem.cs" />
