@@ -14,8 +14,8 @@
         
         WindowStartupLocation="CenterScreen"
         Title="Upload" 
-        MinHeight="500" MinWidth="500"
-        Height="500"
+        MinHeight="600" MinWidth="500"
+        Height="600"
         Width="700"
         Background="#edeef0">
     <Window.DataContext>
@@ -34,7 +34,8 @@
             <Grid Margin="5">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="30"/>
-                    <RowDefinition/>
+                    <RowDefinition Height="200"/>
+                    <RowDefinition Height="180"/>
                     <RowDefinition Height="80"/>
                 </Grid.RowDefinitions>
                 <TextBox Grid.Row="0" Style="{StaticResource VkTextBox}" 
@@ -56,11 +57,15 @@
                            Content="{Binding ProgressName, UpdateSourceTrigger=PropertyChanged}"
                            HorizontalAlignment="Center" VerticalAlignment="Center"
                            FontSize="28"></Label>
-                        <Label Content="{Binding filepath}" Height="30"></Label>
+                        <Label Content="{Binding Filepath}" Height="30"></Label>
                     </StackPanel>
                 </Border>
                 
-                <Grid Grid.Row="2">
+                <StackPanel Grid.Row="2">
+                    <Image Source="{Binding ImagePreview, UpdateSourceTrigger=PropertyChanged}" Height="180" Width="180"></Image>
+                </StackPanel>
+                
+                <Grid Grid.Row="3">
                     <Grid.RowDefinitions>
                         <RowDefinition/>
                         <RowDefinition/>
@@ -70,7 +75,7 @@
                            HorizontalAlignment="Right" Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityConverter}}"></Label>
 
                     <ProgressBar Grid.Row="1" Style="{StaticResource VkProgressBar}" 
-                             Minimum="0" Maximum="50" 
+                             Minimum="0" Maximum="100" 
                              Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityConverter}}"
                              Value="{Binding UploadProgress, UpdateSourceTrigger=PropertyChanged}" Height="25" Margin="1"/>
                     

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -8,6 +9,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using GongSolutions.Wpf.DragDrop;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
@@ -40,7 +43,7 @@ namespace vk.ViewModels {
          set { SetProperty(ref _text, value); }
       }
 
-      public string filepath {
+      public string Filepath {
          get { return _filepath; }
          set { SetProperty(ref _filepath, value); }
       }
@@ -98,7 +101,17 @@ namespace vk.ViewModels {
       }
 
       public void ImportFiles(IEnumerable<string> files) {
-         filepath = files.First();
+         Filepath = files.First();
+
+         if (File.Exists(Filepath) && App.Container.Resolve<ImageExtensionChecker>().IsFileHaveValidExtension(Filepath)) {
+            var src = new BitmapImage();
+            src.BeginInit();
+            src.CacheOption = BitmapCacheOption.OnLoad;
+            src.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
+            src.UriSource = new Uri(Filepath, UriKind.Absolute);
+            src.EndInit();
+            ImagePreview = src;
+         }
          //var filter = new FileFilter(new ImageExtensionChecker());
          //Files.AddRange(filter.FilterOut(files));
       }
@@ -106,6 +119,7 @@ namespace vk.ViewModels {
       private string _urlOfImageToDownload;
       private string _progressString;
       private string _progressName;
+      private ImageSource _imagePreview;
 
       public UploadViewModel() {
          Files = new SmartCollection<string>();
@@ -125,7 +139,7 @@ namespace vk.ViewModels {
          if (result == true) {
             var file = openFile.FileName;
             if (checker.IsFileHaveValidExtension(file)) {
-               filepath = file;
+               Filepath = file;
             }
          }
       }
@@ -141,6 +155,11 @@ namespace vk.ViewModels {
             SetProperty(ref _urlOfImageToDownload, value);
             uploadImageIfPossible();
          }
+      }
+
+      public ImageSource ImagePreview {
+         get { return _imagePreview; }
+         set { SetProperty(ref _imagePreview, value); }
       }
 
       public bool IsImageContentType(string contentType) {
@@ -167,9 +186,13 @@ namespace vk.ViewModels {
 
       private async void uploadImageIfPossible() {
          if (string.IsNullOrEmpty(UrlOfImageToDownload)) return;
+         if (UrlHelper.IsUrlIsValid(UrlOfImageToDownload) == false) return;
 
          var url = UrlOfImageToDownload;
          IsBusy = true;
+
+         Filepath = "";
+         ImagePreview = null;
 
          string contentType;
 
@@ -198,7 +221,8 @@ namespace vk.ViewModels {
          }
          catch (IOException ex) {
             MessageBox.Show($"{ex.Message}\n{ex.StackTrace}");
-            filepath = "";
+            Filepath = "";
+            ImagePreview = null;
             IsBusy = false;
             return;
          }
@@ -220,13 +244,23 @@ namespace vk.ViewModels {
             }
          }
          catch (Exception ex) {
-            MessageBox.Show($"{ex.Message}\n{ex.StackTrace}");
-            filepath = "";
+            MessageBox.Show($"{ex.Message}\n{ex.StackTrace}", ex.ToString(), MessageBoxButton.OK, MessageBoxImage.Error);
+            Filepath = "";
+            ImagePreview = null;
             IsBusy = false;
             return;
          }
 
-         filepath = fileLocation;
+         Filepath = fileLocation;
+
+         var src = new BitmapImage();
+         src.BeginInit();
+         src.CacheOption = BitmapCacheOption.OnLoad;
+         src.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
+         src.UriSource = new Uri(fileLocation, UriKind.Absolute);
+         src.EndInit();
+         ImagePreview = src;
+
          IsBusy = false;
          UrlOfImageToDownload = string.Empty;
       }
@@ -242,12 +276,12 @@ namespace vk.ViewModels {
             var attachments = new List<string>();
             var wallPostMethod = App.Container.Resolve<WallPost>();
 
-            if (!string.IsNullOrEmpty(filepath) || File.Exists(filepath)) {
+            if (!string.IsNullOrEmpty(Filepath) || File.Exists(Filepath)) {
 
                byte[] uploadBytes;
                using (var wc = new WebClient()) {
                   wc.UploadProgressChanged += onUploadProgressChanged;
-                  uploadBytes = await wc.UploadFileTaskAsync(new Uri(uploadServer.UploadUrl), "POST", filepath);
+                  uploadBytes = await wc.UploadFileTaskAsync(new Uri(uploadServer.UploadUrl), "POST", Filepath);
                }
 
                if (uploadBytes == null) return;
@@ -267,17 +301,18 @@ namespace vk.ViewModels {
             }
 
             wallPostMethod.Post(-Wall.WallHolder.ID, Text, false, true, DateUnix, attachments);
-
+         }
+         catch (VkException ex) {
+            MessageBox.Show($"{ex.Message}\n\nStackTrace:\n{ex.StackTrace}", ex.ToString(), MessageBoxButton.OK, MessageBoxImage.Error);
+         }
+         finally {
             Text = "";
-            filepath = "";
+            Filepath = "";
+            ImagePreview = null;
 
             Messenger.Broadcast("refresh");
             getNextDate();
 
-            IsBusy = false;
-         }
-         catch (VkException ex) {
-            MessageBox.Show(ex.Message);
             IsBusy = false;
          }
       }
@@ -294,7 +329,7 @@ namespace vk.ViewModels {
 
       private void onUploadProgressChanged(object sender, UploadProgressChangedEventArgs e) {
          ProgressName = "Uploading...";
-         updateProgress(e.ProgressPercentage, e.BytesSent, e.TotalBytesToSend);
+         updateProgress(e.ProgressPercentage * 2, e.BytesSent, e.TotalBytesToSend);
       }
 
       private void getNextDate() {
