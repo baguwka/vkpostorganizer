@@ -6,24 +6,21 @@ using vk.ViewModels;
 
 namespace vk.Views {
    public partial class MainView : Window {
-      private IVM getViewModel => (IVM)DataContext;
+      private IViewModel getViewModel => (IViewModel)DataContext;
 
       public MainView() {
          InitializeComponent();
-         MainViewData data;
-         if (SaveLoaderHelper.TryLoad("Main Window Data", out data)) {
-            MainWindow.Width = data.Width;
-            MainWindow.Height = data.Heigth;
-         }
-
       }
 
-      private void onLoaded(object sender, RoutedEventArgs e) {
+      private async void onLoaded(object sender, RoutedEventArgs e) {
          getViewModel.OnLoad();
-         MainViewData data;
-         if (SaveLoaderHelper.TryLoad("Main Window Data", out data)) {
-            MainWindow.Left = data.X;
-            MainWindow.Top = data.Y;
+         var windowData = await SaveLoaderHelper.TryLoadAsync<MainViewData>("Main Window Data");
+
+         if (windowData.Successful) {
+            MainWindow.Width = windowData.Result.Width;
+            MainWindow.Height = windowData.Result.Heigth;
+            MainWindow.Left = windowData.Result.X;
+            MainWindow.Top = windowData.Result.Y;
          }
       }
 
@@ -34,13 +31,6 @@ namespace vk.Views {
       }
 
       private void onInitialized(object sender, EventArgs e) {
-      }
-
-      private void onDrop(object sender, DragEventArgs e) {
-         if (e.Data.GetDataPresent(DataFormats.FileDrop)) {
-            var files = (string[])e.Data.GetData(DataFormats.FileDrop);
-            ((MainVM)getViewModel).ImportFiles(files);
-         }
       }
    }
 

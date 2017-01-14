@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Data;
 
 namespace vk.Converter {
+   [ValueConversion(typeof(bool), typeof(Visibility))]
    class BoolToVisibilityHiddenConverter : IValueConverter {
       public Visibility visibility;
 
@@ -17,6 +18,8 @@ namespace vk.Converter {
          return visibility;
       }
    }
+
+   [ValueConversion(typeof(bool), typeof(Visibility))]
    class BoolToVisibilityCollapsedConverter : IValueConverter {
       public Visibility visibility;
 
@@ -31,6 +34,7 @@ namespace vk.Converter {
       }
    }
 
+   [ValueConversion(typeof(bool), typeof(Visibility))]
    class BoolToVisibilityNegativeCollapsedConverter : IValueConverter {
       public Visibility visibility;
 

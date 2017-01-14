@@ -7,7 +7,7 @@ namespace vk.Views {
    /// Interaction logic for ScheduleWindow.xaml
    /// </summary>
    public partial class ScheduleWindow : Window {
-      private IVM getViewModel => (IVM)DataContext;
+      private IViewModel getViewModel => (IViewModel)DataContext;
 
       public ScheduleWindow() {
          InitializeComponent();
@@ -15,7 +15,7 @@ namespace vk.Views {
 
       //todo: use blend triggers and commands instead of this
       private void Selector_OnSelectionChanged(object sender, SelectionChangedEventArgs e) {
-         var vm = (ScheduleVM)getViewModel;
+         var vm = (ScheduleViewModel)getViewModel;
          vm.OnSelectionChange();
       }
 

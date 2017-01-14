@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
 
 namespace vk.ViewModels {
-   public class ScheduleNameEditVM : BindableBase, IVM {
+   public class ScheduleNameEditViewModel : BindableBase, IViewModel {
       private string _name;
       public ICommand CancelCommand { get; set; }
       public ICommand OkCommand { get; set; }
@@ -14,7 +15,7 @@ namespace vk.ViewModels {
          set { SetProperty(ref _name, value); }
       }
 
-      public ScheduleNameEditVM() {
+      public ScheduleNameEditViewModel() {
          CancelCommand = new DelegateCommand(cancelCommandExecute);
          OkCommand = new DelegateCommand(okCommandExecute);
       }
@@ -36,5 +37,12 @@ namespace vk.ViewModels {
       public void OnClosed() {
       }
 
+      public Task OnLoadAsync() {
+         throw new NotImplementedException();
+      }
+
+      public Task OnClosingAsync() {
+         throw new NotImplementedException();
+      }
    }
 }

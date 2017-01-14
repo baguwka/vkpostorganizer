@@ -12,16 +12,14 @@
         Title="Vk.com postpone helper" WindowStartupLocation="CenterScreen"
         Icon="/Resources/32x32.ico"
         
-        AllowDrop="{Binding IsWallShowing, UpdateSourceTrigger=PropertyChanged}"
-        Drop="onDrop"
         Initialized="onInitialized"
         Loaded="onLoaded"
         Closing="onClosing" Background="#edeef0">
     <Window.DataContext>
-        <vm:MainVM/>
+        <vm:MainViewModel/>
     </Window.DataContext>
-    
-    <Grid Margin="10">
+
+    <Grid Margin="10" IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBooleanConverter}}">
         <Grid.RowDefinitions>
             <RowDefinition Height="65"/>
             <RowDefinition/>
@@ -34,12 +32,14 @@
                     <ColumnDefinition Width="50"/>
                     <ColumnDefinition/>
                     <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="100"/>
                 </Grid.ColumnDefinitions>
                 <Image Grid.Column="0" Source="{Binding ProfilePhoto, UpdateSourceTrigger=PropertyChanged}" Name="ProfilePhotoSource"></Image>
                 <Label Grid.Column="1" Content="{Binding Content, UpdateSourceTrigger=PropertyChanged}"></Label>
-                <Button Grid.Column="2" Content="Log out" Height="25" VerticalAlignment="Top" Style="{StaticResource VkBlue}" Command="{Binding LogOutCommand}" 
+                <Button Grid.Column="2" Margin="0,0,2,0" Content="Settings" Height="25" VerticalAlignment="Top" Style="{StaticResource VkBlue}" Command="{Binding SettingsCommand}"/>
+                <Button Grid.Column="3" Margin="2,0,0,0" Content="Log out" Height="25" VerticalAlignment="Top" Style="{StaticResource VkBlue}" Command="{Binding LogOutCommand}" 
                     Visibility="{Binding IsAuthorized, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                <Button Grid.Column="2" Content="Authorize" Height="25" VerticalAlignment="Top" Style="{StaticResource VkBlue}" Command="{Binding AuthorizeCommand}" 
+                <Button Grid.Column="3" Margin="2,0,0,0" Content="Authorize" Height="25" VerticalAlignment="Top" Style="{StaticResource VkBlue}" Command="{Binding AuthorizeCommand}" 
                     Visibility="{Binding IsAuthorized, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityNegativeConverter}}"/>
             </Grid>
         </Border>
@@ -85,7 +85,7 @@
                         <Button Margin="0,5,0,5" Content="Configure schedule" Style="{StaticResource VkBlue}" 
                                 Command="{Binding ConfigureScheduleCommand}"
                                 ToolTip="This is not implemented yet"
-                                Height="25" Width="150" IsEnabled="False"></Button>
+                                Height="25" Width="150" IsEnabled="True"></Button>
                         <Label Style="{StaticResource VkLabel}" Content="{Binding InfoPanel, UpdateSourceTrigger=PropertyChanged}"/>
                     </StackPanel>
                 </Grid>
@@ -109,11 +109,18 @@
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="100"/>
                                             <ColumnDefinition/>
-                                            <ColumnDefinition Width="25"/>
+                                            <ColumnDefinition Width="100"/>
                                         </Grid.ColumnDefinitions>
-                                        <Label Grid.Column="0" Height="25" Content="{Binding Post.DateString}"></Label>
+                                        <Button Grid.Column="0" Height="25" Style="{StaticResource VkMimic}" Command="{Binding OpenPost}"
+                                                IsEnabled="{Binding PostType, Converter={StaticResource PostTypeToBoolConverter}}">
+                                            <Label Height="25" Content="{Binding Post.DateString}"></Label>
+                                        </Button>
                                         <Label Grid.Column="1" Height="25" Content="{Binding Post.Text}"></Label>
-                                        <Button Grid.Column="2" Height="25" Width="25" Content="+" Style="{StaticResource VkCommon}"
+                                        <Button Grid.Column="2" HorizontalAlignment="Right" Height="25" Width="100" Content="Upload" Style="{StaticResource VkCommon}"
+                                                Visibility="{Binding PostType, Converter={StaticResource MissingPostIsShowingConverter}}"
+                                                Command="{Binding UploadAtThisDateCommand}"/>
+                                        <Button Grid.Column="2" HorizontalAlignment="Right" Height="25" Width="25" Content="+" Style="{StaticResource VkCommon}"
+                                                Visibility="{Binding PostType, Converter={StaticResource MissingPostIsHiddenConverter}}"
                                                 Command="{Binding ExpandToggleCommand}"/>
                                     </Grid>
                                     <ItemsControl Margin="10" HorizontalAlignment="Center" ItemsSource="{Binding Images, UpdateSourceTrigger=PropertyChanged}" 
@@ -158,10 +165,9 @@
                 <Button Margin="5,0,5,0" Height="25" Grid.Column="1" Content="Refresh" Style="{StaticResource VkCommon}" Command="{Binding RefreshCommand}"
                         Visibility="{Binding IsAuthorized, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}"/>
                 
-                <!--<Button Margin="5,0,5,0" Height="25" Visibility="{Binding IsWallShowing, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}"
-                Grid.Column="2" Content="Test post" Style="{StaticResource VkBlue}" Command="{Binding TestPostCommand}"/>
+                <Button Margin="5,0,5,0" Height="25" Visibility="{Binding IsWallShowing, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}"
+                Grid.Column="2" Content="Upload" Style="{StaticResource VkBlue}" Command="{Binding UploadCommand}"/>
                 
-                <TextBox Margin="5,0,5,0" Grid.Column="3" VerticalContentAlignment="Center" Text="{Binding TestingGroup, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>-->
             </Grid>
         </Border>
     </Grid>

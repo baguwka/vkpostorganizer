@@ -14,7 +14,7 @@
         Width="500"
         Background="#edeef0">
     <Window.DataContext>
-        <vm:ScheduleVM/>
+        <vm:ScheduleViewModel/>
     </Window.DataContext>
 
     <Grid Margin="10">

@@ -14,7 +14,7 @@
         Width="300"
         Background="#edeef0">
     <Window.DataContext>
-        <vm:ScheduleNameEditVM/>
+        <vm:ScheduleNameEditViewModel/>
     </Window.DataContext>
     <Grid Margin="10">
         <Grid.RowDefinitions>

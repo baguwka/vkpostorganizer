@@ -9,6 +9,8 @@ namespace vk.Models.VkApi.Entities {
    [UsedImplicitly]
    public class Post : BindableBase {
       private int _id;
+      private int _fromId;
+      private int _ownerId;
       private string _text;
       private int _dateUnix;
       private SmartCollection<Attachment> _attachments;
@@ -18,11 +20,23 @@ namespace vk.Models.VkApi.Entities {
       public Post() {
          Attachments = new SmartCollection<Attachment>();
       }
-
+      
       [JsonProperty(PropertyName = "id")]
       public int ID {
          get { return _id; }
          set { SetProperty(ref _id, value); }
+      }
+
+      [JsonProperty(PropertyName = "from_id")]
+      public int FromId {
+         get { return _fromId; }
+         set { SetProperty(ref _fromId, value); }
+      }
+
+      [JsonProperty(PropertyName = "owner_id")]
+      public int OwnerId {
+         get { return _ownerId; }
+         set { SetProperty(ref _ownerId, value); }
       }
 
       [JsonProperty(PropertyName = "text")]

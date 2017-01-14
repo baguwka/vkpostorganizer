@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -18,22 +17,22 @@ using vk.Utils;
 using vk.Views;
 
 namespace vk.ViewModels {
-   class MainVM : BindableBase, IVM {
+   class MainViewModel : BindableBase, IViewModel {
       private string _content;
       private ImageSource _profilePhoto;
       private bool _isAuthorized;
       private bool _isWallShowing;
       private PostType _currentPostTypeFilter;
       private bool _canTestPost;
-      private int _testingGroup;
       private int _missingPosts;
       private int _postCount;
       private int _repostCount;
       private int _totalPostCount;
       private string _infoPanel;
+      private bool _isBusy;
 
       public WallList ListOfAvaliableWalls { get; }
-      public WallVM Wall { get; }
+      public WallControl Wall { get; }
 
       private const string DEFAULT_AVATAR =
          "pack://application:,,,/VKPostOrganizer;component/Resources/default_avatar.png";
@@ -41,10 +40,10 @@ namespace vk.ViewModels {
       public ICommand ConfigureScheduleCommand { get; set; }
       public ICommand BackCommand { get; set; }
       public ICommand RefreshCommand { get; set; }
-      public ICommand TestPostCommand { get; set; }
+      public ICommand UploadCommand { get; set; }
       public ICommand AuthorizeCommand { get; set; }
       public ICommand ApplyScheduleCommand { get; set; }
-
+      public ICommand SettingsCommand { get; set; }
       public ICommand LogOutCommand { get; set; }
 
       public IEnumerable<ValueDescription> PostTypes => EnumHelper.GetAllValuesAndDescriptions<PostType>();
@@ -55,11 +54,6 @@ namespace vk.ViewModels {
             SetProperty(ref _currentPostTypeFilter, value);
             applyFilter(_currentPostTypeFilter);
          }
-      }
-
-      public int TestingGroup {
-         get { return _testingGroup; }
-         set { SetProperty(ref _testingGroup, value); }
       }
 
       public bool CanTestPost {
@@ -117,20 +111,31 @@ namespace vk.ViewModels {
          set { SetProperty(ref _infoPanel, value); }
       }
 
+      public bool IsBusy {
+         get { return _isBusy; }
+         set { SetProperty(ref _isBusy, value); }
+      }
 
-      public MainVM() {
+
+      public MainViewModel() {
          ConfigureScheduleCommand = new DelegateCommand(configureScheduleCommandExecute);
          BackCommand = new DelegateCommand(backCommandExecute);
          RefreshCommand = new DelegateCommand(refreshCommandExecute);
          AuthorizeCommand = new DelegateCommand(authorizeCommandExecute);
-         TestPostCommand = new DelegateCommand(testPostCommandExecute);
+         UploadCommand = new DelegateCommand(uploadCommandExecute);
 
          LogOutCommand = new DelegateCommand(logOutCommandExecute);
 
          ApplyScheduleCommand = new DelegateCommand(applyScheduleCommandExecute);
+         SettingsCommand = new DelegateCommand(settingsCommandExecute);
 
          ListOfAvaliableWalls = App.Container.Resolve<WallList>();
-         Wall = App.Container.Resolve<WallVM>();
+         Wall = App.Container.Resolve<WallControl>();
+
+         Wall.UploadRequested += (sender, control) => {
+            var upload = new UploadWindow(new UploadInfo(new WallControl(Wall.WallHolder), null, control.Post.DateUnix));
+            upload.Show();
+         };
 
          Wall.Items.CollectionChanged += (sender, args) => {
             var realPosts = Wall.Items.Where(post => post.IsExisting).ToList();
@@ -147,6 +152,13 @@ namespace vk.ViewModels {
          CurrentPostTypeFilter = PostType.All;
 
          CurrentSchedule = new Schedule();
+
+         Messenger.AddListener("refresh", refreshWall);
+      }
+
+      private void settingsCommandExecute() {
+         var settings = new SettingsView();
+         settings.ShowDialog();
       }
 
       private void applyScheduleCommandExecute() {
@@ -156,36 +168,23 @@ namespace vk.ViewModels {
 
       public Schedule CurrentSchedule { get; set; }
 
-
-      private void testPostCommandExecute() {
-         var upload = new UploadWindow(Wall.Items, null);
-         upload.ShowDialog();
-
+      public bool IsUploadAllowed() {
          //if (TestingGroup != Wall.WallHolder.ID) {
-         //   var groupsGet = App.Container.Resolve<GroupsGetById>();
-         //   var response = groupsGet.Get(TestingGroup);
-         //   var group = response.Response.FirstOrDefault();
-
-         //   MessageBox.Show($"You're only available to post in \"{group?.Name}\" wall in testing purposes.", "Cant post here",
+         //   MessageBox.Show($"You're only available to post in \"{GroupNameCache.GetGroupName(TestingGroup)}\" wall in safety purposes.", "Cant upload here",
          //      MessageBoxButton.OK, MessageBoxImage.Error);
-         //   return;
+            
+         //   return false;
          //}
+         return true;
+      }
 
-         //var wallPost = App.Container.Resolve<WallPost>();
+      private void uploadCommandExecute() {
+         if (IsUploadAllowed() == false) {
+            return;
+         }
 
-         //try {
-         //   var date = new DateTime(2016, 12, 22, 18, 30, 0);
-         //   for (int i = 0; i < 150; i++) {
-         //      date = date.AddHours(1);
-         //      var unixTimestamp = UnixTimeConverter.ToUnix(date);
-         //      var post = wallPost.Post(Wall.WallHolder.ID, $"Тестовая пустая отложка номер {i}", false, true, unixTimestamp);
-         //   }
-
-         //   refreshCommandExecute();
-         //}
-         //catch (VkException ex) {
-         //   MessageBox.Show(ex.Message);
-         //}
+         var upload = new UploadWindow(new UploadInfo(new WallControl(Wall.WallHolder), null));
+         upload.Show();
       }
 
       private void applyFilter(PostType currentPostTypeFilter) {
@@ -196,7 +195,6 @@ namespace vk.ViewModels {
 
       private void onGroupItemClicked(object sender, WallItem wallItem) {
          IsWallShowing = true;
-         CanTestPost = TestingGroup == wallItem.WallHolder.ID;
 
          try {
             Wall.PullWithScheduleHightlight(wallItem.WallHolder, CurrentPostTypeFilter.GetFilter(), CurrentSchedule);
@@ -209,8 +207,8 @@ namespace vk.ViewModels {
       }
 
       private void configureScheduleCommandExecute() {
-         var configureContentView = new ScheduleWindow();
-         configureContentView.ShowDialog();
+         //var configureContentView = new ScheduleWindow();
+         //configureContentView.ShowDialog();
       }
 
       private void fillWallList() {
@@ -247,7 +245,11 @@ namespace vk.ViewModels {
 
       private void refreshCommandExecute() {
          if (!IsAuthorized) return;
-         Messenger.Broadcast("Refresh");
+         Messenger.Broadcast("refresh");
+         refreshWall();
+      }
+
+      private void refreshWall() {
          if (IsWallShowing) {
             Wall.PullWithScheduleHightlight(CurrentPostTypeFilter.GetFilter(), CurrentSchedule);
          }
@@ -301,6 +303,8 @@ namespace vk.ViewModels {
 
             IsAuthorized = true;
 
+            App.Container.Resolve<StatsTrackVisitor>().Track();
+
             fillWallList();
          }
          catch (VkException ex) {
@@ -338,37 +342,39 @@ namespace vk.ViewModels {
          Authorize(true);
       }
 
-      public void ImportFiles(IEnumerable<string> files) {
-         //var sb = new StringBuilder();
-         //foreach (var file in files) {
-         //   sb.AppendLine(file);
-         //}
-         var upload = new UploadWindow(Wall.Items, files);
-         upload.ShowDialog();
-         //MessageBox.Show($"Importing\n{sb}");
-      }
-
       private void logOutCommandExecute() {
-         var result = MessageBox.Show("Are you sure you want to log out?", "Logging out", MessageBoxButton.YesNo);
+         var result = MessageBox.Show("Are you sure you want to log out?", 
+            "Logging out", MessageBoxButton.YesNo);
 
          if (result == MessageBoxResult.Yes) {
             Deauthorize();
          }
       }
 
-      public void OnLoad() {
-         MainVMSaveInfo data;
-         if (SaveLoaderHelper.TryLoad("MainVM", out data)) {
-            TestingGroup = data.TestingGroup;
-         }
+      public async void OnLoad() {
+         IsBusy = true;
 
          SetUpAvatar(DEFAULT_AVATAR);
 
          authorizeIfAlreadyLoggined();
+
+         var mainVmData = await SaveLoaderHelper.TryLoadAsync<MainVMSaveInfo>("MainVM");
+         if (mainVmData.Successful) {
+            //TestingGroup = data.TestingGroup;
+         }
+
+         var settingsData = await SaveLoaderHelper.TryLoadAsync<Settings>("Settings");
+         if (settingsData.Successful) {
+            App.Container.RegisterInstance(new Settings(settingsData.Result));
+         }
+
+         IsBusy = false;
       }
 
       public void OnClosing() {
-         SaveLoaderHelper.Save("MainVM", new MainVMSaveInfo(TestingGroup));
+         var some = App.Container.Resolve<Settings>();
+         SaveLoaderHelper.Save("MainVM", new MainVMSaveInfo());
+         SaveLoaderHelper.Save("Settings", some);
       }
 
       public void OnClosed() {
@@ -377,10 +383,8 @@ namespace vk.ViewModels {
 
    [Serializable]
    public class MainVMSaveInfo : CommonSaveData {
-      public MainVMSaveInfo(int testingGroup) {
-         TestingGroup = testingGroup;
+      public MainVMSaveInfo() {
       }
-
-      public int TestingGroup { get; set; }
+      
    }
 }

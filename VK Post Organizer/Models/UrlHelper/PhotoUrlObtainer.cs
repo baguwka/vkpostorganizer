@@ -1,10 +1,13 @@
-using System;
 using vk.Models.VkApi.Entities;
 using vk.ViewModels;
 
 namespace vk.Models.UrlHelper {
    public class PhotoUrlObtainer : IImageUrlObtainer {
       public ImageItem Obtain(Attachment attachment, ImageSize preferableImageSize = ImageSize.Any) {
+
+         if (!string.IsNullOrEmpty(attachment.Photo.Photo2560) && (preferableImageSize & ImageSize.Large) != 0) {
+            return new ImageItem(attachment.Photo.Photo2560, attachment.Photo.GetLargest());
+         }
 
          if (!string.IsNullOrEmpty(attachment.Photo.Photo1280) && (preferableImageSize & ImageSize.Large) != 0) {
             return new ImageItem(attachment.Photo.Photo1280, attachment.Photo.GetLargest());

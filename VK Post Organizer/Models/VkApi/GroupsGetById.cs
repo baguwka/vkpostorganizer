@@ -9,7 +9,9 @@ namespace vk.Models.VkApi {
       }
 
       public GroupsGetByIdResponse Get(int id, string fields = "") {
-         var response = ExecuteMethod("groups.getById", $"group_id={id}&fields={fields}");
+         var response = ExecuteMethod("groups.getById", VkParameters.New()
+                                                   .AddParameter("group_id", id)
+                                                   .AddParameter("fields", fields));
          checkForErrors(response);
          return JsonConvert.DeserializeObject<GroupsGetByIdResponse>(response);
       }

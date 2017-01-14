@@ -76,9 +76,20 @@
   <PropertyGroup>
     <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>VK Post Organizer_TemporaryKey.pfx</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Data Persistence Provider">
+    <Reference Include="Data Persistence Provider, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Data Persistence Provider.dll</HintPath>
+    </Reference>
+    <Reference Include="GongSolutions.Wpf.DragDrop, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\gong-wpf-dragdrop.1.0.0\lib\net45\GongSolutions.Wpf.DragDrop.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="JetBrains.Annotations, Version=10.2.1.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <HintPath>..\packages\JetBrains.Annotations.10.2.1\lib\net\JetBrains.Annotations.dll</HintPath>
@@ -122,6 +133,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -134,14 +146,51 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="Xceed.Wpf.AvalonDock, Version=3.0.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.3.0\lib\net40\Xceed.Wpf.AvalonDock.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Aero, Version=3.0.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.3.0\lib\net40\Xceed.Wpf.AvalonDock.Themes.Aero.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Metro, Version=3.0.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.3.0\lib\net40\Xceed.Wpf.AvalonDock.Themes.Metro.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.VS2010, Version=3.0.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.3.0\lib\net40\Xceed.Wpf.AvalonDock.Themes.VS2010.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Xceed.Wpf.DataGrid, Version=3.0.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.3.0\lib\net40\Xceed.Wpf.DataGrid.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Xceed.Wpf.Toolkit, Version=3.0.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.3.0\lib\net40\Xceed.Wpf.Toolkit.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converter\InverseBooleanConverter.cs" />
     <Compile Include="Converter\PostMarkToColorConverter.cs" />
+    <Compile Include="Converter\PostTypeToBoolConverter.cs" />
+    <Compile Include="Converter\MissingPostIsHiddenConverter.cs" />
     <Compile Include="Models\AppDataFolderProvider.cs" />
+    <Compile Include="Models\Files\ExtensionChecker.cs" />
+    <Compile Include="Models\Files\FileFilter.cs" />
+    <Compile Include="Models\ProxyProvider.cs" />
+    <Compile Include="Models\Settings.cs" />
+    <Compile Include="Models\VkApi\PhotosGetWallUploadSever.cs" />
+    <Compile Include="Models\VkApi\PhotosSaveWallPhoto.cs" />
+    <Compile Include="Models\VkApi\StatsTrackVisitor.cs" />
+    <Compile Include="Models\VkApi\VkParameters.cs" />
+    <Compile Include="Utils\GroupNameCache.cs" />
+    <Compile Include="Models\Files\ImageExtensionChecker.cs" />
     <Compile Include="Models\UrlHelper\DocumentPreviewUrlObtainer.cs" />
     <Compile Include="Models\UrlHelper\PhotoUrlObtainer.cs" />
     <Compile Include="Models\VkApi\Entities\Document.cs" />
@@ -158,13 +207,17 @@
     <Compile Include="Utils\EnumExtensions.cs" />
     <Compile Include="Utils\EnumHelper.cs" />
     <Compile Include="Models\Filter\IPostFilter.cs" />
+    <Compile Include="Utils\SizeHelper.cs" />
+    <Compile Include="Utils\MimeTypeLibrary.cs" />
     <Compile Include="Utils\UnixTimeConverter.cs" />
     <Compile Include="Models\UrlHelper\IImageUrlObtainer.cs" />
+    <Compile Include="Utils\UrlHelper.cs" />
     <Compile Include="ViewModels\ImageItem.cs" />
-    <Compile Include="ViewModels\ScheduleNameEditVM.cs" />
-    <Compile Include="ViewModels\ScheduleVM.cs" />
-    <Compile Include="ViewModels\UploadVM.cs" />
-    <Compile Include="ViewModels\WallVM.cs" />
+    <Compile Include="ViewModels\ScheduleNameEditViewModel.cs" />
+    <Compile Include="ViewModels\ScheduleViewModel.cs" />
+    <Compile Include="ViewModels\SettingsViewModel.cs" />
+    <Compile Include="ViewModels\UploadViewModel.cs" />
+    <Compile Include="ViewModels\WallControl.cs" />
     <Compile Include="Models\WallItem.cs" />
     <Compile Include="Models\WallList.cs" />
     <Compile Include="ViewModels\PostControl.cs" />
@@ -183,8 +236,8 @@
     <Compile Include="Models\VkApi\VkApiBase.cs" />
     <Compile Include="Models\VkApi\UsersGet.cs" />
     <Compile Include="Models\VkApi\WallGet.cs" />
-    <Compile Include="ViewModels\IVM.cs" />
-    <Compile Include="ViewModels\MainVM.cs" />
+    <Compile Include="ViewModels\IViewModel.cs" />
+    <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="Views\AuthView.xaml.cs">
       <DependentUpon>AuthView.xaml</DependentUpon>
     </Compile>
@@ -193,6 +246,9 @@
     </Compile>
     <Compile Include="Views\ScheduleWindow.xaml.cs">
       <DependentUpon>ScheduleWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SettingsView.xaml.cs">
+      <DependentUpon>SettingsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\UploadWindow.xaml.cs">
       <DependentUpon>UploadWindow.xaml</DependentUpon>
@@ -221,6 +277,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\ScheduleWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\SettingsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -270,9 +330,7 @@
   <ItemGroup>
     <Resource Include="Resources\default_avatar.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Models\DataPersistance\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Resource Include="Resources\16x16 icon.ico" />
   </ItemGroup>

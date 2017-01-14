@@ -10,7 +10,10 @@ namespace vk.Models.VkApi {
       }
 
       public GroupsGetResponse Get() {
-         var response = ExecuteMethod("groups.get", "extended=1&filter=editor&fields=description");
+         var response = ExecuteMethod("groups.get", VkParameters.New()
+                                                   .AddParameter("extended", 1)
+                                                   .AddParameter("filter", "editor")
+                                                   .AddParameter("fields", "description"));
          checkForErrors(response);
          return JsonConvert.DeserializeObject<GroupsGetResponse>(response);
       }

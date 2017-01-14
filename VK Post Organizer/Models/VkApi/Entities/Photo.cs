@@ -9,6 +9,7 @@ namespace vk.Models.VkApi.Entities {
       private string _photo75;
       private string _photo604;
       private string _photo1280;
+      private string _photo2560;
       private int _date;
       private string _text;
 
@@ -36,6 +37,12 @@ namespace vk.Models.VkApi.Entities {
          set { SetProperty(ref _photo1280, value); }
       }
 
+      [JsonProperty(PropertyName = "photo_2560")]
+      public string Photo2560 {
+         get { return _photo2560; }
+         set { SetProperty(ref _photo2560, value); }
+      }
+
       [JsonProperty(PropertyName = "date")]
       public int Date {
          get { return _date; }
@@ -49,6 +56,10 @@ namespace vk.Models.VkApi.Entities {
       }
 
       public string GetLargest() {
+         if (!string.IsNullOrEmpty(Photo2560)) {
+            return Photo2560;
+         }
+
          if (!string.IsNullOrEmpty(Photo1280)) {
             return Photo1280;
          }

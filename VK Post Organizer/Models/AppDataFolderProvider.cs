@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 using Data_Persistence_Provider;
 using JetBrains.Annotations;
 
@@ -12,7 +13,7 @@ namespace vk.Models {
          get {
             if (string.IsNullOrEmpty(_dataPath)) {
                _dataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) +
-                           "\\Baguwk\\Vk Post Organizer\\";
+                           "\\Baguwk\\Vk Postpone Helper\\";
                if (!Directory.Exists(_dataPath)) {
                   Directory.CreateDirectory(_dataPath);
                }
@@ -44,6 +45,24 @@ namespace vk.Models {
       public void Write(string key, string data) {
          using (var stream = new StreamWriter(getFilePath(key))) {
             stream.Write(data);
+         }
+      }
+
+      public async Task<string> ReadAsync(string key) {
+         var filepath = getFilePath(key);
+
+         if (!File.Exists(filepath)) {
+            return null;
+         }
+
+         using (var content = File.OpenText(filepath)) {
+            return await content.ReadToEndAsync();
+         }
+      }
+
+      public async Task WriteAsync(string key, string data) {
+         using (var stream = new StreamWriter(getFilePath(key))) {
+            await stream.WriteAsync(data);
          }
       }
    }

@@ -3,16 +3,47 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:converters="clr-namespace:vk.Converter"
              xmlns:local="clr-namespace:vk"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              Startup="CompositionRoot">
     <Application.Resources>
 
         <converters:PostMarkToColorConverter x:Key="PostMarkToColorConverter"/>
+        <converters:MissingPostIsHiddenConverter x:Key="MissingPostIsHiddenConverter"/>
+        <converters:MissingPostIsShowingConverter x:Key="MissingPostIsShowingConverter"/>
+        <converters:PostTypeToBoolConverter x:Key="PostTypeToBoolConverter"/>
         <converters:BoolToVisibilityHiddenConverter x:Key="BoolToVisibilityConverterHide"/>
         <converters:BoolToVisibilityCollapsedConverter x:Key="BoolToVisibilityConverter"/>
+        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
         <converters:BoolToVisibilityNegativeCollapsedConverter x:Key="BoolToVisibilityNegativeConverter"/>
 
 
 
+        <Style TargetType="{x:Type ProgressBar}" x:Key="VkProgressBar">
+            <Setter Property="Foreground">
+                <Setter.Value>
+                    <LinearGradientBrush EndPoint="0,0" StartPoint="32,8" 
+                     MappingMode="Absolute" SpreadMethod="Repeat">
+                        <GradientStop Color="#6B8DB3" Offset="0" />
+                        <GradientStop Color="#6B8DB3" Offset="0.5" />
+                        <GradientStop Color="#557AA4" Offset="0.5" />
+                        <GradientStop Color="#557AA4" Offset="1" />
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Background" Value="White"></Setter>
+            <Setter Property="BorderThickness" Value="1"></Setter>
+            <Setter Property="BorderBrush" Value="#CFDAE5"></Setter>
+
+        </Style>
+
+        <Style TargetType="{x:Type xctk:IntegerUpDown}" x:Key="VkIntegerUpDown">
+            <Setter Property="BorderBrush" Value="#d7d8db"></Setter>
+            <Setter Property="Foreground" Value="#4a7198"></Setter>
+        </Style>
+
+        <Style TargetType="{x:Type CheckBox}" x:Key="VkCheckBox">
+            <Setter Property="BorderBrush" Value="#5E81A8"></Setter>
+        </Style>
 
         <Style TargetType="{x:Type Label}" x:Key="VkLabel">
             <Setter Property="Foreground" Value="#4a7198"></Setter>
@@ -152,12 +183,38 @@
             <Setter Property="Background" Value="#ffffff"></Setter>
             <Setter Property="BorderBrush" Value="#d7d8db"></Setter>
             <Setter Property="BorderThickness" Value="1"></Setter>
+            <Setter Property="CornerRadius" Value="4"></Setter>
         </Style>
 
         
         <Style TargetType="{x:Type Button}" x:Key="VkMimic">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Cursor" Value="Hand"></Setter>
+            <Setter Property="BorderThickness" Value="0"></Setter>
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border CornerRadius="4" Background="{TemplateBinding Background}">
+                            <Grid>
+                                <ContentPresenter x:Name="MyContentPresenter" Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,0" />
+                            </Grid>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <!--<Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#5E81A8" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>-->
+
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#6888AD" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
 
         <Style TargetType="{x:Type Button}" x:Key="VkCommon">

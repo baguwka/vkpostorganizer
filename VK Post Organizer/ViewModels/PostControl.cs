@@ -1,18 +1,22 @@
 ﻿using System;
 using System.Linq;
 using System.Windows.Input;
+using JetBrains.Annotations;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
 using vk.Models;
 using vk.Models.UrlHelper;
 using vk.Models.VkApi.Entities;
+using vk.Utils;
 
 namespace vk.ViewModels {
+   [UsedImplicitly]
    public class PostControl : BindableBase {
       private bool _expanded;
       private PostMark _mark;
       private PostType _postType;
       public Post Post { get; }
+      public event EventHandler UploadRequested;
 
       public SmartCollection<ImageItem> Images { get; }
 
@@ -29,7 +33,9 @@ namespace vk.ViewModels {
          set { SetProperty(ref _mark, value); }
       }
 
+      public ICommand OpenPost { get; set; }
       public ICommand ExpandToggleCommand { get; set; }
+      public ICommand UploadAtThisDateCommand { get; set; }
 
       public bool IsExisting { get; set; }
 
@@ -57,6 +63,8 @@ namespace vk.ViewModels {
          Post = post;
 
          ExpandToggleCommand = new DelegateCommand(ExpandToggle);
+         OpenPost = new DelegateCommand(openPostCommand);
+         UploadAtThisDateCommand = new DelegateCommand(uploadAtThisDateCommandExecute);
 
          var prev = Post.CopyHistory?.FirstOrDefault();
          if (prev == null) {
@@ -65,12 +73,21 @@ namespace vk.ViewModels {
             return;
          }
 
+         var groupName = GroupNameCache.GetGroupName(prev.OwnerId);
+
          PostType = PostType.Repost;
-         Post.ID = prev.ID;
-         Post.Text = prev.Text;
+         Post.Text = $"{groupName.Substring(0, 10)} {prev.Text}";
          Post.Attachments = prev.Attachments;
 
          loadImages();
+      }
+
+      private void uploadAtThisDateCommandExecute() {
+         OnUploadRequested();
+      }
+
+      private void openPostCommand() {
+         System.Diagnostics.Process.Start($"https://vk.com/wall{Post.OwnerId}_{Post.ID}");
       }
 
       private void ExpandToggle() {
@@ -87,6 +104,10 @@ namespace vk.ViewModels {
 
       public void Collapse() {
          Expanded = false;
+      }
+
+      protected virtual void OnUploadRequested() {
+         UploadRequested?.Invoke(this, EventArgs.Empty);
       }
    }
 

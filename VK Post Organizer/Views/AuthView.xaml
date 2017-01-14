@@ -5,10 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:vk.Views"
         mc:Ignorable="d"
+        Icon="/Resources/32x32.ico"
         WindowStartupLocation="CenterScreen"
-        Title="AuthView" Height="500" Width="800">
+        Title="Authentication" Height="700" Width="800">
     <Grid>
-        <WebBrowser Name="InternalWebBrowser"
+        <WebBrowser Name="InternalWebBrowser" 
                     Navigated="WebBrowser_OnNavigated"
                     Navigating="WebBrowser_OnNavigating">
             
