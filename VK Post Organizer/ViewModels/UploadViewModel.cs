@@ -4,8 +4,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Http.Headers;
-using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -60,9 +58,17 @@ namespace vk.ViewModels {
          }
       }
 
+      public string ProgressName {
+         get { return _progressName; }
+         set { SetProperty(ref _progressName, value); }
+      }
+
       public string ProgressString {
          get { return _progressString; }
-         set { SetProperty(ref _progressString, value); }
+         set {
+            if (value == _progressName) return;
+            SetProperty(ref _progressString, value);
+         }
       }
 
       public WallControl Wall { get; private set; }
@@ -99,7 +105,7 @@ namespace vk.ViewModels {
       
       private string _urlOfImageToDownload;
       private string _progressString;
-      private string _proxyServer;
+      private string _progressName;
 
       public UploadViewModel() {
          Files = new SmartCollection<string>();
@@ -137,53 +143,50 @@ namespace vk.ViewModels {
          }
       }
 
-      public string ProxyServer {
-         get { return _proxyServer; }
-         set {
-            var uri = new UriBuilder(value).Uri;
-            SetProperty(ref _proxyServer, uri.ToString());
-         }
-      }
-
       public bool IsImageContentType(string contentType) {
          return contentType.ToLower(CultureInfo.InvariantCulture).StartsWith("image/");
       }
 
       public async Task<string> GetContentType(string url) {
-         try {
-            var req = (HttpWebRequest)WebRequest.Create(url);
-            req.Method = "HEAD";
+         var req = (HttpWebRequest)WebRequest.Create(url);
+         req.Proxy = null;
+         req.Method = "HEAD";
 
-            if (isUrlIsValid(ProxyServer)) {
-               req.Proxy = new WebProxy(ProxyServer);
+         var settings = App.Container.Resolve<Settings>();
+         if (settings.Proxy.UseProxy) {
+            var myProxy = App.Container.Resolve<ProxyProvider>().GetProxy();
+            if (myProxy != null) {
+               req.Proxy = myProxy;
             }
-
-            using (var response = await req.GetResponseAsync()) {
-               return response.ContentType;
-            }
          }
-         catch (Exception ex) {
-            MessageBox.Show($"{ex.Message}\n{ex.StackTrace}");
-            return "";
-         }
-      }
 
-      private bool isUrlIsValid(string url) {
-         if (!string.IsNullOrEmpty(url)) {
-            Uri uriResult;
-            return Uri.TryCreate(url, UriKind.Absolute, out uriResult)
-                && uriResult.Scheme == Uri.UriSchemeHttp;
-
+         using (var response = await req.GetResponseAsync()) {
+            return response.ContentType;
          }
-         return false;
       }
 
       private async void uploadImageIfPossible() {
-         var url = UrlOfImageToDownload;
-         var contentType = await GetContentType(url);
-         if (!IsImageContentType(contentType)) return;
+         if (string.IsNullOrEmpty(UrlOfImageToDownload)) return;
 
+         var url = UrlOfImageToDownload;
          IsBusy = true;
+
+         string contentType;
+
+         try {
+            ProgressName = "Recieving image info...";
+            contentType = await GetContentType(url);
+
+            if (!IsImageContentType(contentType)) {
+               IsBusy = false;
+               return;
+            }
+         }
+         catch (Exception ex) {
+            MessageBox.Show($"{ex.Message}\n{ex.StackTrace}", ex.ToString(), MessageBoxButton.OK, MessageBoxImage.Error);
+            IsBusy = false;
+            return;
+         }
 
          var ext = MimeTypeLibrary.GetExtension(contentType);
          var directory = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\Baguwk\\Vk Postpone Helper";
@@ -204,8 +207,12 @@ namespace vk.ViewModels {
 
          try {
             using (var wc = new WebClient()) {
-               if (isUrlIsValid(ProxyServer)) {
-                  wc.Proxy = new WebProxy(ProxyServer);
+               var settings = App.Container.Resolve<Settings>();
+               if (settings.Proxy.UseProxy) {
+                  var myProxy = App.Container.Resolve<ProxyProvider>().GetProxy();
+                  if (myProxy != null) {
+                     wc.Proxy = myProxy;
+                  }
                }
 
                wc.DownloadProgressChanged += onDownloadProgressChanged;
@@ -221,6 +228,7 @@ namespace vk.ViewModels {
 
          filepath = fileLocation;
          IsBusy = false;
+         UrlOfImageToDownload = string.Empty;
       }
 
       private async void uploadCommandExecute() {
@@ -274,14 +282,19 @@ namespace vk.ViewModels {
          }
       }
 
+      private void updateProgress(int percentage, long current, long total) {
+         UploadProgress = percentage;
+         ProgressString = $"{SizeHelper.Suffix(current)}/{SizeHelper.Suffix(total)}";
+      }
+
       private void onDownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e) {
-         UploadProgress = e.ProgressPercentage;
-         ProgressString = $"{SizeHelper.Suffix(e.BytesReceived)}/{SizeHelper.Suffix(e.TotalBytesToReceive)}";
+         ProgressName = "Downloading...";
+         updateProgress(e.ProgressPercentage, e.BytesReceived, e.TotalBytesToReceive);
       }
 
       private void onUploadProgressChanged(object sender, UploadProgressChangedEventArgs e) {
-         UploadProgress = e.ProgressPercentage;
-         ProgressString = $"{SizeHelper.Suffix(e.BytesSent)}/{SizeHelper.Suffix(e.TotalBytesToSend)}";
+         ProgressName = "Uploading...";
+         updateProgress(e.ProgressPercentage, e.BytesSent, e.TotalBytesToSend);
       }
 
       private void getNextDate() {

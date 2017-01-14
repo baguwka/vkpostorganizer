@@ -18,8 +18,8 @@
     <Window.DataContext>
         <vm:MainViewModel/>
     </Window.DataContext>
-    
-    <Grid Margin="10">
+
+    <Grid Margin="10" IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBooleanConverter}}">
         <Grid.RowDefinitions>
             <RowDefinition Height="65"/>
             <RowDefinition/>
@@ -32,12 +32,14 @@
                     <ColumnDefinition Width="50"/>
                     <ColumnDefinition/>
                     <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="100"/>
                 </Grid.ColumnDefinitions>
                 <Image Grid.Column="0" Source="{Binding ProfilePhoto, UpdateSourceTrigger=PropertyChanged}" Name="ProfilePhotoSource"></Image>
                 <Label Grid.Column="1" Content="{Binding Content, UpdateSourceTrigger=PropertyChanged}"></Label>
-                <Button Grid.Column="2" Content="Log out" Height="25" VerticalAlignment="Top" Style="{StaticResource VkBlue}" Command="{Binding LogOutCommand}" 
+                <Button Grid.Column="2" Margin="0,0,2,0" Content="Settings" Height="25" VerticalAlignment="Top" Style="{StaticResource VkBlue}" Command="{Binding SettingsCommand}"/>
+                <Button Grid.Column="3" Margin="2,0,0,0" Content="Log out" Height="25" VerticalAlignment="Top" Style="{StaticResource VkBlue}" Command="{Binding LogOutCommand}" 
                     Visibility="{Binding IsAuthorized, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                <Button Grid.Column="2" Content="Authorize" Height="25" VerticalAlignment="Top" Style="{StaticResource VkBlue}" Command="{Binding AuthorizeCommand}" 
+                <Button Grid.Column="3" Margin="2,0,0,0" Content="Authorize" Height="25" VerticalAlignment="Top" Style="{StaticResource VkBlue}" Command="{Binding AuthorizeCommand}" 
                     Visibility="{Binding IsAuthorized, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityNegativeConverter}}"/>
             </Grid>
         </Border>
@@ -83,7 +85,7 @@
                         <Button Margin="0,5,0,5" Content="Configure schedule" Style="{StaticResource VkBlue}" 
                                 Command="{Binding ConfigureScheduleCommand}"
                                 ToolTip="This is not implemented yet"
-                                Height="25" Width="150" IsEnabled="False"></Button>
+                                Height="25" Width="150" IsEnabled="True"></Button>
                         <Label Style="{StaticResource VkLabel}" Content="{Binding InfoPanel, UpdateSourceTrigger=PropertyChanged}"/>
                     </StackPanel>
                 </Grid>

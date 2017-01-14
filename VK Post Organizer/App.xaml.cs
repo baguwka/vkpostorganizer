@@ -24,6 +24,8 @@ namespace vk {
 
          Container = new UnityContainer();
 
+         Container.RegisterType<Settings>(new ContainerControlledLifetimeManager());
+
          Container.RegisterType<ISerializer, SaveLoadJsonSerializer>();
          Container.RegisterType<IDataProvider, AppDataFolderProvider>();
          Container.RegisterType<SaveLoadController>(new ContainerControlledLifetimeManager());
@@ -42,7 +44,7 @@ namespace vk {
 
       private void CurrentOnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e) {
          MessageBox.Show($"{e.Exception.Message}\n\n See dump at Windows Application Event Log.\nStack Trace:{e.Exception.StackTrace}", 
-            "Exception occured", MessageBoxButton.OK, MessageBoxImage.Error);
+            e.Exception.ToString(), MessageBoxButton.OK, MessageBoxImage.Error);
 
 #if !DEBUG
          e.Handled = true;

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
@@ -104,6 +105,14 @@ namespace vk.ViewModels {
       }
 
       public void OnClosed() {
+      }
+
+      public Task OnLoadAsync() {
+         throw new System.NotImplementedException();
+      }
+
+      public Task OnClosingAsync() {
+         throw new System.NotImplementedException();
       }
 
       public void OnSelectionChange() {

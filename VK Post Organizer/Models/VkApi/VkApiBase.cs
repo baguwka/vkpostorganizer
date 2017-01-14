@@ -35,7 +35,8 @@ namespace vk.Models.VkApi {
          uriParameters["access_token"] = Token.Token;
          uriParameters["v"] = "5.60";
 
-         uriBuilder.Query = string.Join("&", uriParameters.AllKeys.Select(key => $"{key}={HttpUtility.UrlEncode(uriParameters[key])}"));
+         uriBuilder.Query = string.Join("&", uriParameters.AllKeys
+            .Select(key => $"{key}={HttpUtility.UrlEncode(uriParameters[key])}"));
 
          var finalUri = uriBuilder.Uri;
 

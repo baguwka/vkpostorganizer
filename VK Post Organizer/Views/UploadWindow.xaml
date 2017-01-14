@@ -46,11 +46,6 @@
                             Command="{Binding BrowseCommand}"
                             Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityNegativeConverter}}"
                             Width="200" Height="25" Content="Drag here, browse or pass url" Margin="5,3,5,3"></Button>
-
-                        <TextBox Style="{StaticResource VkTextBox}" 
-                            Text="{Binding ProxyServer, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                            Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityNegativeConverter}}"
-                            Width="200" Height="25"  Margin="5,3,5,3"></TextBox>
                         
                         <TextBox Style="{StaticResource VkTextBox}" 
                             Text="{Binding UrlOfImageToDownload, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -58,7 +53,7 @@
                             Width="400" Height="25"  Margin="5,3,5,3"></TextBox>
                         
                         <Label Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityConverter}}"
-                           Content="Uploading, please wait..."
+                           Content="{Binding ProgressName, UpdateSourceTrigger=PropertyChanged}"
                            HorizontalAlignment="Center" VerticalAlignment="Center"
                            FontSize="28"></Label>
                         <Label Content="{Binding filepath}" Height="30"></Label>

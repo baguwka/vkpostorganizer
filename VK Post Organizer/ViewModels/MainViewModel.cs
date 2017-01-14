@@ -29,6 +29,7 @@ namespace vk.ViewModels {
       private int _repostCount;
       private int _totalPostCount;
       private string _infoPanel;
+      private bool _isBusy;
 
       public WallList ListOfAvaliableWalls { get; }
       public WallControl Wall { get; }
@@ -42,7 +43,7 @@ namespace vk.ViewModels {
       public ICommand UploadCommand { get; set; }
       public ICommand AuthorizeCommand { get; set; }
       public ICommand ApplyScheduleCommand { get; set; }
-
+      public ICommand SettingsCommand { get; set; }
       public ICommand LogOutCommand { get; set; }
 
       public IEnumerable<ValueDescription> PostTypes => EnumHelper.GetAllValuesAndDescriptions<PostType>();
@@ -110,6 +111,11 @@ namespace vk.ViewModels {
          set { SetProperty(ref _infoPanel, value); }
       }
 
+      public bool IsBusy {
+         get { return _isBusy; }
+         set { SetProperty(ref _isBusy, value); }
+      }
+
 
       public MainViewModel() {
          ConfigureScheduleCommand = new DelegateCommand(configureScheduleCommandExecute);
@@ -121,6 +127,7 @@ namespace vk.ViewModels {
          LogOutCommand = new DelegateCommand(logOutCommandExecute);
 
          ApplyScheduleCommand = new DelegateCommand(applyScheduleCommandExecute);
+         SettingsCommand = new DelegateCommand(settingsCommandExecute);
 
          ListOfAvaliableWalls = App.Container.Resolve<WallList>();
          Wall = App.Container.Resolve<WallControl>();
@@ -149,13 +156,17 @@ namespace vk.ViewModels {
          Messenger.AddListener("refresh", refreshWall);
       }
 
+      private void settingsCommandExecute() {
+         var settings = new SettingsView();
+         settings.ShowDialog();
+      }
+
       private void applyScheduleCommandExecute() {
          Wall?.PullWithScheduleHightlight(CurrentPostTypeFilter.GetFilter(), CurrentSchedule);
       }
 
 
       public Schedule CurrentSchedule { get; set; }
-
 
       public bool IsUploadAllowed() {
          //if (TestingGroup != Wall.WallHolder.ID) {
@@ -196,8 +207,8 @@ namespace vk.ViewModels {
       }
 
       private void configureScheduleCommandExecute() {
-         var configureContentView = new ScheduleWindow();
-         configureContentView.ShowDialog();
+         //var configureContentView = new ScheduleWindow();
+         //configureContentView.ShowDialog();
       }
 
       private void fillWallList() {
@@ -332,26 +343,38 @@ namespace vk.ViewModels {
       }
 
       private void logOutCommandExecute() {
-         var result = MessageBox.Show("Are you sure you want to log out?", "Logging out", MessageBoxButton.YesNo);
+         var result = MessageBox.Show("Are you sure you want to log out?", 
+            "Logging out", MessageBoxButton.YesNo);
 
          if (result == MessageBoxResult.Yes) {
             Deauthorize();
          }
       }
 
-      public void OnLoad() {
-         MainVMSaveInfo data;
-         if (SaveLoaderHelper.TryLoad("MainVM", out data)) {
-            //TestingGroup = data.TestingGroup;
-         }
+      public async void OnLoad() {
+         IsBusy = true;
 
          SetUpAvatar(DEFAULT_AVATAR);
 
          authorizeIfAlreadyLoggined();
+
+         var mainVmData = await SaveLoaderHelper.TryLoadAsync<MainVMSaveInfo>("MainVM");
+         if (mainVmData.Successful) {
+            //TestingGroup = data.TestingGroup;
+         }
+
+         var settingsData = await SaveLoaderHelper.TryLoadAsync<Settings>("Settings");
+         if (settingsData.Successful) {
+            App.Container.RegisterInstance(new Settings(settingsData.Result));
+         }
+
+         IsBusy = false;
       }
 
       public void OnClosing() {
+         var some = App.Container.Resolve<Settings>();
          SaveLoaderHelper.Save("MainVM", new MainVMSaveInfo());
+         SaveLoaderHelper.Save("Settings", some);
       }
 
       public void OnClosed() {

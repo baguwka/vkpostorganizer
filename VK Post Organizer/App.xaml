@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:converters="clr-namespace:vk.Converter"
              xmlns:local="clr-namespace:vk"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              Startup="CompositionRoot">
     <Application.Resources>
 
@@ -33,6 +34,15 @@
             <Setter Property="BorderThickness" Value="1"></Setter>
             <Setter Property="BorderBrush" Value="#CFDAE5"></Setter>
 
+        </Style>
+
+        <Style TargetType="{x:Type xctk:IntegerUpDown}" x:Key="VkIntegerUpDown">
+            <Setter Property="BorderBrush" Value="#d7d8db"></Setter>
+            <Setter Property="Foreground" Value="#4a7198"></Setter>
+        </Style>
+
+        <Style TargetType="{x:Type CheckBox}" x:Key="VkCheckBox">
+            <Setter Property="BorderBrush" Value="#5E81A8"></Setter>
         </Style>
 
         <Style TargetType="{x:Type Label}" x:Key="VkLabel">
