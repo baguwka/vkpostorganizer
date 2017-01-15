@@ -181,6 +181,7 @@
     <Compile Include="Converter\PostTypeToBoolConverter.cs" />
     <Compile Include="Converter\MissingPostIsHiddenConverter.cs" />
     <Compile Include="Models\AppDataFolderProvider.cs" />
+    <Compile Include="Models\DefaultWebClient.cs" />
     <Compile Include="Models\Files\ExtensionChecker.cs" />
     <Compile Include="Models\Files\FileFilter.cs" />
     <Compile Include="Models\ProxyProvider.cs" />
@@ -225,7 +226,9 @@
     <Compile Include="Models\SmartCollection.cs" />
     <Compile Include="Models\Schedule.cs" />
     <Compile Include="Models\VkApi\AccessToken.cs" />
-    <Compile Include="Models\DefaultWebClient.cs" />
+    <Compile Include="Models\WebClientWithProxy.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Models\VkApi\Entities\Attachment.cs" />
     <Compile Include="Models\VkApi\Entities\Group.cs" />
     <Compile Include="Models\VkApi\Entities\Post.cs" />

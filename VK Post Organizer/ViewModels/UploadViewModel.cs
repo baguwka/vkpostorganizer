@@ -153,7 +153,7 @@ namespace vk.ViewModels {
          get { return _urlOfImageToDownload; }
          set {
             SetProperty(ref _urlOfImageToDownload, value);
-            uploadImageIfPossible();
+            uploadImageIfPossible(_urlOfImageToDownload);
          }
       }
 
@@ -184,11 +184,10 @@ namespace vk.ViewModels {
          }
       }
 
-      private async void uploadImageIfPossible() {
-         if (string.IsNullOrEmpty(UrlOfImageToDownload)) return;
-         if (UrlHelper.IsUrlIsValid(UrlOfImageToDownload) == false) return;
+      private async void uploadImageIfPossible(string url) {
+         if (string.IsNullOrEmpty(url)) return;
+         if (UrlHelper.IsUrlIsValid(url) == false) return;
 
-         var url = UrlOfImageToDownload;
          IsBusy = true;
 
          Filepath = "";

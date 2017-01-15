@@ -7,24 +7,24 @@ using JetBrains.Annotations;
 namespace vk.Models {
    [UsedImplicitly]
    public class DefaultWebClient : IWebClient {
-      public string DownloadString(Uri adress) {
+      public string DownloadString(Uri address) {
          using (var wc = new WebClient()) {
             wc.Encoding = Encoding.UTF8;
-            return wc.DownloadString(adress);
+            return wc.DownloadString(address);
          }
       }
 
-      public string DownloadString(string adress) {
+      public string DownloadString(string address) {
          using (var wc = new WebClient()) {
             wc.Encoding = Encoding.UTF8;
-            return wc.DownloadString(adress);
+            return wc.DownloadString(address);
          }
       }
 
-      public Task<string> DownloadStringAsync(Uri adress) {
+      public Task<string> DownloadStringAsync(Uri address) {
          using (var wc = new WebClient()) {
             wc.Encoding = Encoding.UTF8;
-            return wc.DownloadStringTaskAsync(adress);
+            return wc.DownloadStringTaskAsync(address);
          }
       }
 

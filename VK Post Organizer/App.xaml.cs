@@ -30,7 +30,7 @@ namespace vk {
          Container.RegisterType<IDataProvider, AppDataFolderProvider>();
          Container.RegisterType<SaveLoadController>(new ContainerControlledLifetimeManager());
 
-         Container.RegisterType<IWebClient, DefaultWebClient>();
+         Container.RegisterType<IWebClient, WebClientWithProxy>();
          Container.RegisterType<IWallHolder, EmptyWallHolder>();
          Container.RegisterType<EmptyWallHolder>(new ContainerControlledLifetimeManager());
 

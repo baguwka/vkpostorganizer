@@ -354,10 +354,6 @@ namespace vk.ViewModels {
       public async void OnLoad() {
          IsBusy = true;
 
-         SetUpAvatar(DEFAULT_AVATAR);
-
-         authorizeIfAlreadyLoggined();
-
          var mainVmData = await SaveLoaderHelper.TryLoadAsync<MainVMSaveInfo>("MainVM");
          if (mainVmData.Successful) {
             //TestingGroup = data.TestingGroup;
@@ -367,6 +363,10 @@ namespace vk.ViewModels {
          if (settingsData.Successful) {
             App.Container.RegisterInstance(new Settings(settingsData.Result));
          }
+
+         SetUpAvatar(DEFAULT_AVATAR);
+
+         authorizeIfAlreadyLoggined();
 
          IsBusy = false;
       }
