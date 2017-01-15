@@ -5,7 +5,6 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Web;
 using JetBrains.Annotations;
-using Microsoft.Practices.Unity;
 using Newtonsoft.Json;
 using vk.Models.VkApi.Entities;
 
@@ -64,8 +63,7 @@ namespace vk.Models.VkApi {
 
          switch (ex.Status) {
             case WebExceptionStatus.ConnectFailure:
-               var proxyUsed = App.Container.Resolve<Settings>().Proxy.UseProxy;
-               message = $"{innerException?.Message ?? "Ошибка соединения с удаленным сервером."}{(proxyUsed ? "\n\nCheck your proxy server" : "")}";
+               message = $"{innerException?.Message ?? "Ошибка соединения с удаленным сервером."}\n\nCheck your proxy server if you use one.";
                break;
             default:
                return false;

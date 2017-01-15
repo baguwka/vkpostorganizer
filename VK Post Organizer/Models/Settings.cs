@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.Practices.Prism.Mvvm;
-using Microsoft.Practices.Unity;
 
 namespace vk.Models {
    [Serializable]
@@ -12,11 +11,10 @@ namespace vk.Models {
       private string _username;
       private string _password;
 
-      [InjectionConstructor]
       public ProxySettings() {
       }
 
-      public ProxySettings(ProxySettings proxySettings) {
+      public void Set(ProxySettings proxySettings) {
          UseProxy = proxySettings.UseProxy;
          ProxyAddress = proxySettings.ProxyAddress;
          ProxyPort = proxySettings.ProxyPort;
@@ -85,13 +83,8 @@ namespace vk.Models {
 
    [Serializable]
    public class Settings : BindableBase {
-      [InjectionConstructor]
       public Settings() {
          Proxy = new ProxySettings();
-      }
-
-      public Settings(Settings other) {
-         ApplySettings(other);
       }
 
       public ProxySettings Proxy { get; set; }
@@ -99,7 +92,8 @@ namespace vk.Models {
       public void ApplySettings(Settings other) {
          if (other == null) return;
 
-         Proxy = new ProxySettings(other.Proxy);
+         Proxy = new ProxySettings();
+         Proxy.Set(other.Proxy);
       }
    }
 }

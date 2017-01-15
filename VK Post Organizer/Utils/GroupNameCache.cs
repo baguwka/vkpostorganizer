@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Practices.Unity;
 using vk.Models.VkApi;
 
 namespace vk.Utils {
@@ -17,7 +16,7 @@ namespace vk.Utils {
             return GroupNamesById[groupId];
          }
 
-         var groupsGet = App.Container.Resolve<GroupsGetById>();
+         var groupsGet = App.Container.GetInstance<GroupsGetById>();
          var response = groupsGet.Get(Math.Abs(groupId));
          var group = response.Response.FirstOrDefault();
 

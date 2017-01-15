@@ -7,7 +7,6 @@ using System.Windows;
 using System.Windows.Input;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
-using Microsoft.Practices.Unity;
 using vk.Models;
 using vk.Utils;
 
@@ -82,14 +81,15 @@ namespace vk.ViewModels {
       }
 
       private void revert() {
-         CurrentSettings = new Settings(App.Container.Resolve<Settings>());
+         CurrentSettings = new Settings();
+         CurrentSettings.ApplySettings(App.Container.GetInstance<Settings>());
       }
 
       private async Task saveData() {
          if (CurrentSettings != null) {
-            var settings = new Settings(CurrentSettings);
+            var settings = App.Container.GetInstance<Settings>();
+            settings.ApplySettings(CurrentSettings);
 
-            App.Container.RegisterInstance(settings);
             await SaveLoaderHelper.SaveAsync("Settings", settings);
          }
       }

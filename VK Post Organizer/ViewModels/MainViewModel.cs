@@ -8,7 +8,6 @@ using System.Windows.Media.Imaging;
 using Data_Persistence_Provider;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
-using Microsoft.Practices.Unity;
 using Utilities;
 using vk.Models;
 using vk.Models.VkApi;
@@ -129,8 +128,8 @@ namespace vk.ViewModels {
          ApplyScheduleCommand = new DelegateCommand(applyScheduleCommandExecute);
          SettingsCommand = new DelegateCommand(settingsCommandExecute);
 
-         ListOfAvaliableWalls = App.Container.Resolve<WallList>();
-         Wall = App.Container.Resolve<WallControl>();
+         ListOfAvaliableWalls = App.Container.GetInstance<WallList>();
+         Wall = App.Container.GetInstance<WallControl>();
 
          Wall.UploadRequested += (sender, control) => {
             var upload = new UploadWindow(new UploadInfo(new WallControl(Wall.WallHolder), null, control.Post.DateUnix));
@@ -144,7 +143,10 @@ namespace vk.ViewModels {
             PostCount = realPosts.Count(post => post.PostType == PostType.Post);
             MissingPosts = Wall.Items.Count(post => post.PostType == PostType.Missing);
 
-            InfoPanel = $"Total: {TotalPostCount} ({TotalPostCount + MissingPosts})\nPosts: {PostCount}\nReposts: {RepostCount}\nMissing {MissingPosts}";
+            InfoPanel = $"Total: {TotalPostCount} ({TotalPostCount + MissingPosts})" +
+                        $"\nPosts: {PostCount}" +
+                        $"\nReposts: {RepostCount}" +
+                        $"\nMissing {MissingPosts}";
          };
 
          ListOfAvaliableWalls.ItemClicked += onGroupItemClicked;
@@ -214,7 +216,7 @@ namespace vk.ViewModels {
       private void fillWallList() {
          if (!IsAuthorized) return;
 
-         var methodGroupsGet = App.Container.Resolve<GroupsGet>();
+         var methodGroupsGet = App.Container.GetInstance<GroupsGet>();
          var groups = methodGroupsGet.Get().Collection;
          if (groups == null) {
             MessageBox.Show("Groups null");
@@ -223,7 +225,7 @@ namespace vk.ViewModels {
 
          ListOfAvaliableWalls.Clear();
 
-         var userget = App.Container.Resolve<UsersGet>();
+         var userget = App.Container.GetInstance<UsersGet>();
          var user = userget.Get().Users[0];
 
          //todo: get rid of workaround
@@ -275,9 +277,9 @@ namespace vk.ViewModels {
       }
 
       public void Authorize(bool clearCookies) {
-         var accessToken = new AccessToken();
-         App.Container.RegisterInstance(accessToken);
+         var accessToken = App.Container.GetInstance<AccessToken>();
          var authWindow = new AuthView(accessToken, clearCookies);
+
          authWindow.ShowDialog();
 
          if (string.IsNullOrEmpty(accessToken.Token)) {
@@ -288,7 +290,7 @@ namespace vk.ViewModels {
          }
 
          try {
-            var methodUsersGet = App.Container.Resolve<UsersGet>();
+            var methodUsersGet = App.Container.GetInstance<UsersGet>();
             var users = methodUsersGet.Get();
 
             var user = users.Users.FirstOrDefault();
@@ -303,7 +305,7 @@ namespace vk.ViewModels {
 
             IsAuthorized = true;
 
-            App.Container.Resolve<StatsTrackVisitor>().Track();
+            App.Container.GetInstance<StatsTrackVisitor>().Track();
 
             fillWallList();
          }
@@ -320,8 +322,8 @@ namespace vk.ViewModels {
          Content = "";
          SetUpAvatar(DEFAULT_AVATAR);
 
-         var accessToken = new AccessToken();
-         App.Container.RegisterInstance(accessToken);
+         var accessToken = App.Container.GetInstance<AccessToken>();
+         accessToken.Set(new AccessToken());
 
          var expiration = DateTime.UtcNow - TimeSpan.FromDays(1);
          string cookie = $"remixsid=; expires={expiration.ToString("R")}; path=/; domain=.vk.com";
@@ -361,7 +363,8 @@ namespace vk.ViewModels {
 
          var settingsData = await SaveLoaderHelper.TryLoadAsync<Settings>("Settings");
          if (settingsData.Successful) {
-            App.Container.RegisterInstance(new Settings(settingsData.Result));
+            var settings = App.Container.GetInstance<Settings>();
+            settings.ApplySettings(settingsData.Result);
          }
 
          SetUpAvatar(DEFAULT_AVATAR);
@@ -372,7 +375,7 @@ namespace vk.ViewModels {
       }
 
       public void OnClosing() {
-         var some = App.Container.Resolve<Settings>();
+         var some = App.Container.GetInstance<Settings>();
          SaveLoaderHelper.Save("MainVM", new MainVMSaveInfo());
          SaveLoaderHelper.Save("Settings", some);
       }

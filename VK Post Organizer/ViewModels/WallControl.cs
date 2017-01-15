@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
 using JetBrains.Annotations;
-using Microsoft.Practices.ObjectBuilder2;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
-using Microsoft.Practices.Unity;
 using vk.Models;
 using vk.Models.Filter;
 using vk.Models.VkApi;
@@ -76,7 +74,7 @@ namespace vk.ViewModels {
             throw new ArgumentNullException(nameof(wallHolder));
          }
 
-         var wall = App.Container.Resolve<WallGet>();
+         var wall = App.Container.GetInstance<WallGet>();
 
          try {
             var postList = new List<PostControl>();

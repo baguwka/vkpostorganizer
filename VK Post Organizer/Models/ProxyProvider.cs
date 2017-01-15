@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Net;
-using System.Windows;
 using JetBrains.Annotations;
 using static vk.Utils.UrlHelper;
 

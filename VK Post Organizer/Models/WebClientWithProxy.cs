@@ -3,7 +3,6 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
-using Microsoft.Practices.Unity;
 
 namespace vk.Models {
    public class LowTimeoutWebClient : WebClient {
@@ -20,10 +19,17 @@ namespace vk.Models {
 
    [UsedImplicitly]
    public class WebClientWithProxy : IWebClient {
+      private readonly Settings _settings;
+      private readonly ProxyProvider _proxyProvider;
+
+      public WebClientWithProxy(Settings settings, ProxyProvider proxyProvider) {
+         _settings = settings;
+         _proxyProvider = proxyProvider;
+      }
+
       private void setProxyIfPossible(WebClient wc) {
-         var settings = App.Container.Resolve<Settings>();
-         if (settings.Proxy.UseProxy) {
-            var myProxy = App.Container.Resolve<ProxyProvider>().GetProxy();
+         if (_settings.Proxy.UseProxy) {
+            var myProxy = _proxyProvider.GetProxy();
             if (myProxy != null) {
                wc.Proxy = myProxy;
             }

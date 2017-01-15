@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -14,7 +13,6 @@ using System.Windows.Media.Imaging;
 using GongSolutions.Wpf.DragDrop;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
-using Microsoft.Practices.Unity;
 using Microsoft.Win32;
 using Utilities;
 using vk.Models;
@@ -103,7 +101,7 @@ namespace vk.ViewModels {
       public void ImportFiles(IEnumerable<string> files) {
          Filepath = files.First();
 
-         if (File.Exists(Filepath) && App.Container.Resolve<ImageExtensionChecker>().IsFileHaveValidExtension(Filepath)) {
+         if (File.Exists(Filepath) && App.Container.GetInstance<ImageExtensionChecker>().IsFileHaveValidExtension(Filepath)) {
             var src = new BitmapImage();
             src.BeginInit();
             src.CacheOption = BitmapCacheOption.OnLoad;
@@ -123,7 +121,7 @@ namespace vk.ViewModels {
 
       public UploadViewModel() {
          Files = new SmartCollection<string>();
-         Wall = App.Container.Resolve<WallControl>();
+         Wall = App.Container.GetInstance<WallControl>();
 
          UploadCommand = new DelegateCommand(uploadCommandExecute);
          OpenFilesCommand = new DelegateCommand(openFilesCommandExecute);
@@ -132,7 +130,7 @@ namespace vk.ViewModels {
 
       private void browseCommandExecute() {
          var openFile = new OpenFileDialog();
-         var checker = App.Container.Resolve<ImageExtensionChecker>();
+         var checker = App.Container.GetInstance<ImageExtensionChecker>();
 
          openFile.Filter = checker.GetFileFilter();
          var result = openFile.ShowDialog();
@@ -171,9 +169,9 @@ namespace vk.ViewModels {
          req.Proxy = null;
          req.Method = "HEAD";
 
-         var settings = App.Container.Resolve<Settings>();
+         var settings = App.Container.GetInstance<Settings>();
          if (settings.Proxy.UseProxy) {
-            var myProxy = App.Container.Resolve<ProxyProvider>().GetProxy();
+            var myProxy = App.Container.GetInstance<ProxyProvider>().GetProxy();
             if (myProxy != null) {
                req.Proxy = myProxy;
             }
@@ -230,9 +228,9 @@ namespace vk.ViewModels {
 
          try {
             using (var wc = new WebClient()) {
-               var settings = App.Container.Resolve<Settings>();
+               var settings = App.Container.GetInstance<Settings>();
                if (settings.Proxy.UseProxy) {
-                  var myProxy = App.Container.Resolve<ProxyProvider>().GetProxy();
+                  var myProxy = App.Container.GetInstance<ProxyProvider>().GetProxy();
                   if (myProxy != null) {
                      wc.Proxy = myProxy;
                   }
@@ -269,11 +267,11 @@ namespace vk.ViewModels {
 
          IsBusy = true;
          try {
-            var getUploadServerMethod = App.Container.Resolve<PhotosGetWallUploadSever>();
+            var getUploadServerMethod = App.Container.GetInstance<PhotosGetWallUploadSever>();
             var uploadServer = getUploadServerMethod.Get(-Wall.WallHolder.ID);
 
             var attachments = new List<string>();
-            var wallPostMethod = App.Container.Resolve<WallPost>();
+            var wallPostMethod = App.Container.GetInstance<WallPost>();
 
             if (!string.IsNullOrEmpty(Filepath) || File.Exists(Filepath)) {
 
@@ -288,12 +286,12 @@ namespace vk.ViewModels {
                var uploadResponse = Encoding.UTF8.GetString(uploadBytes);
 
                if (!string.IsNullOrEmpty(uploadResponse)) {
-                  var savePhotoMethod = App.Container.Resolve<PhotosSaveWallPhoto>();
+                  var savePhotoMethod = App.Container.GetInstance<PhotosSaveWallPhoto>();
                   var savePhotoProperty = savePhotoMethod.Save(-Wall.WallHolder.ID, uploadResponse);
 
                   var result = savePhotoProperty;
                   if (result != null) {
-                     var userId = App.Container.Resolve<AccessToken>().UserID;
+                     var userId = App.Container.GetInstance<AccessToken>().UserID;
                      attachments.AddRange(result.Response.Select(photoResponse => $"photo{userId}_{photoResponse.Id}"));
                   }
                }
@@ -344,7 +342,7 @@ namespace vk.ViewModels {
       }
 
       private void openFilesCommandExecute() {
-         var extChecker = App.Container.Resolve<ImageExtensionChecker>();
+         var extChecker = App.Container.GetInstance<ImageExtensionChecker>();
 
          var dialog = new OpenFileDialog {
             Filter = extChecker.GetFileFilter(), Multiselect = true,
