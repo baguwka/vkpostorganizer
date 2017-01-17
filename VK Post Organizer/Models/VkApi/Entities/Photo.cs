@@ -7,22 +7,36 @@ namespace vk.Models.VkApi.Entities {
    public class Photo : BindableBase {
       private int _id;
       private string _photo75;
+      private string _photo130;
       private string _photo604;
       private string _photo1280;
       private string _photo2560;
       private int _date;
       private string _text;
+      private int _ownerId;
 
       [JsonProperty(PropertyName = "id")]
-      public int ID {
+      public int Id {
          get { return _id; }
          set { SetProperty(ref _id, value); }
+      }
+
+      [JsonProperty(PropertyName = "owner_id")]
+      public int OwnerId {
+         get { return _ownerId; }
+         set { SetProperty(ref _ownerId, value); }
       }
 
       [JsonProperty(PropertyName = "photo_75")]
       public string Photo75 {
          get { return _photo75; }
          set { SetProperty(ref _photo75, value); }
+      }
+
+      [JsonProperty(PropertyName = "photo_130")]
+      public string Photo130 {
+         get { return _photo130; }
+         set { SetProperty(ref _photo130, value); }
       }
 
       [JsonProperty(PropertyName = "photo_604")]

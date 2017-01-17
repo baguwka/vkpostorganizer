@@ -168,6 +168,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AppWinApi.cs" />
     <Compile Include="Converter\InverseBooleanConverter.cs" />
     <Compile Include="Converter\PostMarkToColorConverter.cs" />
     <Compile Include="Converter\PostTypeToBoolConverter.cs" />
@@ -182,6 +183,8 @@
     <Compile Include="Models\VkApi\PhotosSaveWallPhoto.cs" />
     <Compile Include="Models\VkApi\StatsTrackVisitor.cs" />
     <Compile Include="Models\VkApi\VkParameters.cs" />
+    <Compile Include="ProgramInfo.cs" />
+    <Compile Include="SingleInstance.cs" />
     <Compile Include="Utils\EnumerableExtensions.cs" />
     <Compile Include="Utils\GroupNameCache.cs" />
     <Compile Include="Models\Files\ImageExtensionChecker.cs" />
@@ -206,6 +209,7 @@
     <Compile Include="Utils\UnixTimeConverter.cs" />
     <Compile Include="Models\UrlHelper\IImageUrlObtainer.cs" />
     <Compile Include="Utils\UrlHelper.cs" />
+    <Compile Include="Models\AttachmentItem.cs" />
     <Compile Include="ViewModels\ImageItem.cs" />
     <Compile Include="ViewModels\ScheduleNameEditViewModel.cs" />
     <Compile Include="ViewModels\ScheduleViewModel.cs" />

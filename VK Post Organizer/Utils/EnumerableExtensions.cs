@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace vk.Utils {
    public static class EnumerableExtensions {
@@ -7,6 +8,10 @@ namespace vk.Utils {
          foreach (var item in source) {
             action(item);
          }
+      }
+
+      public static bool None<TSource>(this IEnumerable<TSource> source, Func<TSource, bool> predicate) {
+         return !source.Any(predicate);
       }
    }
 }

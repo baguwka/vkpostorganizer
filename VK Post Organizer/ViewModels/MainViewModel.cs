@@ -131,10 +131,7 @@ namespace vk.ViewModels {
          ListOfAvaliableWalls = App.Container.GetInstance<WallList>();
          Wall = App.Container.GetInstance<WallControl>();
 
-         Wall.UploadRequested += (sender, control) => {
-            var upload = new UploadWindow(new UploadInfo(new WallControl(Wall.WallHolder), null, control.Post.DateUnix));
-            upload.Show();
-         };
+         Wall.UploadRequested += onWallsUploadRequested;
 
          Wall.Items.CollectionChanged += (sender, args) => {
             var realPosts = Wall.Items.Where(post => post.IsExisting).ToList();
@@ -156,6 +153,12 @@ namespace vk.ViewModels {
          CurrentSchedule = new Schedule();
 
          Messenger.AddListener("refresh", refreshWall);
+      }
+
+      private void onWallsUploadRequested(object sender, PostControl control) {
+         var upload = App.Container.GetInstance<UploadWindow>();
+         upload.Configure(new UploadInfo(new WallControl(Wall.WallHolder), null, control.Post.DateUnix));
+         upload.Show();
       }
 
       private void settingsCommandExecute() {
@@ -185,7 +188,8 @@ namespace vk.ViewModels {
             return;
          }
 
-         var upload = new UploadWindow(new UploadInfo(new WallControl(Wall.WallHolder), null));
+         var upload = App.Container.GetInstance<UploadWindow>();
+         upload.Configure(new UploadInfo(new WallControl(Wall.WallHolder), null));
          upload.Show();
       }
 

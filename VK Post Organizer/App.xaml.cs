@@ -4,7 +4,6 @@ using System.Windows.Threading;
 using Data_Persistence_Provider;
 using SimpleInjector;
 using vk.Models;
-using vk.Models.Files;
 using vk.Models.VkApi;
 using vk.Views;
 
@@ -13,6 +12,12 @@ namespace vk {
       public static Container Container { get; set; }
 
       private void CompositionRoot(object sender, StartupEventArgs e) {
+         if (SingleInstance.IsOnlyInstance() == false) {
+            //SingleInstance.ShowFirstInstance();
+            Current.Shutdown();
+            return;
+         }
+
          Current.DispatcherUnhandledException += CurrentOnDispatcherUnhandledException;
          Current.ShutdownMode = ShutdownMode.OnMainWindowClose;
 
@@ -28,14 +33,15 @@ namespace vk {
          container.Register<AccessToken>(Lifestyle.Singleton);
          container.Register<Settings>(Lifestyle.Singleton);
 
-         container.Register<ISerializer, SaveLoadJsonSerializer>(Lifestyle.Singleton);
-         container.Register<IDataProvider, AppDataFolderProvider>(Lifestyle.Singleton);
-         container.Register<SaveLoadController>(Lifestyle.Singleton);
+         container.Register<ISerializer, SaveLoadJsonSerializer>();
+         container.Register<IDataProvider, AppDataFolderProvider>();
+         //container.Register<SaveLoadController>();
 
          container.Register<IWebClient, WebClientWithProxy>();
-         container.Register<IWallHolder, EmptyWallHolder>(Lifestyle.Singleton);
+         container.Register<IWallHolder, EmptyWallHolder>();
 
-         container.Register<ImageExtensionChecker>(Lifestyle.Singleton);
+         //container.Register<ImageExtensionChecker>();
+         //container.Register<UploadWindow>();
          container.Verify();
 
          return container;
