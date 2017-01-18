@@ -101,8 +101,12 @@
                              Minimum="0" Maximum="100" 
                              Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityConverter}}"
                              Value="{Binding UploadProgress, UpdateSourceTrigger=PropertyChanged}" Height="25" Margin="1"/>
-                    
-                    <Label Grid.Row="2" Content="{Binding DateString}" Height="30" Style="{StaticResource VkLabel}" HorizontalAlignment="Left"></Label>
+
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button Content="«" Height="25" Width="25" Margin="5,0,5,0" Style="{StaticResource VkCommon}" Command="{Binding MovePreviousCommand}"/>
+                        <Label Content="{Binding DateString}" Height="30" Style="{StaticResource VkLabel}" HorizontalAlignment="Left" Width="100"/>
+                        <Button Content="»" Height="25" Width="25" Margin="5,0,5,0" Style="{StaticResource VkCommon}" Command="{Binding MoveNextCommand}"/>
+                    </StackPanel>
                 </Grid>
             </Grid>
         </Border>

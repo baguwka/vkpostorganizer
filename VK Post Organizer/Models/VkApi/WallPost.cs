@@ -34,7 +34,6 @@ namespace vk.Models.VkApi {
          checkForErrors(response);
 
          return JsonConvert.DeserializeObject<WallPostResponse>(response);
-
       }
 
       private static VkParameters makeAQuery(int wallId, string message, bool signed, bool fromGroup, int date,

@@ -38,10 +38,13 @@ namespace vk.ViewModels {
       private string _progressName;
       private string _imagePreviewUrl;
 
-      private CancellationTokenSource _cancellationToken;
+      private readonly CancellationTokenSource _cancellationToken;
 
       public ICommand PublishCommand { get; set; }
       public ICommand BrowseCommand { get; set; }
+
+      public ICommand MovePreviousCommand { get; set; }
+      public ICommand MoveNextCommand { get; set; }
 
       public SmartCollection<string> Files { get; set; }
 
@@ -100,6 +103,53 @@ namespace vk.ViewModels {
       public string ImagePreviewUrl {
          get { return _imagePreviewUrl; }
          set { SetProperty(ref _imagePreviewUrl, value); }
+      }
+
+      public UploadViewModel() {
+         _cancellationToken = new CancellationTokenSource();
+
+         Attachments = new SmartCollection<AttachmentItem>();
+
+         Files = new SmartCollection<string>();
+         Wall = App.Container.GetInstance<WallControl>();
+
+         PublishCommand = new DelegateCommand(publishCommandExecute);
+         BrowseCommand = new DelegateCommand(browseCommandExecute);
+
+         MovePreviousCommand = new DelegateCommand(moveToPreviousMissing);
+         MoveNextCommand = new DelegateCommand(moveToNextMissing);
+      }
+
+      private void moveToPreviousMissing() {
+         if (Wall.Items.None() || DateUnix <= 0) return;
+
+         var previousOne = Wall.Items.LastOrDefault((p) => p.Post.DateUnix < DateUnix);
+         if (previousOne == null) {
+            previousOne = Wall.Items.LastOrDefault();
+            if (previousOne == null) return;
+            DateUnix = previousOne.Post.DateUnix;
+         }
+         else {
+            DateUnix = previousOne.Post.DateUnix;
+         }
+      }
+
+      private void moveToNextMissing() {
+         if (Wall.Items.None() || DateUnix <= 0) return;
+
+         var previousOne = Wall.Items.FirstOrDefault((p) => p.Post.DateUnix > DateUnix);
+         if (previousOne == null) {
+            previousOne = Wall.Items.FirstOrDefault();
+            if (previousOne == null) return;
+            DateUnix = previousOne.Post.DateUnix;
+         }
+         else {
+            DateUnix = previousOne.Post.DateUnix;
+         }
+      }
+
+      private void refresh() {
+         Wall.PullWithScheduleHightlight(new MissingPostFilter(), new Schedule());
       }
 
       public void Configure(UploadInfo info) {
@@ -170,18 +220,6 @@ namespace vk.ViewModels {
 
             await tryToUpload(file);
          }
-      }
-
-      public UploadViewModel() {
-         _cancellationToken  = new CancellationTokenSource();
-
-         Attachments = new SmartCollection<AttachmentItem>();
-
-         Files = new SmartCollection<string>();
-         Wall = App.Container.GetInstance<WallControl>(); 
-
-         PublishCommand = new DelegateCommand(publishCommandExecute);
-         BrowseCommand = new DelegateCommand(browseCommandExecute);
       }
 
       public bool IsImageContentType(string contentType) {
@@ -363,7 +401,8 @@ namespace vk.ViewModels {
             Attachments.Clear();
 
             Messenger.Broadcast("refresh");
-            getNextDate();
+            refresh();
+            moveToNextMissing();
 
             IsBusy = false;
          }
@@ -382,18 +421,6 @@ namespace vk.ViewModels {
       private void onUploadProgressChanged(object sender, UploadProgressChangedEventArgs e) {
          ProgressName = "Uploading...";
          updateProgress(e.ProgressPercentage * 2, e.BytesSent, e.TotalBytesToSend);
-      }
-
-      private void getNextDate() {
-         Wall.PullWithScheduleHightlight(new MissingPostFilter(), new Schedule());
-         var firstMissed = Wall.Items.FirstOrDefault((p) => p.Post.DateUnix > DateUnix);
-         if (firstMissed == null) {
-            firstMissed = Wall.Items.FirstOrDefault();
-            if (firstMissed == null) return;
-            DateUnix = firstMissed.Post.DateUnix;
-            return;
-         }
-         DateUnix = firstMissed.Post.DateUnix;
       }
 
       public void OnLoad() {
