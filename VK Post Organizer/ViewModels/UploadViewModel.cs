@@ -188,6 +188,9 @@ namespace vk.ViewModels {
          return contentType.ToLower(CultureInfo.InvariantCulture).StartsWith("image/");
       }
 
+      /// <summary>
+      /// 
+      /// </summary>
       public async Task<string> GetContentType(string url) {
          var req = (HttpWebRequest)WebRequest.Create(url);
          req.Proxy = null;
@@ -206,6 +209,9 @@ namespace vk.ViewModels {
          }
       }
 
+      /// <summary>
+      /// 
+      /// </summary>
       private async void downloadImageIfPossible(string url) {
          if (string.IsNullOrEmpty(url)) return;
          if (UrlHelper.IsUrlIsValid(url) == false) return;
@@ -339,13 +345,13 @@ namespace vk.ViewModels {
          attachment.RemoveRequested -= onAttachmentRemoveRequest;
       }
 
-      private void publishCommandExecute() {
+      private async void publishCommandExecute() {
          if (IsBusy) return;
 
          IsBusy = true;
          try {
             var wallPostMethod = App.Container.GetInstance<WallPost>();
-            wallPostMethod.Post(-Wall.WallHolder.ID, Text, false, true, DateUnix,
+            await wallPostMethod.PostAsync(-Wall.WallHolder.ID, Text, false, true, DateUnix,
                Attachments.Take(10).Select(item => item.Attachment));
          }
          catch (VkException ex) {

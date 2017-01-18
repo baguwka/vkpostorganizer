@@ -9,8 +9,7 @@
         mc:Ignorable="d"
         Icon="/Resources/32x32.ico"
         
-        AllowDrop="{Binding IsBusy, Converter={StaticResource InverseBooleanConverter}}"
-        Drop="UploadWindow_OnDrop"
+        
         
         WindowStartupLocation="CenterScreen"
         Title="Upload" 
@@ -43,7 +42,8 @@
                 <TextBox Grid.Row="0" Style="{StaticResource VkTextBox}" 
                          FontSize="16" Text="{Binding Text}" Height="30"/>
 
-                <Border Grid.Row="1" Style="{StaticResource VkBorder}" Height="190" Drop="onFilesDrop" Margin="0,5,0,5">
+                <Border Grid.Row="1" Style="{StaticResource VkBorder}" Height="190" Drop="onFilesDrop" Margin="0,5,0,5"
+                        AllowDrop="{Binding IsBusy, Converter={StaticResource InverseBooleanConverter}}">
                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                         <Button Style="{StaticResource VkCommon}"
                             Command="{Binding BrowseCommand}"

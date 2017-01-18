@@ -49,12 +49,6 @@ namespace vk.Views {
          _viewModel.Configure(info);
       }
 
-      private async void UploadWindow_OnDrop(object sender, DragEventArgs e) {
-         var files = (string[])e.Data.GetData(DataFormats.FileDrop);
-         await _viewModel.ImportFilesAsync(files);
-         e.Handled = true;
-      }
-
       private void onCloseClick(object sender, RoutedEventArgs e) {
          this.Close();
       }
