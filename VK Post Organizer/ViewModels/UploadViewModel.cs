@@ -137,14 +137,14 @@ namespace vk.ViewModels {
       private void moveToNextMissing() {
          if (Wall.Items.None() || DateUnix <= 0) return;
 
-         var previousOne = Wall.Items.FirstOrDefault((p) => p.Post.DateUnix > DateUnix);
-         if (previousOne == null) {
-            previousOne = Wall.Items.FirstOrDefault();
-            if (previousOne == null) return;
-            DateUnix = previousOne.Post.DateUnix;
+         var nextOne = Wall.Items.FirstOrDefault((p) => p.Post.DateUnix > DateUnix);
+         if (nextOne == null) {
+            nextOne = Wall.Items.FirstOrDefault();
+            if (nextOne == null) return;
+            DateUnix = nextOne.Post.DateUnix;
          }
          else {
-            DateUnix = previousOne.Post.DateUnix;
+            DateUnix = nextOne.Post.DateUnix;
          }
       }
 
