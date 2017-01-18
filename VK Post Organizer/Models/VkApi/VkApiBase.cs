@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 using System.Web;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
@@ -17,13 +19,60 @@ namespace vk.Models.VkApi {
       public AccessToken Token { get; }
 
       protected void checkForErrors(string response) {
+         if (string.IsNullOrEmpty(response)) {
+            throw new VkException($"Got no response from server");
+         }
+
          if (response.Substring(2, 5) == "error") {
             var error = deserializeError(response);
             throw new VkException($"Error code: {error.ErrorCode}\n{error.ErrorMessage}");
          }
       }
 
+      public async Task<string> ExecuteMethodAsync(string method, VkParameters parameters = null) {
+         var finalUri = buildFinalUri(method, parameters);
+         try {
+            var result = await WebClient.DownloadStringAsync(finalUri);
+            return result;
+         }
+         catch (WebException ex) {
+            if (tryToHandleException(ex) == false) {
+               throw;
+            }
+         }
+         return string.Empty;
+      }
+
       public string ExecuteMethod(string method, VkParameters parameters = null) {
+         var finalUri = buildFinalUri(method, parameters);
+         try {
+            var result = WebClient.DownloadString(finalUri);
+            return result;
+         }
+         catch (WebException ex) {
+            if (tryToHandleException(ex) == false) {
+               throw;
+            }
+         }
+         return string.Empty;
+      }
+
+      private bool tryToHandleException(WebException ex) {
+         string message;
+         var innerException = ex.InnerException;
+
+         switch (ex.Status) {
+            case WebExceptionStatus.ConnectFailure:
+               message = $"{innerException?.Message ?? "Ошибка соединения с удаленным сервером."}\n\nCheck your proxy server if you use one.";
+               break;
+            default:
+               return false;
+         }
+
+         throw new VkException(!string.IsNullOrEmpty(message) ? message : innerException?.Message ?? ex.Message, ex);
+      }
+
+      private Uri buildFinalUri(string method, VkParameters parameters) {
          var uriBuilder = new UriBuilder($"https://api.vk.com/method/{method}");
 
          var uriParameters = new NameValueCollection();
@@ -33,14 +82,12 @@ namespace vk.Models.VkApi {
          }
 
          uriParameters["access_token"] = Token.Token;
-         uriParameters["v"] = "5.60";
+         uriParameters["v"] = "5.62";
 
          uriBuilder.Query = string.Join("&", uriParameters.AllKeys
             .Select(key => $"{key}={HttpUtility.UrlEncode(uriParameters[key])}"));
 
-         var finalUri = uriBuilder.Uri;
-
-         return WebClient.DownloadString(finalUri);
+         return uriBuilder.Uri;
       }
 
       protected Error deserializeError(string jsonString) {

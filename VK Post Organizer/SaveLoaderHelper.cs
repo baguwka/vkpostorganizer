@@ -1,23 +1,21 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using Data_Persistence_Provider;
-using Microsoft.Practices.Unity;
 
 namespace vk {
    public static class SaveLoaderHelper {
       public static void Save<T>(string key, T data) where T : class {
-         App.Container.Resolve<SaveLoadController>().Save(key, data, onSaveCorrupted);
+         App.Container.GetInstance<SaveLoadController>().Save(key, data, onSaveCorrupted);
       }
 
       [Obsolete("Use LoadInfo<T> TryLoad<T> instead")]
       public static bool TryLoad<T>(string key, out T data) where T : class {
-         return App.Container.Resolve<SaveLoadController>().TryLoad(key, out data, onLoadCorrupted);
+         return App.Container.GetInstance<SaveLoadController>().TryLoad(key, out data, onLoadCorrupted);
       }
 
       public static LoadInfo<T> TryLoad<T>(string key) where T : class {
-         return App.Container.Resolve<SaveLoadController>().TryLoad<T>(key, onLoadCorrupted);
+         return App.Container.GetInstance<SaveLoadController>().TryLoad<T>(key, onLoadCorrupted);
       }
 
       private static bool onLoadCorrupted(DataCorruptedException exception) {
@@ -39,11 +37,11 @@ namespace vk {
       }
 
       public static async Task SaveAsync<T>(string key, T data) where T : class {
-         await App.Container.Resolve<SaveLoadController>().SaveAsync(key, data, onSaveCorrupted);
+         await App.Container.GetInstance<SaveLoadController>().SaveAsync(key, data, onSaveCorrupted);
       }
 
       public static async Task<LoadInfo<T>> TryLoadAsync<T>(string key) where T : class {
-         return await App.Container.Resolve<SaveLoadController>().TryLoadAsync<T>(key, onLoadCorrupted);
+         return await App.Container.GetInstance<SaveLoadController>().TryLoadAsync<T>(key, onLoadCorrupted);
       }
 
       private static bool onSaveCorrupted(DataCorruptedException exception) {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Windows;
 using JetBrains.Annotations;
 using vk.ViewModels;
@@ -28,32 +29,49 @@ namespace vk.Views {
    /// Interaction logic for UploadWindow.xaml
    /// </summary>
    public partial class UploadWindow : Window {
-      private IViewModel getViewModel => (IViewModel)DataContext;
+      private readonly UploadViewModel _viewModel;
 
-      public UploadWindow([NotNull] UploadInfo info) {
-         if (info == null) {
-            throw new ArgumentNullException(nameof(info));
-         }
+      public UploadWindow() {
+         //if (viewModel == null) {
+         //   throw new ArgumentNullException(nameof(viewModel));
+         //}
 
          InitializeComponent();
 
-         var vm = (UploadViewModel)getViewModel;
-         vm.PrepareImages(info);
+         //base.DataContext = _viewModel;
+         _viewModel = (UploadViewModel)DataContext; //viewModel;
       }
 
-      private void UploadWindow_OnDrop(object sender, DragEventArgs e) {
-         var files = (string[])e.Data.GetData(DataFormats.FileDrop);
-         ((UploadViewModel)getViewModel).ImportFiles(files);
-         e.Handled = true;
+      public void Configure([NotNull] UploadInfo info) {
+         if (info == null) {
+            throw new ArgumentNullException(nameof(info));
+         }
+         _viewModel.Configure(info);
       }
 
       private void onCloseClick(object sender, RoutedEventArgs e) {
          this.Close();
       }
 
-      private void onFilesDrop(object sender, DragEventArgs e) {
+      protected override void OnClosing(CancelEventArgs e) {
+         base.OnClosing(e);
+         if (_viewModel.IsBusy) {
+            var result = MessageBox.Show("Some work in progress, interrupt?", "App is busy", MessageBoxButton.YesNo,
+               MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes) {
+               _viewModel.InterruptAllWork();
+            }
+            else {
+               e.Cancel = true;
+            }
+         }
+
+      }
+
+      private async void onFilesDrop(object sender, DragEventArgs e) {
          var files = (string[])e.Data.GetData(DataFormats.FileDrop);
-         ((UploadViewModel)getViewModel).ImportFiles(files);
+         await _viewModel.ImportFilesAsync(files);
          e.Handled = true;
       }
    }

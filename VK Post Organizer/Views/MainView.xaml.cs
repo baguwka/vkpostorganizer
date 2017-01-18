@@ -24,6 +24,12 @@ namespace vk.Views {
          }
       }
 
+      protected override void OnClosed(EventArgs e) {
+         base.OnClosed(e);
+
+         Application.Current.Shutdown();
+      }
+
       private void onClosing(object sender, CancelEventArgs e) {
          getViewModel.OnClosing();
          SaveLoaderHelper.Save("Main Window Data", 

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 
@@ -17,6 +18,27 @@ namespace vk.Models.VkApi {
       }
 
       public WallPostResponse Post(int wallId, string message, bool signed, bool fromGroup, int date, IEnumerable<string> attachments = null) {
+         var parameters = makeAQuery(wallId, message, signed, fromGroup, date, attachments);
+         var response = ExecuteMethod("wall.post", parameters);
+
+         checkForErrors(response);
+
+         return JsonConvert.DeserializeObject<WallPostResponse>(response);
+      }
+
+
+      public async Task<WallPostResponse> PostAsync(int wallId, string message, bool signed, bool fromGroup, int date, IEnumerable<string> attachments = null) {
+         var parameters = makeAQuery(wallId, message, signed, fromGroup, date, attachments);
+         var response = await ExecuteMethodAsync("wall.post", parameters);
+
+         checkForErrors(response);
+
+         return JsonConvert.DeserializeObject<WallPostResponse>(response);
+
+      }
+
+      private static VkParameters makeAQuery(int wallId, string message, bool signed, bool fromGroup, int date,
+         IEnumerable<string> attachments) {
          var signedInt = signed ? 1 : 0;
          var fromGroupInt = fromGroup ? 1 : 0;
          if (message == null) {
@@ -37,12 +59,9 @@ namespace vk.Models.VkApi {
             .AddParameter("attachments", attachmentsString);
 
          parameters.AddParameter("message", message);
-         var response = ExecuteMethod("wall.post", parameters);
-
-         checkForErrors(response);
-
-         return JsonConvert.DeserializeObject<WallPostResponse>(response);
+         return parameters;
       }
+
    }
 
    [UsedImplicitly]

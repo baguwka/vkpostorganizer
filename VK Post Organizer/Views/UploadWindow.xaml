@@ -9,19 +9,20 @@
         mc:Ignorable="d"
         Icon="/Resources/32x32.ico"
         
-        AllowDrop="{Binding IsBusy, Converter={StaticResource InverseBooleanConverter}}"
-        Drop="UploadWindow_OnDrop"
+        
         
         WindowStartupLocation="CenterScreen"
         Title="Upload" 
-        MinHeight="500" MinWidth="500"
-        Height="500"
+        ResizeMode="NoResize"
+        Height="600"
         Width="700"
-        Background="#edeef0">
+        Background="#edeef0"
+        >
     <Window.DataContext>
         <vm:UploadViewModel/>
     </Window.DataContext>
-    <Grid Margin="10" IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBooleanConverter}}">
+    
+    <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition/>
             <RowDefinition Height="35"/>
@@ -34,13 +35,15 @@
             <Grid Margin="5">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="30"/>
-                    <RowDefinition/>
+                    <RowDefinition Height="200"/>
+                    <RowDefinition Height="180"/>
                     <RowDefinition Height="80"/>
                 </Grid.RowDefinitions>
                 <TextBox Grid.Row="0" Style="{StaticResource VkTextBox}" 
                          FontSize="16" Text="{Binding Text}" Height="30"/>
 
-                <Border Grid.Row="1" Style="{StaticResource VkBorder}" Height="200" Drop="onFilesDrop" Margin="0,5,0,5">
+                <Border Grid.Row="1" Style="{StaticResource VkBorder}" Height="190" Drop="onFilesDrop" Margin="0,5,0,5"
+                        AllowDrop="{Binding IsBusy, Converter={StaticResource InverseBooleanConverter}}">
                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                         <Button Style="{StaticResource VkCommon}"
                             Command="{Binding BrowseCommand}"
@@ -56,11 +59,36 @@
                            Content="{Binding ProgressName, UpdateSourceTrigger=PropertyChanged}"
                            HorizontalAlignment="Center" VerticalAlignment="Center"
                            FontSize="28"></Label>
-                        <Label Content="{Binding filepath}" Height="30"></Label>
+                        <Label Content="{Binding Filepath}" Height="30"></Label>
                     </StackPanel>
                 </Border>
+
+                <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Hidden">
+                    <ItemsControl ItemsSource="{Binding Attachments}" FlowDirection="LeftToRight" Margin="5" Width="600">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel  Orientation="Horizontal" ></WrapPanel>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Style="{StaticResource VkMimic}" Command="{Binding OpenInBrowserCommand}" Height="130" Width="130" Margin="2">
+                                    <Grid>
+                                        <Image Source="{Binding Photo.Photo130, UpdateSourceTrigger=PropertyChanged}" 
+                                               Height="130" Width="130"/>
+                                        <Button Content="x" Width="20" Height="20" Style="{StaticResource VkCommon}" 
+                                                VerticalAlignment="Top" HorizontalAlignment="Right"
+                                                Command="{Binding RemoveCommand}"/>
+                                    </Grid>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+
+                    </ItemsControl>
+                    
+                </ScrollViewer>
                 
-                <Grid Grid.Row="2">
+                <Grid Grid.Row="3">
                     <Grid.RowDefinitions>
                         <RowDefinition/>
                         <RowDefinition/>
@@ -70,7 +98,7 @@
                            HorizontalAlignment="Right" Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityConverter}}"></Label>
 
                     <ProgressBar Grid.Row="1" Style="{StaticResource VkProgressBar}" 
-                             Minimum="0" Maximum="50" 
+                             Minimum="0" Maximum="100" 
                              Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityConverter}}"
                              Value="{Binding UploadProgress, UpdateSourceTrigger=PropertyChanged}" Height="25" Margin="1"/>
                     
@@ -81,8 +109,9 @@
         
         <Border Grid.Row="1" Style="{StaticResource VkBorder}">
             <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="5" HorizontalAlignment="Center">
-                <Button Style="{StaticResource VkBlue}" Width="100" Content="Upload" Margin="0,0,5,0"
-                        Command="{Binding UploadCommand}"></Button>
+                <Button Style="{StaticResource VkBlue}" Width="100" Content="Publish post" Margin="0,0,5,0"
+                        Command="{Binding PublishCommand}"
+                        IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBooleanConverter}}"></Button>
                 <Button Style="{StaticResource VkCommon}" Width="100" Content="Close" Margin="5,0,0,0"
                         Click="onCloseClick"></Button>
             </StackPanel>

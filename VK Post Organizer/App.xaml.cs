@@ -2,44 +2,49 @@
 using System.Windows;
 using System.Windows.Threading;
 using Data_Persistence_Provider;
-using Microsoft.Practices.Unity;
+using SimpleInjector;
 using vk.Models;
-using vk.Models.Files;
 using vk.Models.VkApi;
 using vk.Views;
 
 namespace vk {
    public partial class App : Application {
-      private static IUnityContainer _container;
-
-      public static IUnityContainer Container
-      {
-         get { return _container; }
-         private set { _container = value; }
-      }
+      public static Container Container { get; set; }
 
       private void CompositionRoot(object sender, StartupEventArgs e) {
+         if (SingleInstance.IsOnlyInstance() == false) {
+            //SingleInstance.ShowFirstInstance();
+            Current.Shutdown();
+            return;
+         }
+
          Current.DispatcherUnhandledException += CurrentOnDispatcherUnhandledException;
          Current.ShutdownMode = ShutdownMode.OnMainWindowClose;
 
-         Container = new UnityContainer();
+         Container = Bootstrap();
 
-         Container.RegisterType<Settings>(new ContainerControlledLifetimeManager());
-
-         Container.RegisterType<ISerializer, SaveLoadJsonSerializer>();
-         Container.RegisterType<IDataProvider, AppDataFolderProvider>();
-         Container.RegisterType<SaveLoadController>(new ContainerControlledLifetimeManager());
-
-         Container.RegisterType<IWebClient, DefaultWebClient>();
-         Container.RegisterType<IWallHolder, EmptyWallHolder>();
-         Container.RegisterType<EmptyWallHolder>(new ContainerControlledLifetimeManager());
-
-         Container.RegisterType<ImageExtensionChecker>(new ContainerControlledLifetimeManager());
-
-         Container.RegisterType<StatsTrackVisitor>(new ContainerControlledLifetimeManager());
-
-         var window = new MainView();
+         var window = Container.GetInstance<MainView>();
          window.Show();
+      }
+
+      public static Container Bootstrap() {
+         var container = new Container();
+
+         container.Register<AccessToken>(Lifestyle.Singleton);
+         container.Register<Settings>(Lifestyle.Singleton);
+
+         container.Register<ISerializer, SaveLoadJsonSerializer>();
+         container.Register<IDataProvider, AppDataFolderProvider>();
+         //container.Register<SaveLoadController>();
+
+         container.Register<IWebClient, WebClientWithProxy>();
+         container.Register<IWallHolder, EmptyWallHolder>();
+
+         //container.Register<ImageExtensionChecker>();
+         //container.Register<UploadWindow>();
+         container.Verify();
+
+         return container;
       }
 
       private void CurrentOnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e) {

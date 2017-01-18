@@ -3,10 +3,10 @@ using System.Threading.Tasks;
 
 namespace vk.Models {
    public interface IWebClient {
-      string DownloadString(Uri adress);
-      string DownloadString(string adress);
+      string DownloadString(Uri address);
+      string DownloadString(string address);
 
-      Task<string> DownloadStringAsync(Uri adress);
+      Task<string> DownloadStringAsync(Uri address);
       Task<string> DownloadStringAsync(string adress);
    }
 }
