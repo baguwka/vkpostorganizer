@@ -81,7 +81,6 @@ namespace vk.ViewModels {
       }
 
       private void revert() {
-         CurrentSettings = new Settings();
          CurrentSettings.ApplySettings(App.Container.GetInstance<Settings>());
       }
 

@@ -156,7 +156,7 @@ namespace vk.ViewModels {
       }
 
       private void onWallsUploadRequested(object sender, PostControl control) {
-         var upload = App.Container.GetInstance<UploadWindow>();
+         var upload = App.Container.GetInstance<UploadView>();
          upload.Configure(new UploadInfo(new WallControl(Wall.WallHolder), null, control.Post.DateUnix));
          upload.Show();
       }
@@ -188,7 +188,7 @@ namespace vk.ViewModels {
             return;
          }
 
-         var upload = App.Container.GetInstance<UploadWindow>();
+         var upload = App.Container.GetInstance<UploadView>();
          upload.Configure(new UploadInfo(new WallControl(Wall.WallHolder), null));
          upload.Show();
       }
@@ -365,10 +365,20 @@ namespace vk.ViewModels {
             //TestingGroup = data.TestingGroup;
          }
 
-         var settingsData = await SaveLoaderHelper.TryLoadAsync<Settings>("Settings");
-         if (settingsData.Successful) {
-            var settings = App.Container.GetInstance<Settings>();
-            settings.ApplySettings(settingsData.Result);
+         var loadedSettings = await SaveLoaderHelper.TryLoadAsync<Settings>("Settings");
+         var currentSettings = App.Container.GetInstance<Settings>();
+
+         if (loadedSettings.Successful) {
+            currentSettings.ApplySettings(loadedSettings.Result);
+         }
+         else {
+            //defaults
+            currentSettings.ApplySettings(new Settings() {
+               CloseUploadWindowAfterPublish = true,
+               Proxy = new ProxySettings {
+                  UseProxy = false
+               }
+            });
          }
 
          SetUpAvatar(DEFAULT_AVATAR);

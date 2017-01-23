@@ -177,6 +177,7 @@
     <Compile Include="Models\DefaultWebClient.cs" />
     <Compile Include="Models\Files\ExtensionChecker.cs" />
     <Compile Include="Models\Files\FileFilter.cs" />
+    <Compile Include="Models\Files\GifExtensionChecker.cs" />
     <Compile Include="Models\ProxyProvider.cs" />
     <Compile Include="Models\Settings.cs" />
     <Compile Include="Models\VkApi\PhotosGetWallUploadSever.cs" />
@@ -250,8 +251,8 @@
     <Compile Include="Views\SettingsView.xaml.cs">
       <DependentUpon>SettingsView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\UploadWindow.xaml.cs">
-      <DependentUpon>UploadWindow.xaml</DependentUpon>
+    <Compile Include="Views\UploadView.xaml.cs">
+      <DependentUpon>UploadView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\WallSelection.xaml.cs">
       <DependentUpon>WallSelection.xaml</DependentUpon>
@@ -284,7 +285,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\UploadWindow.xaml">
+    <Page Include="Views\UploadView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

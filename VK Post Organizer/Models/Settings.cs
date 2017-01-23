@@ -88,9 +88,12 @@ namespace vk.Models {
       }
 
       public ProxySettings Proxy { get; set; }
+      public bool CloseUploadWindowAfterPublish { get; set; }
 
       public void ApplySettings(Settings other) {
          if (other == null) return;
+
+         CloseUploadWindowAfterPublish = other.CloseUploadWindowAfterPublish;
 
          Proxy = new ProxySettings();
          Proxy.Set(other.Proxy);

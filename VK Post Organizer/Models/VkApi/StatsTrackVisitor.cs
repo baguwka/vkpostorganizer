@@ -8,9 +8,7 @@ namespace vk.Models.VkApi {
       }
 
       public int Track() {
-         var response = ExecuteMethod("stats.trackVisitor");
-
-         checkForErrors(response);
+         var response = ExecuteMethod("stats.trackVisitor", VkParameters.No());
 
          return JsonConvert.DeserializeObject<StatsTrackVisitorResponse>(response).Response;
       }

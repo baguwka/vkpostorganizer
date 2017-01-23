@@ -59,9 +59,6 @@ namespace vk.Models {
          }
       }
 
-      public ScheduleItem() {
-      }
-
       public ScheduleItem(DateTime time) {
          Hour = time.Hour;
          Minute = time.Minute;

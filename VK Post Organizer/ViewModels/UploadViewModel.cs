@@ -9,7 +9,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media.Imaging;
 using GongSolutions.Wpf.DragDrop;
 using JetBrains.Annotations;
 using Microsoft.Practices.Prism.Commands;
@@ -37,8 +36,10 @@ namespace vk.ViewModels {
       private string _progressString;
       private string _progressName;
       private string _imagePreviewUrl;
+      private readonly Settings _appSettings;
 
       private readonly CancellationTokenSource _cancellationToken;
+      private bool _closeAfterPublish;
 
       public ICommand PublishCommand { get; set; }
       public ICommand BrowseCommand { get; set; }
@@ -52,6 +53,7 @@ namespace vk.ViewModels {
          get { return _text; }
          set { SetProperty(ref _text, value); }
       }
+
       public string DateString {
          get { return _dateString; }
          set { SetProperty(ref _dateString, value); }
@@ -73,7 +75,9 @@ namespace vk.ViewModels {
       public string ProgressString {
          get { return _progressString; }
          set {
-            if (value == _progressName) return;
+            if (value == _progressName) {
+               return;
+            }
             SetProperty(ref _progressString, value);
          }
       }
@@ -91,7 +95,7 @@ namespace vk.ViewModels {
          }
       }
 
-      public WallControl Wall { get; private set; }
+      public WallControl Wall { get; }
 
       public float UploadProgress {
          get { return _uploadProgress; }
@@ -105,6 +109,14 @@ namespace vk.ViewModels {
          set { SetProperty(ref _imagePreviewUrl, value); }
       }
 
+      public bool CloseAfterPublish {
+         get { return _closeAfterPublish; }
+         set {
+            SetProperty(ref _closeAfterPublish, value);
+            _appSettings.CloseUploadWindowAfterPublish = _closeAfterPublish;
+         }
+      }
+
       public UploadViewModel() {
          _cancellationToken = new CancellationTokenSource();
 
@@ -113,7 +125,10 @@ namespace vk.ViewModels {
          Files = new SmartCollection<string>();
          Wall = App.Container.GetInstance<WallControl>();
 
-         PublishCommand = new DelegateCommand(publishCommandExecute);
+         _appSettings = App.Container.GetInstance<Settings>();
+         CloseAfterPublish = _appSettings.CloseUploadWindowAfterPublish;
+
+         PublishCommand = new DelegateCommand<Window>(publishCommandExecute);
          BrowseCommand = new DelegateCommand(browseCommandExecute);
 
          MovePreviousCommand = new DelegateCommand(moveToPreviousMissing);
@@ -121,12 +136,16 @@ namespace vk.ViewModels {
       }
 
       private void moveToPreviousMissing() {
-         if (Wall.Items.None() || DateUnix <= 0) return;
+         if (Wall.Items.None() || DateUnix <= 0) {
+            return;
+         }
 
-         var previousOne = Wall.Items.LastOrDefault((p) => p.Post.DateUnix < DateUnix);
+         var previousOne = Wall.Items.LastOrDefault(p => p.Post.DateUnix < DateUnix);
          if (previousOne == null) {
             previousOne = Wall.Items.LastOrDefault();
-            if (previousOne == null) return;
+            if (previousOne == null) {
+               return;
+            }
             DateUnix = previousOne.Post.DateUnix;
          }
          else {
@@ -135,12 +154,16 @@ namespace vk.ViewModels {
       }
 
       private void moveToNextMissing() {
-         if (Wall.Items.None() || DateUnix <= 0) return;
+         if (Wall.Items.None() || DateUnix <= 0) {
+            return;
+         }
 
-         var nextOne = Wall.Items.FirstOrDefault((p) => p.Post.DateUnix > DateUnix);
+         var nextOne = Wall.Items.FirstOrDefault(p => p.Post.DateUnix > DateUnix);
          if (nextOne == null) {
             nextOne = Wall.Items.FirstOrDefault();
-            if (nextOne == null) return;
+            if (nextOne == null) {
+               return;
+            }
             DateUnix = nextOne.Post.DateUnix;
          }
          else {
@@ -161,7 +184,9 @@ namespace vk.ViewModels {
 
          if (info.DateOverride == -1) {
             var firstMissed = Wall.Items.FirstOrDefault();
-            if (firstMissed == null) return;
+            if (firstMissed == null) {
+               return;
+            }
             DateUnix = firstMissed.Post.DateUnix;
          }
          else {
@@ -178,7 +203,9 @@ namespace vk.ViewModels {
          if (result == true) {
             var files = openFile.FileNames.Take(10);
             foreach (var file in files.Where(file => checker.IsFileHaveValidExtension(file))) {
-               if (_cancellationToken.IsCancellationRequested) break;
+               if (_cancellationToken.IsCancellationRequested) {
+                  break;
+               }
 
                await tryToUpload(file);
             }
@@ -187,7 +214,6 @@ namespace vk.ViewModels {
 
       private async Task tryToUpload(string filePath) {
          if (Attachments.Count >= 10) {
-            //MessageBox.Show("Only 10 attachments allowed", "Too much attachments", MessageBoxButton.OK,MessageBoxImage.Error);
             return;
          }
 
@@ -204,18 +230,12 @@ namespace vk.ViewModels {
 
       public async Task ImportFilesAsync(IEnumerable<string> files) {
          foreach (var file in files.Take(10)) {
-            if (_cancellationToken.IsCancellationRequested) break;
+            if (_cancellationToken.IsCancellationRequested) {
+               break;
+            }
 
-            if (Attachments.Count > 10) continue;
-
-            if (File.Exists(file) && App.Container.GetInstance<ImageExtensionChecker>().IsFileHaveValidExtension(file)) {
-
-               var src = new BitmapImage();
-               src.BeginInit();
-               src.CacheOption = BitmapCacheOption.OnLoad;
-               src.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
-               src.UriSource = new Uri(file, UriKind.Absolute);
-               src.EndInit();
+            if (Attachments.Count > 10) {
+               continue;
             }
 
             await tryToUpload(file);
@@ -227,7 +247,6 @@ namespace vk.ViewModels {
       }
 
       /// <summary>
-      /// 
       /// </summary>
       public async Task<string> GetContentType(string url) {
          var req = (HttpWebRequest)WebRequest.Create(url);
@@ -248,11 +267,14 @@ namespace vk.ViewModels {
       }
 
       /// <summary>
-      /// 
       /// </summary>
       private async void downloadImageIfPossible(string url) {
-         if (string.IsNullOrEmpty(url)) return;
-         if (UrlHelper.IsUrlIsValid(url) == false) return;
+         if (string.IsNullOrEmpty(url)) {
+            return;
+         }
+         if (UrlHelper.IsUrlIsValid(url) == false) {
+            return;
+         }
 
          IsBusy = true;
 
@@ -309,13 +331,6 @@ namespace vk.ViewModels {
             IsBusy = false;
             return;
          }
-
-         var src = new BitmapImage();
-         src.BeginInit();
-         src.CacheOption = BitmapCacheOption.OnLoad;
-         src.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
-         src.UriSource = new Uri(fileLocation, UriKind.Absolute);
-         src.EndInit();
 
          IsBusy = false;
          UrlOfImageToDownload = string.Empty;
@@ -377,32 +392,55 @@ namespace vk.ViewModels {
 
       private void onAttachmentRemoveRequest(object sender, EventArgs eventArgs) {
          var attachment = sender as AttachmentItem;
-         if (attachment == null) return;
+         if (attachment == null) {
+            return;
+         }
 
          Attachments.Remove(attachment);
          attachment.RemoveRequested -= onAttachmentRemoveRequest;
       }
 
-      private async void publishCommandExecute() {
-         if (IsBusy) return;
+      private async void publishCommandExecute(Window window) {
+         if (IsBusy) {
+            return;
+         }
 
          IsBusy = true;
+         bool clearOnError = true;
+
          try {
             var wallPostMethod = App.Container.GetInstance<WallPost>();
             await wallPostMethod.PostAsync(-Wall.WallHolder.ID, Text, false, true, DateUnix,
                Attachments.Take(10).Select(item => item.Attachment));
          }
          catch (VkException ex) {
-            MessageBox.Show($"{ex.Message}\n\nStackTrace:\n{ex.StackTrace}", ex.ToString(), MessageBoxButton.OK,
-               MessageBoxImage.Error);
+            // 150 postpone posts reached
+            if (ex.ErrorCode == 214) {
+               clearOnError = false;
+               MessageBox.Show("Максимальное число отложенных публикаций — 150.", "Превышен лимит отложенных публикаций",
+                  MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            else {
+               MessageBox.Show($"{ex.Message}\n\nStackTrace:\n{ex.StackTrace}", ex.ToString(), MessageBoxButton.OK,
+                  MessageBoxImage.Error);
+            }
          }
          finally {
-            Text = "";
-            Attachments.Clear();
+            if (clearOnError) {
+               Text = "";
+               Attachments.Clear();
 
-            Messenger.Broadcast("refresh");
-            refresh();
-            moveToNextMissing();
+               Messenger.Broadcast("refresh");
+
+               if (CloseAfterPublish) {
+                  IsBusy = false;
+                  window?.Close();
+               }
+               else {
+                  refresh();
+                  moveToNextMissing();
+               }
+            }
 
             IsBusy = false;
          }

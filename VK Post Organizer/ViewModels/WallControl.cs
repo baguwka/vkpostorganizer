@@ -140,12 +140,12 @@ namespace vk.ViewModels {
 
          int totalCount = tempList.Count;
 
-         while(totalCount < 150) { 
+         while(totalCount < 165) { 
             var thisDayDate = nextDate;
             var thisDayPosts = tempList.Where(i => i.Post.Date.Date == thisDayDate.Date).ToList();
 
             foreach (var scheduleItem in schedule.Items) {
-               if (totalCount >= 150) continue;
+               if (totalCount >= 165) continue;
 
                var scheduledDate = ConvertScheduleItemToDateTime(new DateTime(thisDayDate.Year, thisDayDate.Month, thisDayDate.Day), scheduleItem);
 

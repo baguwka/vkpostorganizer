@@ -21,8 +21,6 @@ namespace vk.Models.VkApi {
          var parameters = makeAQuery(wallId, message, signed, fromGroup, date, attachments);
          var response = ExecuteMethod("wall.post", parameters);
 
-         checkForErrors(response);
-
          return JsonConvert.DeserializeObject<WallPostResponse>(response);
       }
 
@@ -30,8 +28,6 @@ namespace vk.Models.VkApi {
       public async Task<WallPostResponse> PostAsync(int wallId, string message, bool signed, bool fromGroup, int date, IEnumerable<string> attachments = null) {
          var parameters = makeAQuery(wallId, message, signed, fromGroup, date, attachments);
          var response = await ExecuteMethodAsync("wall.post", parameters);
-
-         checkForErrors(response);
 
          return JsonConvert.DeserializeObject<WallPostResponse>(response);
       }

@@ -8,6 +8,7 @@ using vk.Models;
 using vk.Models.UrlHelper;
 using vk.Models.VkApi.Entities;
 using vk.Utils;
+using vk.Views;
 
 namespace vk.ViewModels {
    [UsedImplicitly]
@@ -36,8 +37,12 @@ namespace vk.ViewModels {
       public ICommand OpenPost { get; set; }
       public ICommand ExpandToggleCommand { get; set; }
       public ICommand UploadAtThisDateCommand { get; set; }
+      public ICommand RapidUploadModeCommand { get; set; }
 
       public bool IsExisting { get; set; }
+
+      public bool IsRapidUploadModeEnabled { get; set; }
+      public bool IsImageReady { get; set; }
 
       public PostType PostType {
          get { return _postType; }
@@ -62,7 +67,7 @@ namespace vk.ViewModels {
          Images = new SmartCollection<ImageItem>();
          Post = post;
 
-         ExpandToggleCommand = new DelegateCommand(ExpandToggle);
+         ExpandToggleCommand = new DelegateCommand(expandToggle);
          OpenPost = new DelegateCommand(openPostCommand);
          UploadAtThisDateCommand = new DelegateCommand(uploadAtThisDateCommandExecute);
 
@@ -76,7 +81,7 @@ namespace vk.ViewModels {
          var groupName = GroupNameCache.GetGroupName(prev.OwnerId);
 
          PostType = PostType.Repost;
-         Post.Text = $"{groupName.Substring(0, 10)} {prev.Text}";
+         Post.Text = $"{groupName.Substring(0, groupName.Length > 10 ? 10 : groupName.Length)}... {prev.Text}";
          Post.Attachments = prev.Attachments;
 
          loadImages();
@@ -90,7 +95,7 @@ namespace vk.ViewModels {
          System.Diagnostics.Process.Start($"https://vk.com/wall{Post.OwnerId}_{Post.ID}");
       }
 
-      private void ExpandToggle() {
+      private void expandToggle() {
          Expanded = !Expanded;
       }
 

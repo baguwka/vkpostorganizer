@@ -12,6 +12,12 @@ namespace vk.Models.VkApi.Entities {
       public string ErrorMessage { get; set; }
 
       [JsonProperty(PropertyName = "request_params")]
-      public List<RequiestParam> RequiestParams { get; set; }
+      public List<RequiestParam> RequestParams { get; set; }
+
+      [JsonProperty(PropertyName = "captcha_sid")]
+      public int CaptchaSid { get; set; }
+
+      [JsonProperty(PropertyName = "captcha_img")]
+      public string CaptchaImage { get; set; }
    }
 }

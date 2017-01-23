@@ -13,8 +13,6 @@ namespace vk.Models.VkApi {
 
          var response = ExecuteMethod("photos.getWallUploadServer", VkParameters.New().AddParameter("group_id", groupId));
 
-         checkForErrors(response);
-
          return JsonConvert.DeserializeObject<PhotosGetWallUploadServerResponse>(response)?.Response;
       }
    }

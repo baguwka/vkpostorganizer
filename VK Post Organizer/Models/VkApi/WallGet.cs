@@ -19,8 +19,6 @@ namespace vk.Models.VkApi {
                                                    .AddParameter("offset", offset)
                                                    .AddParameter("count", count));
 
-         checkForErrors(response);
-
          return JsonConvert.DeserializeObject<WallGetResponse>(response);
       }
    }

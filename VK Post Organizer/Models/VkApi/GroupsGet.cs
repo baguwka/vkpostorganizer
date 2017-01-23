@@ -14,7 +14,6 @@ namespace vk.Models.VkApi {
                                                    .AddParameter("extended", 1)
                                                    .AddParameter("filter", "editor")
                                                    .AddParameter("fields", "description"));
-         checkForErrors(response);
          return JsonConvert.DeserializeObject<GroupsGetResponse>(response);
       }
    }

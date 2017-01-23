@@ -18,21 +18,27 @@ namespace vk.Models.VkApi {
       public IWebClient WebClient { get; }
       public AccessToken Token { get; }
 
-      protected void checkForErrors(string response) {
-         if (string.IsNullOrEmpty(response)) {
+      private void checkForErrors(string response) {
+         if (string.IsNullOrEmpty(response) || response.Length < 5) {
             throw new VkException($"Got no response from server");
          }
 
          if (response.Substring(2, 5) == "error") {
             var error = deserializeError(response);
-            throw new VkException($"Error code: {error.ErrorCode}\n{error.ErrorMessage}");
+            throw new VkException($"Error code: {error.ErrorCode}\n{error.ErrorMessage}", error.ErrorCode);
          }
       }
 
-      public async Task<string> ExecuteMethodAsync(string method, VkParameters parameters = null) {
+      public async Task<string> ExecuteMethodAsync(string method, [NotNull] VkParameters parameters) {
+         if (parameters == null) {
+            throw new ArgumentNullException(nameof(parameters));
+         }
+
          var finalUri = buildFinalUri(method, parameters);
+         var result = string.Empty;
          try {
-            var result = await WebClient.DownloadStringAsync(finalUri);
+            result = await WebClient.DownloadStringAsync(finalUri);
+            checkForErrors(result);
             return result;
          }
          catch (WebException ex) {
@@ -40,13 +46,27 @@ namespace vk.Models.VkApi {
                throw;
             }
          }
+         //catch (VkException ex) {
+         //   //captcha needed
+         //   if (ex.ErrorCode == 14) {
+         //      // do captcha
+         //      doCaptcha(parameters, result);
+         //      await ExecuteMethodAsync(method, parameters);
+         //   }
+         //}
          return string.Empty;
       }
 
-      public string ExecuteMethod(string method, VkParameters parameters = null) {
+      public string ExecuteMethod(string method, [NotNull] VkParameters parameters) {
+         if (parameters == null) {
+            throw new ArgumentNullException(nameof(parameters));
+         }
+
          var finalUri = buildFinalUri(method, parameters);
+         var result = string.Empty;
          try {
-            var result = WebClient.DownloadString(finalUri);
+            result = WebClient.DownloadString(finalUri);
+            checkForErrors(result);
             return result;
          }
          catch (WebException ex) {
@@ -54,12 +74,26 @@ namespace vk.Models.VkApi {
                throw;
             }
          }
+         //catch (VkException ex) {
+         //   //captcha needed
+         //   if (ex.ErrorCode == 14) {
+         //      doCaptcha(parameters, result);
+         //      ExecuteMethod(method, parameters);
+         //   }
+         //}
          return string.Empty;
       }
+
+      //private void doCaptcha(VkParameters parameters, string result) {
+      //   var error = deserializeError(result);
+
+      //   parameters.AddParameter("captcha_sid", error.CaptchaSid);
+      //   parameters.AddParameter("captcha_key", 123);
+      //}
 
       private bool tryToHandleException(WebException ex) {
          string message;
-         var innerException = ex.InnerException;
+         var innerException = ex.InnerException; 
 
          switch (ex.Status) {
             case WebExceptionStatus.ConnectFailure:

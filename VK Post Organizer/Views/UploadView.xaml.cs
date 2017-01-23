@@ -28,10 +28,10 @@ namespace vk.Views {
    /// <summary>
    /// Interaction logic for UploadWindow.xaml
    /// </summary>
-   public partial class UploadWindow : Window {
+   public partial class UploadView : Window {
       private readonly UploadViewModel _viewModel;
 
-      public UploadWindow() {
+      public UploadView() {
          //if (viewModel == null) {
          //   throw new ArgumentNullException(nameof(viewModel));
          //}

@@ -30,8 +30,6 @@ namespace vk.Models.VkApi {
                                                    .AddParameter("photo", jphoto)
                                                    .AddParameter("hash", jhash));
 
-         checkForErrors(response);
-
          return JsonConvert.DeserializeObject<PhotosSaveWallPhotoResponse>(response);
       }
    }

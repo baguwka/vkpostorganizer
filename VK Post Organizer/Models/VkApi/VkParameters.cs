@@ -4,6 +4,10 @@ namespace vk.Models.VkApi {
    public class VkParameters {
       public NameValueCollection Query { get; }
 
+      public static VkParameters No() {
+         return new VkParameters();
+      }
+
       public static VkParameters New() {
          return new VkParameters();
       }
