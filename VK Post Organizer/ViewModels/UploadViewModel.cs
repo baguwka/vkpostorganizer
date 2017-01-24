@@ -128,7 +128,7 @@ namespace vk.ViewModels {
          _appSettings = App.Container.GetInstance<Settings>();
          CloseAfterPublish = _appSettings.CloseUploadWindowAfterPublish;
 
-         PublishCommand = new DelegateCommand<Window>(publishCommandExecute);
+         PublishCommand = new DelegateCommand<Window>(publishCommandExecute, window => !IsBusy);
          BrowseCommand = new DelegateCommand(browseCommandExecute);
 
          MovePreviousCommand = new DelegateCommand(moveToPreviousMissing);

@@ -4,6 +4,7 @@ using System.Windows.Threading;
 using Data_Persistence_Provider;
 using SimpleInjector;
 using vk.Models;
+using vk.Models.UrlHelper;
 using vk.Models.VkApi;
 using vk.Views;
 
@@ -40,6 +41,8 @@ namespace vk {
          container.Register<IWebClient, WebClientWithProxy>();
          container.Register<IWallHolder, EmptyWallHolder>();
 
+         container.Register<PhotoUrlObtainer>(Lifestyle.Singleton);
+         container.Register<DocumentPreviewUrlObtainer>(Lifestyle.Singleton);
          //container.Register<ImageExtensionChecker>();
          //container.Register<UploadWindow>();
          container.Verify();

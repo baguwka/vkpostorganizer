@@ -16,8 +16,9 @@ namespace vk.Utils {
             return GroupNamesById[groupId];
          }
 
-         var groupsGet = App.Container.GetInstance<GroupsGetById>();
-         var response = groupsGet.Get(Math.Abs(groupId));
+         var groupsGetById = App.Container.GetInstance<GroupsGetById>();
+
+         var response = groupsGetById.Get(Math.Abs(groupId));
          var group = response.Response.FirstOrDefault();
 
          GroupNamesById.Add(groupId, group?.Name);

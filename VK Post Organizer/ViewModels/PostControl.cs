@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows.Input;
 using JetBrains.Annotations;
@@ -8,7 +9,6 @@ using vk.Models;
 using vk.Models.UrlHelper;
 using vk.Models.VkApi.Entities;
 using vk.Utils;
-using vk.Views;
 
 namespace vk.ViewModels {
    [UsedImplicitly]
@@ -46,31 +46,33 @@ namespace vk.ViewModels {
 
       public PostType PostType {
          get { return _postType; }
-         set { _postType = value; }
+         set { SetProperty(ref _postType, value); }
       }
 
       private void loadImages() {
-         foreach (var attachment in Post.Attachments) {
-            if (attachment.Type == "photo") {
-               Images.Add(new PhotoUrlObtainer().Obtain(attachment, ImageSize.Medium));
-            }
+         Images.AddRange(from attachment in Post.Attachments
+                         where attachment.Type == "photo"
+                         select attachment.ObtainPhotoUrl(ImageSize.Medium));
 
-            if (attachment.Type == "doc") {
-               if (attachment.Document.Type == (int)DocType.Image || attachment.Document.Type == (int)DocType.Gif) {
-                  Images.Add(new DocumentPreviewUrlObtainer().Obtain(attachment, ImageSize.Large));
-               }
-            }
-         }
+         Images.AddRange(from attachment in Post.Attachments
+                         where attachment.Type == "doc" && (attachment.Document.Type == (int)DocType.Image || attachment.Document.Type == (int)DocType.Gif)
+                         select attachment.ObtainDocumentPreview(ImageSize.Large));
       }
 
-      public PostControl(Post post) {
+      public PostControl([NotNull] Post post) {
+         if (post == null) {
+            throw new ArgumentNullException(nameof(post));
+         }
+
          Images = new SmartCollection<ImageItem>();
+
+         ExpandToggleCommand = new DelegateCommand(expandToggle, () => PostType != PostType.Missing);
+         OpenPost = new DelegateCommand(openPostCommand, () => IsExisting == true && PostType != PostType.Missing);
+         UploadAtThisDateCommand = new DelegateCommand(uploadAtThisDateCommandExecute, () => PostType == PostType.Missing);
+
          Post = post;
 
-         ExpandToggleCommand = new DelegateCommand(expandToggle);
-         OpenPost = new DelegateCommand(openPostCommand);
-         UploadAtThisDateCommand = new DelegateCommand(uploadAtThisDateCommandExecute);
-
+         //if copy history is null it's not a repost
          var prev = Post.CopyHistory?.FirstOrDefault();
          if (prev == null) {
             loadImages();
@@ -78,6 +80,7 @@ namespace vk.ViewModels {
             return;
          }
 
+         //it's a repost
          var groupName = GroupNameCache.GetGroupName(prev.OwnerId);
 
          PostType = PostType.Repost;
