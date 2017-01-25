@@ -16,7 +16,6 @@ using Microsoft.Practices.Prism.Mvvm;
 using Microsoft.Win32;
 using Utilities;
 using vk.Models;
-using vk.Models.Configuration;
 using vk.Models.Files;
 using vk.Models.Filter;
 using vk.Models.VkApi;

@@ -8,7 +8,6 @@ using System.Windows.Input;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
 using vk.Models;
-using vk.Models.Configuration;
 using vk.Utils;
 
 namespace vk.ViewModels {

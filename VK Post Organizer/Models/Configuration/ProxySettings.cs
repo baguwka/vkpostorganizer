@@ -1,7 +1,7 @@
 using System;
 using Microsoft.Practices.Prism.Mvvm;
 
-namespace vk.Models.Configuration {
+namespace vk.Models {
    [Serializable]
    public class ProxySettings : BindableBase {
       private bool _useProxy;

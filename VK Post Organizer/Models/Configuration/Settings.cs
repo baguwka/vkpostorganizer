@@ -1,7 +1,8 @@
 ﻿using System;
 using Microsoft.Practices.Prism.Mvvm;
+using Newtonsoft.Json;
 
-namespace vk.Models.Configuration {
+namespace vk.Models {
    [Serializable]
    public class UploadSettings : BindableBase {
       private bool _closeUploadWindowAfterPublish;
@@ -31,11 +32,19 @@ namespace vk.Models.Configuration {
    [Serializable]
    public class Settings : BindableBase {
       public Settings() {
-         Proxy = new ProxySettings();
-         Upload = new UploadSettings();
+         Proxy = new ProxySettings {
+            UseProxy = false,
+         };
+         Upload = new UploadSettings {
+            CloseUploadWindowAfterPublish = true,
+            SignedPosting = false,
+            PostFromGroup = true
+         };
       }
 
       public ProxySettings Proxy { get; set; }
+
+      [JsonProperty(Required = Required.DisallowNull)]
       public UploadSettings Upload { get; set; }
 
       public void ApplySettings(Settings other) {

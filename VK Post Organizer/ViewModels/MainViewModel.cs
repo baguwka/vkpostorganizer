@@ -10,7 +10,6 @@ using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
 using Utilities;
 using vk.Models;
-using vk.Models.Configuration;
 using vk.Models.VkApi;
 using vk.Models.VkApi.Entities;
 using vk.Utils;
