@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using Microsoft.Practices.Prism.Mvvm;
 
-namespace vk.Models {
+namespace vk.Models.Configuration {
    [Serializable]
    public class ProxySettings : BindableBase {
       private bool _useProxy;
@@ -78,25 +78,6 @@ namespace vk.Models {
          }
          var builder = new UriBuilder(ProxyAddress) {Port = ProxyPort};
          _proxyUri = builder.Uri;
-      }
-   }
-
-   [Serializable]
-   public class Settings : BindableBase {
-      public Settings() {
-         Proxy = new ProxySettings();
-      }
-
-      public ProxySettings Proxy { get; set; }
-      public bool CloseUploadWindowAfterPublish { get; set; }
-
-      public void ApplySettings(Settings other) {
-         if (other == null) return;
-
-         CloseUploadWindowAfterPublish = other.CloseUploadWindowAfterPublish;
-
-         Proxy = new ProxySettings();
-         Proxy.Set(other.Proxy);
       }
    }
 }

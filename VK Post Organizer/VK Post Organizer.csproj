@@ -174,12 +174,13 @@
     <Compile Include="Converter\PostTypeToBoolConverter.cs" />
     <Compile Include="Converter\MissingPostIsHiddenConverter.cs" />
     <Compile Include="Models\AppDataFolderProvider.cs" />
+    <Compile Include="Models\Configuration\ProxySettings.cs" />
     <Compile Include="Models\DefaultWebClient.cs" />
     <Compile Include="Models\Files\ExtensionChecker.cs" />
     <Compile Include="Models\Files\FileFilter.cs" />
     <Compile Include="Models\Files\GifExtensionChecker.cs" />
     <Compile Include="Models\ProxyProvider.cs" />
-    <Compile Include="Models\Settings.cs" />
+    <Compile Include="Models\Configuration\Settings.cs" />
     <Compile Include="Models\VkApi\PhotosGetWallUploadSever.cs" />
     <Compile Include="Models\VkApi\PhotosSaveWallPhoto.cs" />
     <Compile Include="Models\VkApi\StatsTrackVisitor.cs" />

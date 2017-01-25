@@ -18,7 +18,6 @@ namespace vk.Utils {
       public static IWebProxy GetProxy(Uri uri, string username, string password) {
          if (IsUrlIsValid(uri.ToString()) && uri.Port > 0) {
             var credentials = new NetworkCredential(username, password);
-            //MessageBox.Show($"url: {uri}\nusrnm: {credentials.UserName}\n pswd: {credentials.Password}");
             return new WebProxy(uri, true, null, credentials);
          }
          return null;

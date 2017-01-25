@@ -16,6 +16,7 @@ using Microsoft.Practices.Prism.Mvvm;
 using Microsoft.Win32;
 using Utilities;
 using vk.Models;
+using vk.Models.Configuration;
 using vk.Models.Files;
 using vk.Models.Filter;
 using vk.Models.VkApi;
@@ -32,7 +33,7 @@ namespace vk.ViewModels {
       private float _uploadProgress;
       private bool _isBusy;
 
-      private string _urlOfImageToDownload;
+      private string _urlToDownload;
       private string _progressString;
       private string _progressName;
       private string _imagePreviewUrl;
@@ -87,11 +88,11 @@ namespace vk.ViewModels {
          set { SetProperty(ref _isBusy, value); }
       }
 
-      public string UrlOfImageToDownload {
-         get { return _urlOfImageToDownload; }
+      public string UrlToDownload {
+         get { return _urlToDownload; }
          set {
-            SetProperty(ref _urlOfImageToDownload, value);
-            downloadImageIfPossible(_urlOfImageToDownload);
+            SetProperty(ref _urlToDownload, value);
+            onUrlToDownloadChanged(_urlToDownload);
          }
       }
 
@@ -113,7 +114,7 @@ namespace vk.ViewModels {
          get { return _closeAfterPublish; }
          set {
             SetProperty(ref _closeAfterPublish, value);
-            _appSettings.CloseUploadWindowAfterPublish = _closeAfterPublish;
+            _appSettings.Upload.CloseUploadWindowAfterPublish = _closeAfterPublish;
          }
       }
 
@@ -126,7 +127,7 @@ namespace vk.ViewModels {
          Wall = App.Container.GetInstance<WallControl>();
 
          _appSettings = App.Container.GetInstance<Settings>();
-         CloseAfterPublish = _appSettings.CloseUploadWindowAfterPublish;
+         CloseAfterPublish = _appSettings.Upload.CloseUploadWindowAfterPublish;
 
          PublishCommand = new DelegateCommand<Window>(publishCommandExecute, window => !IsBusy);
          BrowseCommand = new DelegateCommand(browseCommandExecute);
@@ -268,14 +269,14 @@ namespace vk.ViewModels {
 
       /// <summary>
       /// </summary>
-      private async void downloadImageIfPossible(string url) {
+      private async void onUrlToDownloadChanged(string url) {
          if (string.IsNullOrEmpty(url)) {
             return;
          }
          if (UrlHelper.IsUrlIsValid(url) == false) {
             return;
          }
-
+         
          IsBusy = true;
 
          string contentType;
@@ -333,7 +334,7 @@ namespace vk.ViewModels {
          }
 
          IsBusy = false;
-         UrlOfImageToDownload = string.Empty;
+         UrlToDownload = string.Empty;
 
          await tryToUpload(fileLocation);
       }
@@ -399,7 +400,7 @@ namespace vk.ViewModels {
          Attachments.Remove(attachment);
          attachment.RemoveRequested -= onAttachmentRemoveRequest;
       }
-
+      
       private async void publishCommandExecute(Window window) {
          if (IsBusy) {
             return;

@@ -4,6 +4,7 @@ using System.Windows.Threading;
 using Data_Persistence_Provider;
 using SimpleInjector;
 using vk.Models;
+using vk.Models.Configuration;
 using vk.Models.UrlHelper;
 using vk.Models.VkApi;
 using vk.Views;

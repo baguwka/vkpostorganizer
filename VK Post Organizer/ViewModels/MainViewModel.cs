@@ -10,6 +10,7 @@ using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
 using Utilities;
 using vk.Models;
+using vk.Models.Configuration;
 using vk.Models.VkApi;
 using vk.Models.VkApi.Entities;
 using vk.Utils;
@@ -374,7 +375,11 @@ namespace vk.ViewModels {
          else {
             //defaults
             currentSettings.ApplySettings(new Settings() {
-               CloseUploadWindowAfterPublish = true,
+               Upload = new UploadSettings {
+                  CloseUploadWindowAfterPublish = true,
+                  SignedPosting = false,
+                  PostFromGroup = true
+               },
                Proxy = new ProxySettings {
                   UseProxy = false
                }

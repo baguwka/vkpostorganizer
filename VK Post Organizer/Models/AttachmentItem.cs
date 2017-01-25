@@ -2,10 +2,11 @@ using System;
 using System.Diagnostics;
 using System.Windows.Input;
 using Microsoft.Practices.Prism.Commands;
+using Microsoft.Practices.Prism.Mvvm;
 using vk.Models.VkApi.Entities;
 
 namespace vk.Models {
-   public class AttachmentItem {
+   public class AttachmentItem : BindableBase {
       private Photo _photo;
 
       public string Attachment { get; private set; }
@@ -17,7 +18,7 @@ namespace vk.Models {
 
       public Photo Photo {
          get { return _photo; }
-         set { _photo = value; }
+         set { SetProperty(ref _photo, value); }
       }
 
       public string _preview;
@@ -25,7 +26,7 @@ namespace vk.Models {
       public AttachmentItem() {
          RemoveCommand = new DelegateCommand(onRemoveRequested);
          OpenInBrowserCommand = new DelegateCommand(openInBrowserExecute);
-      }
+      } 
 
       private void openInBrowserExecute() {
          var largestImageUrl = _photo?.GetLargest();

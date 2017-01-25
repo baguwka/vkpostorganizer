@@ -8,18 +8,15 @@ using System.Windows.Input;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
 using vk.Models;
+using vk.Models.Configuration;
 using vk.Utils;
 
 namespace vk.ViewModels {
    public class SettingsViewModel : BindableBase {
-      private Settings _currentSettings;
       private bool _isBusy;
       private string _proxyPingMs;
 
-      public Settings CurrentSettings {
-         get { return _currentSettings; }
-         set { SetProperty(ref _currentSettings, value); }
-      }
+      public Settings CurrentSettings { get; }
 
       public bool IsBusy {
          get { return _isBusy; }
@@ -40,6 +37,7 @@ namespace vk.ViewModels {
          RevertSettingsCommand = new DelegateCommand(revert);
 
          PingCommand = new DelegateCommand(pingProxy);
+         CurrentSettings = new Settings();
 
          revert();
          //pingProxy();

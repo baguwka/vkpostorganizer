@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using JetBrains.Annotations;
+using vk.Models.Configuration;
 using static vk.Utils.UrlHelper;
 
 namespace vk.Models {
