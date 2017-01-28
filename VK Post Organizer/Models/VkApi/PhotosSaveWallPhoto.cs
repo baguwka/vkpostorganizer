@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -11,8 +12,22 @@ namespace vk.Models.VkApi {
       public PhotosSaveWallPhoto([NotNull] AccessToken token, [NotNull] IWebClient webClient) : base(token, webClient) {
       }
 
+      [Obsolete]
       public PhotosSaveWallPhotoResponse Save(int groupID, string uploadResponse) {
+         var query = buildAQuery(groupID, uploadResponse);
+         var response = ExecuteMethod("photos.saveWallPhoto", query);
+         return JsonConvert.DeserializeObject<PhotosSaveWallPhotoResponse>(response);
+      }
+
+      public async Task<PhotosSaveWallPhotoResponse> SaveAsync(int groupID, string uploadResponse) {
+         var query = buildAQuery(groupID, uploadResponse);
+         var response = await ExecuteMethodAsync("photos.saveWallPhoto", query);
+         return JsonConvert.DeserializeObject<PhotosSaveWallPhotoResponse>(response);
+      }
+
+      private static VkParameters buildAQuery(int groupID, string uploadResponse) {
          groupID = Math.Abs(groupID);
+
          var jsonedResponse = JsonConvert.DeserializeObject(uploadResponse) as JObject;
 
          if (jsonedResponse == null) {
@@ -22,15 +37,12 @@ namespace vk.Models.VkApi {
          var jserver = jsonedResponse["server"];
          var jphoto = jsonedResponse["photo"];
          var jhash = jsonedResponse["hash"];
-
-
-         var response = ExecuteMethod("photos.saveWallPhoto", VkParameters.New()
-                                                   .AddParameter("group_id", groupID)
-                                                   .AddParameter("server", jserver)
-                                                   .AddParameter("photo", jphoto)
-                                                   .AddParameter("hash", jhash));
-
-         return JsonConvert.DeserializeObject<PhotosSaveWallPhotoResponse>(response);
+         var query = VkParameters.New()
+            .AddParameter("group_id", groupID)
+            .AddParameter("server", jserver)
+            .AddParameter("photo", jphoto)
+            .AddParameter("hash", jhash);
+         return query;
       }
    }
 

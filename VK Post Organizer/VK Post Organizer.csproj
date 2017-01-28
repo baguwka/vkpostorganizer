@@ -205,7 +205,7 @@
     <Compile Include="Models\VkApi\Entities\VkException.cs" />
     <Compile Include="Utils\EnumExtensions.cs" />
     <Compile Include="Utils\EnumHelper.cs" />
-    <Compile Include="Models\Filter\IPostFilter.cs" />
+    <Compile Include="Models\Filter\PostFilter.cs" />
     <Compile Include="Utils\SizeHelper.cs" />
     <Compile Include="Utils\MimeTypeLibrary.cs" />
     <Compile Include="Utils\UnixTimeConverter.cs" />

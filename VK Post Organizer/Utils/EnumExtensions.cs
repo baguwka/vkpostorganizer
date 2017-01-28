@@ -4,7 +4,7 @@ using vk.Models.Filter;
 
 namespace vk.Utils {
    public static class EnumExtensions {
-      public static IPostFilter GetFilter(this PostType type) {
+      public static PostFilter GetFilter(this PostType type) {
          switch (type) {
             case PostType.Post:
                return new PostsOnlyFilter();

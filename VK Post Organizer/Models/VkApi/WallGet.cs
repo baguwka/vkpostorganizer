@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using vk.Models.VkApi.Entities;
@@ -10,16 +11,27 @@ namespace vk.Models.VkApi {
       public WallGet([NotNull] AccessToken token, [NotNull] IWebClient webClient) : base(token, webClient) {
       }
 
+      [Obsolete]
       public WallGetResponse Get(int id, int count = 100, int offset = 0) {
-         id = -Math.Abs(id);
-
-         var response = ExecuteMethod("wall.get", VkParameters.New()
-                                                   .AddParameter("owner_id", id)
-                                                   .AddParameter("filter", "postponed")
-                                                   .AddParameter("offset", offset)
-                                                   .AddParameter("count", count));
-
+         var parameters = makeAQuery(id, count, offset);
+         var response = ExecuteMethod("wall.get", parameters);
          return JsonConvert.DeserializeObject<WallGetResponse>(response);
+      }
+
+      public async Task<WallGetResponse> GetAsync(int id, int count = 100, int offset = 0) {
+         var parameters = makeAQuery(id, count, offset);
+         var response = await ExecuteMethodAsync("wall.get", parameters);
+         return JsonConvert.DeserializeObject<WallGetResponse>(response);
+      }
+
+      private static VkParameters makeAQuery(int id, int count, int offset) {
+         id = -Math.Abs(id);
+         var parameters = VkParameters.New()
+            .AddParameter("owner_id", id)
+            .AddParameter("filter", "postponed")
+            .AddParameter("offset", offset)
+            .AddParameter("count", count);
+         return parameters;
       }
    }
 

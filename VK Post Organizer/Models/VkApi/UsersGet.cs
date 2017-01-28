@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using vk.Models.VkApi.Entities;
@@ -9,11 +11,23 @@ namespace vk.Models.VkApi {
       public UsersGet(AccessToken token, IWebClient webClient) : base(token, webClient) {
       }
 
+      [Obsolete]
       public UsersGetResponse Get() {
-         var response = ExecuteMethod("users.get", VkParameters.New()
-                                                   .AddParameter("fields", "first_name,last_name,photo_50"));
-
+         var query = buildAQuery();
+         var response = ExecuteMethod("users.get", query);
          return JsonConvert.DeserializeObject<UsersGetResponse>(response);
+      }
+
+      public async Task<UsersGetResponse> GetAsync() {
+         var query = buildAQuery();
+         var response = await ExecuteMethodAsync("users.get", query);
+         return JsonConvert.DeserializeObject<UsersGetResponse>(response);
+      }
+
+      private static VkParameters buildAQuery() {
+         var query = VkParameters.New()
+            .AddParameter("fields", "first_name,last_name,photo_50");
+         return query;
       }
    }
 

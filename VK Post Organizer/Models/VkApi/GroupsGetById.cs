@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 
@@ -8,11 +10,24 @@ namespace vk.Models.VkApi {
       public GroupsGetById(AccessToken token, IWebClient webClient) : base(token, webClient) {
       }
 
+      [Obsolete]
       public GroupsGetByIdResponse Get(int id, string fields = "") {
-         var response = ExecuteMethod("groups.getById", VkParameters.New()
-                                                   .AddParameter("group_id", id)
-                                                   .AddParameter("fields", fields));
+         var query = buildAQuery(id, fields);
+         var response = ExecuteMethod("groups.getById", query);
          return JsonConvert.DeserializeObject<GroupsGetByIdResponse>(response);
+      }
+
+      public async Task<GroupsGetByIdResponse> GetAsync(int id, string fields = "") {
+         var query = buildAQuery(id, fields);
+         var response = await ExecuteMethodAsync("groups.getById", query);
+         return JsonConvert.DeserializeObject<GroupsGetByIdResponse>(response);
+      }
+
+      private static VkParameters buildAQuery(int id, string fields) {
+         var query = VkParameters.New()
+            .AddParameter("group_id", id)
+            .AddParameter("fields", fields);
+         return query;
       }
    }
 

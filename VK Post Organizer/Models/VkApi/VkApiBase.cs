@@ -29,21 +29,36 @@ namespace vk.Models.VkApi {
          }
       }
 
-      public async Task<string> ExecuteMethodAsync(string method, [NotNull] VkParameters parameters) {
-         if (parameters == null) {
-            throw new ArgumentNullException(nameof(parameters));
+      private int _failedAttempts = 0;
+
+      public async Task<string> ExecuteMethodAsync(string method, [NotNull] VkParameters query) {
+         if (query == null) {
+            throw new ArgumentNullException(nameof(query));
          }
 
-         var finalUri = buildFinalUri(method, parameters);
+         var finalUri = buildFinalUri(method, query);
          var result = string.Empty;
          try {
             result = await WebClient.DownloadStringAsync(finalUri);
             checkForErrors(result);
+            _failedAttempts = 0;
             return result;
          }
          catch (WebException ex) {
             if (tryToHandleException(ex) == false) {
                throw;
+            }
+         }
+         catch (VkException ex) {
+            if (_failedAttempts > 5) {
+               throw;
+            }
+
+            _failedAttempts++;
+            //too much requests per second
+            if (ex.ErrorCode == 6) {
+               await Task.Delay(TimeSpan.FromSeconds(0.3f));
+               return await ExecuteMethodAsync(method, query);
             }
          }
          //catch (VkException ex) {
@@ -57,12 +72,13 @@ namespace vk.Models.VkApi {
          return string.Empty;
       }
 
-      public string ExecuteMethod(string method, [NotNull] VkParameters parameters) {
-         if (parameters == null) {
-            throw new ArgumentNullException(nameof(parameters));
+      [Obsolete]
+      public string ExecuteMethod(string method, [NotNull] VkParameters query) {
+         if (query == null) {
+            throw new ArgumentNullException(nameof(query));
          }
 
-         var finalUri = buildFinalUri(method, parameters);
+         var finalUri = buildFinalUri(method, query);
          var result = string.Empty;
          try {
             result = WebClient.DownloadString(finalUri);

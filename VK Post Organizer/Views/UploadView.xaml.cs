@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using System.Windows;
 using JetBrains.Annotations;
 using vk.ViewModels;
@@ -42,11 +43,11 @@ namespace vk.Views {
          _viewModel = (UploadViewModel)DataContext; //viewModel;
       }
 
-      public void Configure([NotNull] UploadInfo info) {
+      public async Task ConfigureAsync([NotNull] UploadInfo info) {
          if (info == null) {
             throw new ArgumentNullException(nameof(info));
          }
-         _viewModel.Configure(info);
+         await _viewModel.ConfigureAsync(info);
       }
 
       private void onCloseClick(object sender, RoutedEventArgs e) {

@@ -14,7 +14,7 @@ namespace vk.Views {
       private readonly AccessToken _token;
 
       private const string SCOPES = "offline,wall,groups,photos,docs";
-      private const string CLIENT_ID = "5730368";
+      private const string CLIENT_ID = "5590028";
 
       public AuthView([NotNull] AccessToken token, bool clearCookies) {
          InitializeComponent();

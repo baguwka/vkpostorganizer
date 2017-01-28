@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using JetBrains.Annotations;
 using Microsoft.Practices.Prism.Commands;
@@ -16,10 +17,10 @@ namespace vk.ViewModels {
       private bool _expanded;
       private PostMark _mark;
       private PostType _postType;
-      public Post Post { get; }
+      public Post Post { get; private set; }
       public event EventHandler UploadRequested;
 
-      public SmartCollection<ImageItem> Images { get; }
+      public SmartCollection<ImageItem> Images { get; private set; }
 
       public bool Expanded {
          get { return _expanded; }
@@ -59,36 +60,86 @@ namespace vk.ViewModels {
                          select attachment.ObtainDocumentPreview(ImageSize.Large));
       }
 
-      public PostControl([NotNull] Post post) {
-         if (post == null) {
-            throw new ArgumentNullException(nameof(post));
+      private PostControl() {
+         
+      }
+
+      public static async Task<PostControl> CreateAsync([NotNull] Post postReference) {
+         if (postReference == null) {
+            throw new ArgumentNullException(nameof(postReference));
+         }
+
+         var postControl = new PostControl();
+         return await postControl.InitializeAsync(postReference);
+      }
+
+      private async Task<PostControl> InitializeAsync([NotNull] Post postReference) {
+         if (postReference == null) {
+            throw new ArgumentNullException(nameof(postReference));
          }
 
          Images = new SmartCollection<ImageItem>();
 
-         ExpandToggleCommand = new DelegateCommand(expandToggle, () => PostType != PostType.Missing);
-         OpenPost = new DelegateCommand(openPostCommand, () => IsExisting == true && PostType != PostType.Missing);
-         UploadAtThisDateCommand = new DelegateCommand(uploadAtThisDateCommandExecute, () => PostType == PostType.Missing);
+         ExpandToggleCommand = new DelegateCommand(expandToggle,
+            () => PostType != PostType.Missing);
 
-         Post = post;
+         OpenPost = new DelegateCommand(openPostCommand,
+            () => IsExisting == true && PostType != PostType.Missing);
+
+         UploadAtThisDateCommand = new DelegateCommand(uploadAtThisDateCommandExecute,
+            () => PostType == PostType.Missing);
+
+         Post = postReference;
 
          //if copy history is null it's not a repost
          var prev = Post.CopyHistory?.FirstOrDefault();
          if (prev == null) {
             loadImages();
             PostType = PostType.Post;
-            return;
          }
+         else {
+            //it's a repost
+            var groupName = await GroupNameCache.GetGroupNameAsync(prev.OwnerId);
 
-         //it's a repost
-         var groupName = GroupNameCache.GetGroupName(prev.OwnerId);
+            PostType = PostType.Repost;
+            Post.Text = $"{groupName.Substring(0, groupName.Length > 10 ? 10 : groupName.Length)}... {prev.Text}";
+            Post.Attachments = prev.Attachments;
 
-         PostType = PostType.Repost;
-         Post.Text = $"{groupName.Substring(0, groupName.Length > 10 ? 10 : groupName.Length)}... {prev.Text}";
-         Post.Attachments = prev.Attachments;
-
-         loadImages();
+            loadImages();
+         }
+         return this;
       }
+
+      //public PostControl([NotNull] Post post) {
+      //   if (post == null) {
+      //      throw new ArgumentNullException(nameof(post));
+      //   }
+
+      //   Images = new SmartCollection<ImageItem>();
+
+      //   ExpandToggleCommand = new DelegateCommand(expandToggle, () => PostType != PostType.Missing);
+      //   OpenPost = new DelegateCommand(openPostCommand, () => IsExisting == true && PostType != PostType.Missing);
+      //   UploadAtThisDateCommand = new DelegateCommand(uploadAtThisDateCommandExecute, () => PostType == PostType.Missing);
+
+      //   Post = post;
+
+      //   //if copy history is null it's not a repost
+      //   var prev = Post.CopyHistory?.FirstOrDefault();
+      //   if (prev == null) {
+      //      loadImages();
+      //      PostType = PostType.Post;
+      //      return;
+      //   }
+
+      //   //it's a repost
+      //   var groupName = GroupNameCache.GetGroupName(prev.OwnerId);
+
+      //   PostType = PostType.Repost;
+      //   Post.Text = $"{groupName.Substring(0, groupName.Length > 10 ? 10 : groupName.Length)}... {prev.Text}";
+      //   Post.Attachments = prev.Attachments;
+
+      //   loadImages();
+      //}
 
       private void uploadAtThisDateCommandExecute() {
          OnUploadRequested();

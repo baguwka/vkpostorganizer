@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Data_Persistence_Provider;
+using Messenger;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
 using Utilities;
@@ -23,10 +26,6 @@ namespace vk.ViewModels {
       private bool _isWallShowing;
       private PostType _currentPostTypeFilter;
       private bool _canTestPost;
-      private int _missingPosts;
-      private int _postCount;
-      private int _repostCount;
-      private int _totalPostCount;
       private string _infoPanel;
       private bool _isBusy;
 
@@ -36,14 +35,15 @@ namespace vk.ViewModels {
       private const string DEFAULT_AVATAR =
          "pack://application:,,,/VKPostOrganizer;component/Resources/default_avatar.png";
 
-      public ICommand ConfigureScheduleCommand { get; set; }
-      public ICommand BackCommand { get; set; }
-      public ICommand RefreshCommand { get; set; }
-      public ICommand UploadCommand { get; set; }
-      public ICommand AuthorizeCommand { get; set; }
-      public ICommand ApplyScheduleCommand { get; set; }
-      public ICommand SettingsCommand { get; set; }
-      public ICommand LogOutCommand { get; set; }
+
+      public DelegateCommand ConfigureScheduleCommand { get; private set; }
+      public DelegateCommand BackCommand { get; private set; }
+      public DelegateCommand RefreshCommand { get; private set; }
+      public DelegateCommand UploadCommand { get; private set; }
+      public DelegateCommand AuthorizeCommand { get; private set; }
+      public DelegateCommand ApplyScheduleCommand { get; private set; }
+      public DelegateCommand SettingsCommand { get; private set; }
+      public DelegateCommand LogOutCommand { get; private set; }
 
       public IEnumerable<ValueDescription> PostTypes => EnumHelper.GetAllValuesAndDescriptions<PostType>();
 
@@ -85,26 +85,6 @@ namespace vk.ViewModels {
          }
       }
 
-      public int TotalPostCount {
-         get { return _totalPostCount; }
-         set { SetProperty(ref _totalPostCount, value); }
-      }
-
-      public int RepostCount {
-         get { return _repostCount; }
-         set { SetProperty(ref _repostCount, value); }
-      }
-
-      public int PostCount {
-         get { return _postCount; }
-         set { SetProperty(ref _postCount, value); }
-      }
-
-      public int MissingPosts {
-         get { return _missingPosts; }
-         set { SetProperty(ref _missingPosts, value); }
-      }
-
       public string InfoPanel {
          get { return _infoPanel; }
          set { SetProperty(ref _infoPanel, value); }
@@ -112,21 +92,29 @@ namespace vk.ViewModels {
 
       public bool IsBusy {
          get { return _isBusy; }
-         set { SetProperty(ref _isBusy, value); }
+         set {
+            SetProperty(ref _isBusy, value);
+            _commandsAffectedByBusyStatus.ForEach(command => command.RaiseCanExecuteChanged());
+         }
       }
 
+      private readonly IEnumerable<DelegateCommand> _commandsAffectedByBusyStatus;
 
       public MainViewModel() {
-         ConfigureScheduleCommand = new DelegateCommand(configureScheduleCommandExecute);
-         BackCommand = new DelegateCommand(backCommandExecute);
-         RefreshCommand = new DelegateCommand(refreshCommandExecute);
-         AuthorizeCommand = new DelegateCommand(authorizeCommandExecute);
+         ConfigureScheduleCommand = new DelegateCommand(configureScheduleCommandExecute, () => !IsBusy);
+         BackCommand = new DelegateCommand(backCommandExecute, () => !IsBusy);
+         RefreshCommand = new DelegateCommand(refreshCommandExecute, () => !IsBusy);
+         AuthorizeCommand = new DelegateCommand(authorizeCommandExecute, () => !IsBusy);
          UploadCommand = new DelegateCommand(uploadCommandExecute);
 
-         LogOutCommand = new DelegateCommand(logOutCommandExecute);
+         LogOutCommand = new DelegateCommand(logOutCommandExecute, () => !IsBusy);
 
          ApplyScheduleCommand = new DelegateCommand(applyScheduleCommandExecute);
          SettingsCommand = new DelegateCommand(settingsCommandExecute);
+
+         _commandsAffectedByBusyStatus = new List<DelegateCommand>() {
+            BackCommand,ConfigureScheduleCommand, RefreshCommand, AuthorizeCommand, LogOutCommand
+         };
 
          ListOfAvaliableWalls = App.Container.GetInstance<WallList>();
          Wall = App.Container.GetInstance<WallControl>();
@@ -134,16 +122,15 @@ namespace vk.ViewModels {
          Wall.UploadRequested += onWallsUploadRequested;
 
          Wall.Items.CollectionChanged += (sender, args) => {
-            var realPosts = Wall.Items.Where(post => post.IsExisting).ToList();
-            TotalPostCount = realPosts.Count();
-            RepostCount = realPosts.Count(post => post.PostType == PostType.Repost);
-            PostCount = realPosts.Count(post => post.PostType == PostType.Post);
-            MissingPosts = Wall.Items.Count(post => post.PostType == PostType.Missing);
+            var totalPostCount = Wall.GetRealPostCount();
+            var repostCount = Wall.GetRepostCount();
+            var postCount = Wall.GetPostOnlyCount();
+            var missingPosts = Wall.GetMissingPostCount();
 
-            InfoPanel = $"Total: {TotalPostCount} ({TotalPostCount + MissingPosts})" +
-                        $"\nPosts: {PostCount}" +
-                        $"\nReposts: {RepostCount}" +
-                        $"\nMissing {MissingPosts}";
+            InfoPanel = $"Total: {totalPostCount} / {WallControl.MAX_POSTPONED}" +
+                        $"\nPosts: {postCount}" +
+                        $"\nReposts: {repostCount}" +
+                        $"\nMissing {missingPosts}";
          };
 
          ListOfAvaliableWalls.ItemClicked += onGroupItemClicked;
@@ -152,12 +139,12 @@ namespace vk.ViewModels {
 
          CurrentSchedule = new Schedule();
 
-         Messenger.AddListener("refresh", refreshWall);
+         AsyncMessenger.AddListener("refresh", refreshWallAsync);
       }
 
-      private void onWallsUploadRequested(object sender, PostControl control) {
+      private async void onWallsUploadRequested(object sender, PostControl control) {
          var upload = App.Container.GetInstance<UploadView>();
-         upload.Configure(new UploadInfo(new WallControl(Wall.WallHolder), null, control.Post.DateUnix));
+         await upload.ConfigureAsync(new UploadInfo(new WallControl(Wall.WallHolder), null, control.Post.DateUnix));
          upload.Show();
       }
 
@@ -166,8 +153,8 @@ namespace vk.ViewModels {
          settings.ShowDialog();
       }
 
-      private void applyScheduleCommandExecute() {
-         Wall?.PullWithScheduleHightlight(CurrentPostTypeFilter.GetFilter(), CurrentSchedule);
+      private async void applyScheduleCommandExecute() {
+         await Wall.PullWithScheduleHightlightAsync(CurrentPostTypeFilter.GetFilter(), CurrentSchedule);
       }
 
 
@@ -183,32 +170,39 @@ namespace vk.ViewModels {
          return true;
       }
 
-      private void uploadCommandExecute() {
+      private async void uploadCommandExecute() {
          if (IsUploadAllowed() == false) {
             return;
          }
 
          var upload = App.Container.GetInstance<UploadView>();
-         upload.Configure(new UploadInfo(new WallControl(Wall.WallHolder), null));
+         await upload.ConfigureAsync(new UploadInfo(new WallControl(Wall.WallHolder), null));
          upload.Show();
       }
 
-      private void applyFilter(PostType currentPostTypeFilter) {
-         if (!IsWallShowing) return;
+      private async void applyFilter(PostType currentPostTypeFilter) {
+         if (!IsWallShowing) {
+            return;
+         }
 
-         Wall?.PullWithScheduleHightlight(currentPostTypeFilter.GetFilter(), CurrentSchedule);
+         await doAsyncShit(Wall.PullWithScheduleHightlightAsync(currentPostTypeFilter.GetFilter(), CurrentSchedule));
       }
 
-      private void onGroupItemClicked(object sender, WallItem wallItem) {
+      private async void onGroupItemClicked(object sender, WallItem wallItem) {
          IsWallShowing = true;
 
          try {
-            Wall.PullWithScheduleHightlight(wallItem.WallHolder, CurrentPostTypeFilter.GetFilter(), CurrentSchedule);
+            IsBusy = true;
+            await Wall.PullWithScheduleHightlightAsync(wallItem.WallHolder, CurrentPostTypeFilter.GetFilter(),
+                  CurrentSchedule);
          }
          catch (VkException ex) {
             IsWallShowing = false;
 
             MessageBox.Show(ex.Message, "Error occured", MessageBoxButton.OK, MessageBoxImage.Error);
+         }
+         finally {
+            IsBusy = false;
          }
       }
 
@@ -217,29 +211,33 @@ namespace vk.ViewModels {
          //configureContentView.ShowDialog();
       }
 
-      private void fillWallList() {
+      private async Task fillWallList() {
          if (!IsAuthorized) return;
 
          var methodGroupsGet = App.Container.GetInstance<GroupsGet>();
-         var groups = methodGroupsGet.Get().Collection;
-         if (groups == null) {
-            MessageBox.Show("Groups null");
+         var groups = await methodGroupsGet.GetAsync();
+         if (groups.Collection == null) {
+            MessageBox.Show("Groups not found", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             return;
          }
 
-         ListOfAvaliableWalls.Clear();
-
          var userget = App.Container.GetInstance<UsersGet>();
-         var user = userget.Get().Users[0];
+         var users = await userget.GetAsync();
+         var user = users.Users.FirstOrDefault();
+         if (user == null) {
+            MessageBox.Show("User not found", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            return;
+         }
 
          //todo: get rid of workaround
          var item = new WallItem(new EmptyWallHolder {
             Name = user.Name, Description = user.Description, Photo200 = user.Photo200, Photo50 = user.Photo50
          });
 
+         ListOfAvaliableWalls.Clear();
          ListOfAvaliableWalls.Add(item);
 
-         foreach (var group in groups.Groups) {
+         foreach (var group in groups.Collection.Groups) {
             ListOfAvaliableWalls.Add(new WallItem(group));
          }
       }
@@ -249,29 +247,48 @@ namespace vk.ViewModels {
          Wall.Clear();
       }
 
-      private void refreshCommandExecute() {
+      private async void refreshCommandExecute() {
          if (!IsAuthorized) return;
-         Messenger.Broadcast("refresh");
-         refreshWall();
+         await refreshWallAsync();
       }
 
-      private void refreshWall() {
-         if (IsWallShowing) {
-            Wall.PullWithScheduleHightlight(CurrentPostTypeFilter.GetFilter(), CurrentSchedule);
+      private async Task doAsyncShit(Task shit) {
+         try {
+            IsBusy = true;
+            await shit;
          }
-         else {
-            fillWallList();
+         finally {
+            IsBusy = false;
+         }
+      } 
+
+      private async Task refreshWallAsync() {
+         try {
+            if (IsWallShowing) {
+               await doAsyncShit(Wall.PullWithScheduleHightlightAsync(CurrentPostTypeFilter.GetFilter(), CurrentSchedule));
+            }
+            else {
+               await doAsyncShit(fillWallList());
+            }
+         }
+         catch (VkException ex) {
+            if (ex.ErrorCode == 6) {
+               MessageBox.Show(ex.Message, "Too much requests", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            else {
+               throw;
+            }
          }
       }
 
-      private void authorizeIfAlreadyLoggined() {
+      private async Task authorizeIfAlreadyLoggined() {
          try {
             var cookies = Application.GetCookie(new Uri("https://www.vk.com"));
             if (!string.IsNullOrEmpty(cookies)) {
                var values = cookies.Split(';');
 
                if (values.Where(s => s.IndexOf('=') > 0).Any(s => s.Substring(0, s.IndexOf('=')).Trim() == "remixsid")) {
-                  Authorize(false);
+                  await Authorize(false);
                }
             }
          }
@@ -280,7 +297,7 @@ namespace vk.ViewModels {
          }
       }
 
-      public void Authorize(bool clearCookies) {
+      public async Task Authorize(bool clearCookies) {
          var accessToken = App.Container.GetInstance<AccessToken>();
          var authWindow = new AuthView(accessToken, clearCookies);
 
@@ -295,7 +312,7 @@ namespace vk.ViewModels {
 
          try {
             var methodUsersGet = App.Container.GetInstance<UsersGet>();
-            var users = methodUsersGet.Get();
+            var users = await methodUsersGet.GetAsync();
 
             var user = users.Users.FirstOrDefault();
             if (user == null) {
@@ -309,9 +326,9 @@ namespace vk.ViewModels {
 
             IsAuthorized = true;
 
-            App.Container.GetInstance<StatsTrackVisitor>().Track();
+            await App.Container.GetInstance<StatsTrackVisitor>().TrackAsync();
 
-            fillWallList();
+            await fillWallList();
          }
          catch (VkException ex) {
             MessageBox.Show(ex.Message, $"Error while authoriazation occured\n{ex.Message}", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -344,8 +361,8 @@ namespace vk.ViewModels {
          ProfilePhoto = bitmap;
       }
 
-      private void authorizeCommandExecute() {
-         Authorize(true);
+      private async void authorizeCommandExecute() {
+         await Authorize(true);
       }
 
       private void logOutCommandExecute() {
@@ -387,7 +404,7 @@ namespace vk.ViewModels {
 
          SetUpAvatar(DEFAULT_AVATAR);
 
-         authorizeIfAlreadyLoggined();
+         await authorizeIfAlreadyLoggined();
 
          IsBusy = false;
       }

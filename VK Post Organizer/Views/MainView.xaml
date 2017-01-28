@@ -19,7 +19,7 @@
         <vm:MainViewModel/>
     </Window.DataContext>
 
-    <Grid Margin="10" IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBooleanConverter}}">
+    <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="65"/>
             <RowDefinition/>
@@ -71,6 +71,7 @@
                         
                         <!--<CheckBox Margin="0,5,0,0" Content="Show photos" IsChecked="{Binding Wall.ShowPhotos, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"></CheckBox>-->
                         <ComboBox Margin="0,5,0,5" SelectedValuePath="Value" 
+                                  IsEnabled="{Binding IsBusy, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}"
                                   Style="{StaticResource ComboBoxFlatStyle}"
                                   Width="150" Height="25"
                               ItemsSource="{Binding PostTypes}"
@@ -86,13 +87,18 @@
                                 Command="{Binding ConfigureScheduleCommand}"
                                 ToolTip="This is not implemented yet"
                                 Height="25" Width="150" IsEnabled="True"></Button>
-                        <Label Style="{StaticResource VkLabel}" Content="{Binding InfoPanel, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Label Style="{StaticResource VkLabel}" Content="{Binding InfoPanel, UpdateSourceTrigger=PropertyChanged}"
+                               Visibility="{Binding IsBusy, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityNegativeConverter}}"/>
                     </StackPanel>
                 </Grid>
             </Border>
 
+            <Label Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Loading..." FontSize="48" FontWeight="Bold"
+                   Visibility="{Binding IsBusy, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}"/>
+            
             <!-- Group content -->
-            <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" Margin="5">
+            <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" Margin="5" 
+                          Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityNegativeConverter}, UpdateSourceTrigger=PropertyChanged}">
                 <ItemsControl BorderThickness="0" Background="Transparent" VerticalAlignment="Top" HorizontalAlignment="Stretch"
                           ItemsSource="{Binding Wall.Items, UpdateSourceTrigger=PropertyChanged}" >
                     <ItemsControl.ItemsPanel>

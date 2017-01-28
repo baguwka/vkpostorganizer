@@ -1,27 +1,31 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using vk.Models.VkApi;
 
 namespace vk.Utils {
    public static class GroupNameCache {
-      public static Dictionary<int, string> GroupNamesById { get; set; }
+      private static ConcurrentDictionary<int, string> _groupNamesById { get; }
 
       static GroupNameCache() {
-         GroupNamesById = new Dictionary<int, string>();
+         _groupNamesById = new ConcurrentDictionary<int, string>();
       }
 
-      public static string GetGroupName(int groupId) {
-         if (GroupNamesById.ContainsKey(groupId)) {
-            return GroupNamesById[groupId];
+      public static async Task<string> GetGroupNameAsync(int groupId) {
+         Debug.WriteLine($"GET BY ID AT {DateTime.Now.Millisecond}");
+         if (_groupNamesById.ContainsKey(groupId)) {
+            return _groupNamesById[groupId];
          }
 
          var groupsGetById = App.Container.GetInstance<GroupsGetById>();
 
-         var response = groupsGetById.Get(Math.Abs(groupId));
+         var response = await groupsGetById.GetAsync(Math.Abs(groupId));
          var group = response.Response.FirstOrDefault();
 
-         GroupNamesById.Add(groupId, group?.Name);
+         _groupNamesById.TryAdd(groupId, group?.Name);
          return group?.Name;
       }
    }

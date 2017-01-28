@@ -13,19 +13,17 @@ namespace vk.Models {
 
       public event EventHandler RemoveRequested;
 
-      public ICommand OpenInBrowserCommand { get; set; }
-      public ICommand RemoveCommand { get; set; }
+      public ICommand OpenInBrowserCommand { get; private set; }
+      public ICommand RemoveCommand { get; private set; }
 
       public Photo Photo {
          get { return _photo; }
-         set { SetProperty(ref _photo, value); }
+         private set { SetProperty(ref _photo, value); }
       }
-
-      public string _preview;
 
       public AttachmentItem() {
          RemoveCommand = new DelegateCommand(onRemoveRequested);
-         OpenInBrowserCommand = new DelegateCommand(openInBrowserExecute);
+         OpenInBrowserCommand = new DelegateCommand(openInBrowserExecute, () => Photo != null);
       } 
 
       private void openInBrowserExecute() {
@@ -40,7 +38,7 @@ namespace vk.Models {
       }
 
       public void Set(string kind, Photo photo) {
-         _photo = photo;
+         Photo = photo;
          Attachment = $"{kind}{photo.OwnerId}_{photo.Id}";
       }
    }

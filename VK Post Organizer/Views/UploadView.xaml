@@ -39,7 +39,7 @@
                     <RowDefinition Height="80"/>
                 </Grid.RowDefinitions>
                 <TextBox Grid.Row="0" Style="{StaticResource VkTextBox}" 
-                         FontSize="16" Text="{Binding Text}" Height="30"/>
+                         FontSize="16" Text="{Binding Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="30"/>
 
                 <Border Grid.Row="1" Style="{StaticResource VkBorder}" Height="190" Drop="onFilesDrop" Margin="0,5,0,5"
                         AllowDrop="{Binding IsBusy, Converter={StaticResource InverseBooleanConverter}}">
@@ -100,11 +100,19 @@
                              Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityConverter}}"
                              Value="{Binding UploadProgress, UpdateSourceTrigger=PropertyChanged}" Height="25" Margin="1"/>
 
-                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
-                        <Button Content="«" Height="25" Width="25" Margin="5,0,5,0" Style="{StaticResource VkCommon}" Command="{Binding MovePreviousCommand}"/>
-                        <Label Content="{Binding DateString}" Height="30" Style="{StaticResource VkLabel}" HorizontalAlignment="Left" Width="100"/>
-                        <Button Content="»" Height="25" Width="25" Margin="5,0,5,0" Style="{StaticResource VkCommon}" Command="{Binding MoveNextCommand}"/>
-                    </StackPanel>
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Label Style="{StaticResource VkLabel}" Content="{Binding InfoPanel, UpdateSourceTrigger=PropertyChanged}"></Label>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Button Content="«" Height="25" Width="25" Margin="5,0,5,0" Style="{StaticResource VkCommon}" Command="{Binding MovePreviousCommand}"/>
+                            <Label Content="{Binding DateString}" Height="30" Style="{StaticResource VkLabel}" HorizontalAlignment="Left" Width="100"/>
+                            <Button Content="»" Height="25" Width="25" Margin="5,0,5,0" Style="{StaticResource VkCommon}" Command="{Binding MoveNextCommand}"/>
+                        </StackPanel>
+                    </Grid>
                 </Grid>
             </Grid>
         </Border>
@@ -114,7 +122,7 @@
                 <CheckBox Content="Close after publishing" Width="150" Margin="-150,0,0,0" 
                           IsChecked="{Binding CloseAfterPublish, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <Button Style="{StaticResource VkBlue}" Width="100" Content="Publish post" Margin="0,0,5,0"
-                        Command="{Binding PublishCommand}" CommandParameter="{Binding ElementName=UploadWindow}"
+                        Command="{Binding PublishCommand, UpdateSourceTrigger=PropertyChanged}" CommandParameter="{Binding ElementName=UploadWindow}"
                         IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBooleanConverter}}"></Button>
                 <Button Style="{StaticResource VkCommon}" Width="100" Content="Close" Margin="5,0,0,0"
                         Click="onCloseClick"></Button>

@@ -11,6 +11,7 @@ using System.Windows;
 using System.Windows.Input;
 using GongSolutions.Wpf.DragDrop;
 using JetBrains.Annotations;
+using Messenger;
 using Microsoft.Practices.Prism.Commands;
 using Microsoft.Practices.Prism.Mvvm;
 using Microsoft.Win32;
@@ -41,17 +42,19 @@ namespace vk.ViewModels {
       private readonly CancellationTokenSource _cancellationToken;
       private bool _closeAfterPublish;
 
-      public ICommand PublishCommand { get; set; }
-      public ICommand BrowseCommand { get; set; }
+      private string _infoPanel;
 
-      public ICommand MovePreviousCommand { get; set; }
-      public ICommand MoveNextCommand { get; set; }
+      public DelegateCommand<Window> PublishCommand { get; private set; }
+      public DelegateCommand BrowseCommand { get; private set; }
 
-      public SmartCollection<string> Files { get; set; }
+      public DelegateCommand MovePreviousCommand { get; private set; }
+      public DelegateCommand MoveNextCommand { get; private set; }
 
       public string Text {
          get { return _text; }
-         set { SetProperty(ref _text, value); }
+         set { SetProperty(ref _text, value);
+            PublishCommand.RaiseCanExecuteChanged();
+         }
       }
 
       public string DateString {
@@ -84,7 +87,10 @@ namespace vk.ViewModels {
 
       public bool IsBusy {
          get { return _isBusy; }
-         set { SetProperty(ref _isBusy, value); }
+         set {
+            SetProperty(ref _isBusy, value);
+            PublishCommand.RaiseCanExecuteChanged();
+         }
       }
 
       public string UrlToDownload {
@@ -117,18 +123,34 @@ namespace vk.ViewModels {
          }
       }
 
+      public string InfoPanel {
+         get { return _infoPanel; }
+         set { SetProperty(ref _infoPanel, value); }
+      }
+
       public UploadViewModel() {
          _cancellationToken = new CancellationTokenSource();
 
          Attachments = new SmartCollection<AttachmentItem>();
+         Attachments.CollectionChanged += (sender, args) => {
+            PublishCommand.RaiseCanExecuteChanged();
+         };
 
-         Files = new SmartCollection<string>();
          Wall = App.Container.GetInstance<WallControl>();
+
+         Wall.Items.CollectionChanged += (sender, args) => {
+            var missing = Wall.GetMissingPostCount();
+            InfoPanel = $"{WallControl.MAX_POSTPONED - missing}/{WallControl.MAX_POSTPONED}";
+         };
 
          _appSettings = App.Container.GetInstance<Settings>();
          CloseAfterPublish = _appSettings.Upload.CloseUploadWindowAfterPublish;
 
-         PublishCommand = new DelegateCommand<Window>(publishCommandExecute, window => !IsBusy);
+         PublishCommand = new DelegateCommand<Window>(publishCommandExecute,
+            window => {
+               var textExists = !string.IsNullOrWhiteSpace(Text);
+               return !IsBusy && (textExists || Attachments.Any());
+            });
          BrowseCommand = new DelegateCommand(browseCommandExecute);
 
          MovePreviousCommand = new DelegateCommand(moveToPreviousMissing);
@@ -171,16 +193,13 @@ namespace vk.ViewModels {
          }
       }
 
-      private void refresh() {
-         Wall.PullWithScheduleHightlight(new MissingPostFilter(), new Schedule());
+      private async Task refresh() {
+         await Wall.PullWithScheduleHightlightAsync(new MissingPostFilter(), new Schedule());
       }
 
-      public void Configure(UploadInfo info) {
-         Files.Clear();
-         Files.AddRange(info.Files);
-
+      public async Task ConfigureAsync(UploadInfo info) {
          Wall.WallHolder = info.Wall.WallHolder;
-         Wall.PullWithScheduleHightlight(new MissingPostFilter(), new Schedule());
+         await Wall.PullWithScheduleHightlightAsync(new MissingPostFilter(), new Schedule());
 
          if (info.DateOverride == -1) {
             var firstMissed = Wall.Items.FirstOrDefault();
@@ -343,7 +362,7 @@ namespace vk.ViewModels {
       private async Task<UploadPhotoInfo> tryToUploadPhoto(string filePath) {
          try {
             var getUploadServerMethod = App.Container.GetInstance<PhotosGetWallUploadSever>();
-            var uploadServer = getUploadServerMethod.Get(-Wall.WallHolder.ID);
+            var uploadServer = await getUploadServerMethod.GetAsync(-Wall.WallHolder.ID);
 
             if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath)) {
                return new UploadPhotoInfo(null, false);
@@ -366,7 +385,7 @@ namespace vk.ViewModels {
             }
 
             var savePhotoMethod = App.Container.GetInstance<PhotosSaveWallPhoto>();
-            var savePhotoProperty = savePhotoMethod.Save(-Wall.WallHolder.ID, uploadResponse);
+            var savePhotoProperty = await savePhotoMethod.SaveAsync(-Wall.WallHolder.ID, uploadResponse);
 
             var savedPhoto = savePhotoProperty?.Response.FirstOrDefault();
 
@@ -430,14 +449,14 @@ namespace vk.ViewModels {
                Text = "";
                Attachments.Clear();
 
-               Messenger.Broadcast("refresh");
+               await AsyncMessenger.Broadcast("refresh");
 
                if (CloseAfterPublish) {
                   IsBusy = false;
                   window?.Close();
                }
                else {
-                  refresh();
+                  await refresh();
                   moveToNextMissing();
                }
             }
