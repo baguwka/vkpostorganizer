@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
-using Microsoft.Practices.Prism.Mvvm;
+using Prism.Mvvm;
 
 namespace vk.Models {
    [Serializable]

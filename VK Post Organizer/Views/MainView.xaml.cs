@@ -6,14 +6,15 @@ using vk.ViewModels;
 
 namespace vk.Views {
    public partial class MainView : Window {
-      private IViewModel getViewModel => (IViewModel)DataContext;
+      private readonly MainViewModel _viewModel;
 
       public MainView() {
          InitializeComponent();
+         _viewModel = (MainViewModel)DataContext;
       }
 
       private async void onLoaded(object sender, RoutedEventArgs e) {
-         getViewModel.OnLoad();
+         _viewModel.OnLoad();
          var windowData = await SaveLoaderHelper.TryLoadAsync<MainViewData>("Main Window Data");
 
          if (windowData.Successful) {
@@ -31,12 +32,19 @@ namespace vk.Views {
       }
 
       private void onClosing(object sender, CancelEventArgs e) {
-         getViewModel.OnClosing();
+         _viewModel.OnClosing();
          SaveLoaderHelper.Save("Main Window Data", 
             new MainViewData(MainWindow.Width, MainWindow.Height, MainWindow.Left, MainWindow.Top));
       }
 
       private void onInitialized(object sender, EventArgs e) {
+      }
+
+      private void onFilesDropToUpload(object sender, DragEventArgs e) {
+         //todo: upload files here pls
+         //var files = (string[])e.Data.GetData(DataFormats.FileDrop);
+         //await _viewModel.ImportFilesAsync(files);
+         //e.Handled = true;
       }
    }
 

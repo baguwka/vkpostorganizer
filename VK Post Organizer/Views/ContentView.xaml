@@ -1,0 +1,31 @@
+﻿<UserControl x:Class="vk.Views.ContentView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:vk.Views"
+             xmlns:prism="http://prismlibrary.com/"
+             xmlns:inf="clr-namespace:vk.Infrastructure"
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             mc:Ignorable="d" 
+             Background="#edeef0"
+             d:DesignHeight="600" d:DesignWidth="900">
+
+    <!-- Wall workspace -->
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Left block -->
+        <Border Grid.Column="0" Style="{StaticResource VkBorder}" Margin="0,10,0,10">
+            <ContentControl prism:RegionManager.RegionName="{x:Static inf:RegionNames.ContentLeftBlockRegion}"/>
+        </Border>
+
+        <Grid Grid.Column="1">
+            <ContentControl prism:RegionManager.RegionName="{x:Static inf:RegionNames.ContentMainRegion}"/>
+        </Grid>
+    </Grid>
+
+</UserControl>

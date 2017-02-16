@@ -6,6 +6,9 @@
         xmlns:dd="urn:gong-wpf-dragdrop"
         xmlns:vm="clr-namespace:vk.ViewModels"
         xmlns:local="clr-namespace:vk.Views"
+        xmlns:prism="http://prismlibrary.com/"
+        prism:ViewModelLocator.AutoWireViewModel="True"
+        
         mc:Ignorable="d"
         Icon="/Resources/32x32.ico"
         
@@ -15,21 +18,15 @@
         ResizeMode="NoResize"
         Height="600"
         Width="700"
-        Background="#edeef0">
-    
-    <Window.DataContext>
-        <vm:UploadViewModel/>
-    </Window.DataContext>
-    
+        Background="#edeef0"
+        
+        Loaded="onLoaded"
+        Closed="onClosed">
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition/>
             <RowDefinition Height="35"/>
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-        </Grid.ColumnDefinitions>
-
         <Border Grid.Row="0" Style="{StaticResource VkBorder}" Margin="0,0,0,10">
             <Grid Margin="5">
                 <Grid.RowDefinitions>

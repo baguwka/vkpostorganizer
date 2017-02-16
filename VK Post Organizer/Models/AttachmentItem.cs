@@ -1,8 +1,8 @@
 using System;
 using System.Diagnostics;
 using System.Windows.Input;
-using Microsoft.Practices.Prism.Commands;
-using Microsoft.Practices.Prism.Mvvm;
+using Prism.Commands;
+using Prism.Mvvm;
 using vk.Models.VkApi.Entities;
 
 namespace vk.Models {
@@ -23,7 +23,8 @@ namespace vk.Models {
 
       public AttachmentItem() {
          RemoveCommand = new DelegateCommand(onRemoveRequested);
-         OpenInBrowserCommand = new DelegateCommand(openInBrowserExecute, () => Photo != null);
+         OpenInBrowserCommand = new DelegateCommand(openInBrowserExecute, () => Photo != null)
+            .ObservesProperty(() => Photo);
       } 
 
       private void openInBrowserExecute() {

@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using JetBrains.Annotations;
-using Microsoft.Practices.Prism.Commands;
-using Microsoft.Practices.Prism.Mvvm;
+using Prism.Commands;
+using Prism.Mvvm;
 using vk.Models;
 using vk.Models.UrlHelper;
 using vk.Models.VkApi.Entities;
@@ -81,13 +80,13 @@ namespace vk.ViewModels {
          Images = new SmartCollection<ImageItem>();
 
          ExpandToggleCommand = new DelegateCommand(expandToggle,
-            () => PostType != PostType.Missing);
+            () => PostType != PostType.Missing).ObservesProperty(() => PostType);
 
          OpenPost = new DelegateCommand(openPostCommand,
-            () => IsExisting == true && PostType != PostType.Missing);
+            () => IsExisting == true && PostType != PostType.Missing).ObservesProperty(() => IsExisting);
 
          UploadAtThisDateCommand = new DelegateCommand(uploadAtThisDateCommandExecute,
-            () => PostType == PostType.Missing);
+            () => PostType == PostType.Missing).ObservesProperty(() => PostType);
 
          Post = postReference;
 

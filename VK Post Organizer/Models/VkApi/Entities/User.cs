@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
-using Microsoft.Practices.Prism.Mvvm;
 using Newtonsoft.Json;
+using Prism.Mvvm;
 
 namespace vk.Models.VkApi.Entities {
    [UsedImplicitly]

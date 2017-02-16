@@ -1,40 +1,22 @@
 ﻿using System;
-using Microsoft.Practices.Prism.Mvvm;
 using Newtonsoft.Json;
+using Prism.Mvvm;
 
 namespace vk.Models {
    [Serializable]
-   public class UploadSettings : BindableBase {
-      private bool _closeUploadWindowAfterPublish;
-      private bool _postFromGroup;
-      private bool _signedPosting;
-
-      public bool SignedPosting {
-         get { return _signedPosting; }
-         set { SetProperty(ref _signedPosting, value); }
-      }
-
-      public bool CloseUploadWindowAfterPublish {
-         get { return _closeUploadWindowAfterPublish; }
-         set { SetProperty(ref _closeUploadWindowAfterPublish, value); }
-      }
-
-      public bool PostFromGroup {
-         get { return _postFromGroup; }
-         set { SetProperty(ref _postFromGroup, value); }
-      }
-
-      public void Set(UploadSettings other) {
-         CloseUploadWindowAfterPublish = other.CloseUploadWindowAfterPublish;
-      }
-   }
-
-   [Serializable]
    public class Settings : BindableBase {
+      private ProxySettings _proxy;
+      private HistorySettings _history;
+
       public Settings() {
          Proxy = new ProxySettings {
             UseProxy = false,
          };
+
+         History = new HistorySettings {
+            Use = false,
+         };
+
          Upload = new UploadSettings {
             CloseUploadWindowAfterPublish = true,
             SignedPosting = false,
@@ -42,7 +24,15 @@ namespace vk.Models {
          };
       }
 
-      public ProxySettings Proxy { get; set; }
+      public ProxySettings Proxy {
+         get { return _proxy; }
+         private set { SetProperty(ref _proxy, value); }
+      }
+
+      public HistorySettings History {
+         get { return _history; }
+         private set { SetProperty(ref _history, value); }
+      }
 
       [JsonProperty(Required = Required.DisallowNull)]
       public UploadSettings Upload { get; set; }
@@ -52,6 +42,7 @@ namespace vk.Models {
 
          Proxy.Set(other.Proxy);
          Upload.Set(other.Upload);
+         History.Set(other.History);
       }
    }
 }

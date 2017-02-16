@@ -132,7 +132,7 @@ namespace vk.Models.VkApi {
          }
 
          uriParameters["access_token"] = Token.Token;
-         uriParameters["v"] = "5.62";
+         uriParameters["v"] = VERSION;
 
          uriBuilder.Query = string.Join("&", uriParameters.AllKeys
             .Select(key => $"{key}={HttpUtility.UrlEncode(uriParameters[key])}"));
@@ -143,6 +143,8 @@ namespace vk.Models.VkApi {
       protected Error deserializeError(string jsonString) {
          return JsonConvert.DeserializeObject<ErrorResponse>(jsonString).Error;
       }
+
+      public const string VERSION = "5.62";
    }
 
    [UsedImplicitly]

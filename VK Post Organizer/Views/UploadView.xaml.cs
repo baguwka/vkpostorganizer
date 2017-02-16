@@ -32,6 +32,10 @@ namespace vk.Views {
    public partial class UploadView : Window {
       private readonly UploadViewModel _viewModel;
 
+      public static bool IsOpened { get; private set; }
+      [CanBeNull]
+      public static UploadView OpenedInstance { get; private set; }
+
       public UploadView() {
          //if (viewModel == null) {
          //   throw new ArgumentNullException(nameof(viewModel));
@@ -39,9 +43,12 @@ namespace vk.Views {
 
          InitializeComponent();
 
+         IsOpened = true;
+         OpenedInstance = this;
          //base.DataContext = _viewModel;
          _viewModel = (UploadViewModel)DataContext; //viewModel;
       }
+
 
       public async Task ConfigureAsync([NotNull] UploadInfo info) {
          if (info == null) {
@@ -74,6 +81,14 @@ namespace vk.Views {
          var files = (string[])e.Data.GetData(DataFormats.FileDrop);
          await _viewModel.ImportFilesAsync(files);
          e.Handled = true;
+      }
+
+      private void onLoaded(object sender, RoutedEventArgs e) {
+      }
+
+      private void onClosed(object sender, EventArgs e) {
+         IsOpened = false;
+         OpenedInstance = null;
       }
    }
 }

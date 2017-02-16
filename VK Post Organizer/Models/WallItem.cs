@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Windows.Input;
 using JetBrains.Annotations;
-using Microsoft.Practices.Prism.Commands;
-using Microsoft.Practices.Prism.Mvvm;
+using Prism.Commands;
+using Prism.Mvvm;
 
 namespace vk.Models {
    public class WallItem : BindableBase {

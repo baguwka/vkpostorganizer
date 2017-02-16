@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using JetBrains.Annotations;
-using Microsoft.Practices.Prism.Commands;
-using Microsoft.Practices.Prism.Mvvm;
+using Prism.Commands;
+using Prism.Mvvm;
 using vk.Models;
 using vk.Models.Filter;
 using vk.Models.VkApi;
@@ -17,7 +16,7 @@ namespace vk.ViewModels {
    [UsedImplicitly]
    public class WallControl : BindableBase {
       public const int MAX_POSTPONED = 150;
-      public const int RESERVE = 15;
+      public const int RESERVE = 100;
 
       private IWallHolder _wallHolder;
       private SmartCollection<PostControl> _items;

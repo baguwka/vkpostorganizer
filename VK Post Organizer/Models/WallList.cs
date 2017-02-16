@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
-using Microsoft.Practices.Prism.Mvvm;
+using Prism.Mvvm;
 
 namespace vk.Models {
    [UsedImplicitly]

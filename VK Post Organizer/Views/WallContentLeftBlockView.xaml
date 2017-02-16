@@ -1,0 +1,58 @@
+﻿<UserControl x:Class="vk.Views.WallContentLeftBlockView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:vk.Views"
+             xmlns:prism="http://prismlibrary.com/"
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             mc:Ignorable="d" 
+             d:DesignHeight="800" d:DesignWidth="250">
+
+    <Border Style="{StaticResource VkBorder}" Margin="0,10,0,10">
+        <Grid Grid.Column="0" Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="25"/>
+                <RowDefinition Height="200"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Label Grid.Row="0" Content="{Binding Wall.WallHolder.Name, UpdateSourceTrigger=PropertyChanged}" FontWeight="DemiBold"/>
+            <Image Grid.Row="1" ToolTip="{Binding Wall.WallHolder.Description, UpdateSourceTrigger=PropertyChanged}"
+                           Source="{Binding Wall.WallHolder.Photo200, UpdateSourceTrigger=PropertyChanged}"/>
+            <StackPanel Grid.Row="2" Orientation="Vertical" HorizontalAlignment="Center">
+                <Button Width="150" Height="25" Margin="5,5,0,0" Content="Expand all" Style="{StaticResource VkCommon}"
+                                Command="{Binding Wall.ExpandAllCommand}"/>
+
+                <Button Width="150" Height="25" Margin="5,5,0,0" Content="Collapse all" Style="{StaticResource VkCommon}"
+                                Command="{Binding Wall.CollapseAllCommand}"/>
+
+                <!--<CheckBox Margin="0,5,0,0" Content="Show photos" IsChecked="{Binding Wall.ShowPhotos, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"></CheckBox>-->
+                <ComboBox Margin="0,5,0,5" SelectedValuePath="Value" 
+                                  IsEnabled="{Binding IsBusy, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}"
+                                  Style="{StaticResource ComboBoxFlatStyle}"
+                                  Width="150" Height="25"
+                              ItemsSource="{Binding PostTypes}"
+                              SelectedValue="{Binding CurrentPostTypeFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Margin="3,0,0,0" Height="18" Text="{Binding Description}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+
+                <Label Style="{StaticResource VkLabel}" Content="{Binding InfoPanel, UpdateSourceTrigger=PropertyChanged}"
+                               Visibility="{Binding IsBusy, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityNegativeConverter}}"/>
+
+                <Button Margin="0,5,0,5" Content="Actual wall" Style="{StaticResource VkBlue}" 
+                                Command="{Binding ShowHistoryCommand}"
+                                Height="25" Width="150" IsEnabled="True"></Button>
+                <Button Margin="0,5,0,5" Content="Postpones" Style="{StaticResource VkBlue}" 
+                                Command="{Binding ShowHistoryCommand}"
+                                Height="25" Width="150" IsEnabled="True"></Button>
+                <Button Margin="0,5,0,5" Content="History" Style="{StaticResource VkBlue}" 
+                                Command="{Binding ShowHistoryCommand}"
+                                Height="25" Width="150" IsEnabled="True"></Button>
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>

@@ -1,0 +1,75 @@
+﻿<UserControl x:Class="vk.Views.WallPostponeContentView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:vk.Views"
+             xmlns:prism="http://prismlibrary.com/"
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="5" 
+                          Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityNegativeConverter}, UpdateSourceTrigger=PropertyChanged}">
+        <ItemsControl BorderThickness="0" Background="Transparent" VerticalAlignment="Top" HorizontalAlignment="Stretch"
+                          ItemsSource="{Binding Wall.Items, UpdateSourceTrigger=PropertyChanged}" >
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel VerticalAlignment="Bottom"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border Background="{Binding Mark, Converter={StaticResource PostMarkToColorConverter}}" Style="{StaticResource VkBorder}" Margin="5" MinWidth="400" MaxWidth="750">
+                        <StackPanel Orientation="Vertical">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="100"/>
+                                </Grid.ColumnDefinitions>
+                                <Button Grid.Column="0" Height="25" Style="{StaticResource VkMimic}" Command="{Binding OpenPost}"
+                                                IsEnabled="{Binding PostType, Converter={StaticResource PostTypeToBoolConverter}, UpdateSourceTrigger=PropertyChanged}">
+                                    <Label Height="25" Content="{Binding Post.DateString}"></Label>
+                                </Button>
+
+                                <Label Grid.Column="1" Height="25" Content="{Binding Post.Text}"
+                                               Visibility="{Binding PostType, Converter={StaticResource MissingPostIsHiddenConverter}, UpdateSourceTrigger=PropertyChanged}"></Label>
+
+                                <!--<Button Grid.Column="1" HorizontalAlignment="Stretch" Margin="4" Height="21" Content="Rapid-upload" Style="{StaticResource VkMimic}"
+                                                Visibility="{Binding PostType, Converter={StaticResource MissingPostIsShowingConverter}}"
+                                                Command="{Binding RapidUploadModeCommand}"/>-->
+
+                                <Button Grid.Column="2" HorizontalAlignment="Right" Margin="4" Height="21" Width="96" Content="Upload" Style="{StaticResource VkCommon}"
+                                                Visibility="{Binding PostType, Converter={StaticResource MissingPostIsShowingConverter}, UpdateSourceTrigger=PropertyChanged}"
+                                                Command="{Binding UploadAtThisDateCommand}"/>
+
+                                <Button Grid.Column="2" HorizontalAlignment="Right" Height="25" Width="25" Content="+" Style="{StaticResource VkCommon}"
+                                                Visibility="{Binding PostType, Converter={StaticResource MissingPostIsHiddenConverter}, UpdateSourceTrigger=PropertyChanged}"
+                                                Command="{Binding ExpandToggleCommand}"/>
+                            </Grid>
+                            <ItemsControl Margin="10" HorizontalAlignment="Center" ItemsSource="{Binding Images, UpdateSourceTrigger=PropertyChanged}" 
+                                           Visibility="{Binding Expanded, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <VirtualizingStackPanel VerticalAlignment="Bottom"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Button Style="{StaticResource VkMimic}"  Margin="0,5,0,5" HorizontalAlignment="Left" MinWidth="400" MaxWidth="604" 
+                                                         Command="{Binding ClickCommand}" Background="White" BorderThickness="0">
+                                            <Image  Source="{Binding Url, IsAsync=True}"></Image>
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </ScrollViewer>
+</UserControl>

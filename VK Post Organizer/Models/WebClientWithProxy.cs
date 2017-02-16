@@ -5,18 +5,6 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 
 namespace vk.Models {
-   public class LowTimeoutWebClient : WebClient {
-      protected override WebRequest GetWebRequest(Uri address) {
-         var request = base.GetWebRequest(address);
-
-         if (request != null) {
-            request.Timeout = 3 * 1000;
-         }
-
-         return request;
-      }
-   }
-
    [UsedImplicitly]
    public class WebClientWithProxy : IWebClient {
       private readonly Settings _settings;
@@ -61,11 +49,12 @@ namespace vk.Models {
       }
 
       public async Task<string> DownloadStringAsync(string adress) {
-         using (var wc = new WebClient()) {
-            setProxyIfPossible(wc);
-            wc.Encoding = Encoding.UTF8;
-            return await wc.DownloadStringTaskAsync(adress);
-         }
+         return await DownloadStringAsync(new Uri(adress));
+         //using (var wc = new WebClient()) {
+         //   setProxyIfPossible(wc);
+         //   wc.Encoding = Encoding.UTF8;
+         //   return await wc.DownloadStringTaskAsync(adress);
+         //}
       }
    }
 }

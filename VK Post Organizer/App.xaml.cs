@@ -2,34 +2,44 @@
 using System.Windows;
 using System.Windows.Threading;
 using Data_Persistence_Provider;
+using Microsoft.Practices.Unity;
+using Prism.Events;
+using Prism.Mvvm;
 using SimpleInjector;
 using vk.Models;
+using vk.Models.Logger;
 using vk.Models.UrlHelper;
 using vk.Models.VkApi;
-using vk.Views;
 
 namespace vk {
    public partial class App : Application {
       public static Container Container { get; set; }
 
-      private void CompositionRoot(object sender, StartupEventArgs e) {
+      protected override void OnStartup(StartupEventArgs e) {
          if (SingleInstance.IsOnlyInstance() == false) {
             //SingleInstance.ShowFirstInstance();
             Current.Shutdown();
             return;
          }
 
+
+         base.OnStartup(e);
+
          Current.DispatcherUnhandledException += CurrentOnDispatcherUnhandledException;
          Current.ShutdownMode = ShutdownMode.OnMainWindowClose;
 
-         Container = Bootstrap();
+         var bs = new Bootstrapper();
 
-         var window = Container.GetInstance<MainView>();
-         window.Show();
+         ViewModelLocationProvider.SetDefaultViewModelFactory(type => bs.Container.Resolve(type));
+
+         Container = Bootstrap();
+         bs.Run();
       }
 
       public static Container Bootstrap() {
          var container = new Container();
+
+         container.Register<IEventAggregator, EventAggregator>(Lifestyle.Singleton);
 
          container.Register<AccessToken>(Lifestyle.Singleton);
          container.Register<Settings>(Lifestyle.Singleton);
@@ -41,6 +51,8 @@ namespace vk {
          container.Register<IWebClient, WebClientWithProxy>();
          container.Register<IWallHolder, EmptyWallHolder>();
 
+         container.Register<IPublishLogger, JsonServerPublishLogger>();
+
          container.Register<PhotoUrlObtainer>(Lifestyle.Singleton);
          container.Register<DocumentPreviewUrlObtainer>(Lifestyle.Singleton);
          //container.Register<ImageExtensionChecker>();
@@ -49,6 +61,30 @@ namespace vk {
 
          return container;
       }
+
+      //[System.Runtime.InteropServices.DllImport("wininet.dll", CharSet = System.Runtime.InteropServices.CharSet.Auto, SetLastError = true)]
+      //public static extern bool InternetSetOption(int hInternet, int dwOption, IntPtr lpBuffer, int dwBufferLength);
+
+      //public static unsafe void SuppressWininetBehavior() {
+      //   /* SOURCE: http://msdn.microsoft.com/en-us/library/windows/desktop/aa385328%28v=vs.85%29.aspx
+      //       * INTERNET_OPTION_SUPPRESS_BEHAVIOR (81):
+      //       *      A general purpose option that is used to suppress behaviors on a process-wide basis. 
+      //       *      The lpBuffer parameter of the function must be a pointer to a DWORD containing the specific behavior to suppress. 
+      //       *      This option cannot be queried with InternetQueryOption. 
+      //       *      
+      //       * INTERNET_SUPPRESS_COOKIE_PERSIST (3):
+      //       *      Suppresses the persistence of cookies, even if the server has specified them as persistent.
+      //       *      Version:  Requires Internet Explorer 8.0 or later.
+      //       */
+
+      //   int option = (int)3/* INTERNET_SUPPRESS_COOKIE_PERSIST*/;
+      //   int* optionPtr = &option;
+
+      //   bool success = InternetSetOption(0, 81/*INTERNET_OPTION_SUPPRESS_BEHAVIOR*/, new IntPtr(optionPtr), sizeof(int));
+      //   if (!success) {
+      //      MessageBox.Show("Something went wrong !>?");
+      //   }
+      //}
 
       private void CurrentOnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e) {
          MessageBox.Show($"{e.Exception.Message}\n\n See dump at Windows Application Event Log.\nStack Trace:{e.Exception.StackTrace}", 

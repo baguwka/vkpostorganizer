@@ -1,5 +1,5 @@
 using System;
-using Microsoft.Practices.Prism.Mvvm;
+using Prism.Mvvm;
 
 namespace vk.Models {
    [Serializable]
@@ -10,9 +10,6 @@ namespace vk.Models {
       private Uri _proxyUri;
       private string _username;
       private string _password;
-
-      public ProxySettings() {
-      }
 
       public void Set(ProxySettings proxySettings) {
          UseProxy = proxySettings.UseProxy;
@@ -32,7 +29,7 @@ namespace vk.Models {
          set {
             var uri = new UriBuilder(!string.IsNullOrEmpty(value) ? value : "127.0.0.1").Uri;
             SetProperty(ref _proxyAddress, uri.ToString());
-            updateProxyUri();
+            updateUri();
          }
       }
 
@@ -42,14 +39,14 @@ namespace vk.Models {
             if (value < 0) value = 0;
             if (value > 65535) value = 65535;
             SetProperty(ref _proxyPort, value);
-            updateProxyUri();
+            updateUri();
          }
       }
 
       public Uri ProxyUri {
          get {
             if (_proxyUri == null) {
-               updateProxyUri();
+               updateUri();
             }
             return _proxyUri;
          }
@@ -71,7 +68,7 @@ namespace vk.Models {
          }
       }
 
-      private void updateProxyUri() {
+      private void updateUri() {
          if (UseProxy == false) {
             _proxyUri = new UriBuilder("127.0.0.1").Uri;
             return;

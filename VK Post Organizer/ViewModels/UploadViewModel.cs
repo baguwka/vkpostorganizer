@@ -8,14 +8,12 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Input;
 using GongSolutions.Wpf.DragDrop;
 using JetBrains.Annotations;
 using Messenger;
-using Microsoft.Practices.Prism.Commands;
-using Microsoft.Practices.Prism.Mvvm;
 using Microsoft.Win32;
-using Utilities;
+using Prism.Commands;
+using Prism.Mvvm;
 using vk.Models;
 using vk.Models.Files;
 using vk.Models.Filter;
@@ -53,7 +51,6 @@ namespace vk.ViewModels {
       public string Text {
          get { return _text; }
          set { SetProperty(ref _text, value);
-            PublishCommand.RaiseCanExecuteChanged();
          }
       }
 
@@ -89,7 +86,6 @@ namespace vk.ViewModels {
          get { return _isBusy; }
          set {
             SetProperty(ref _isBusy, value);
-            PublishCommand.RaiseCanExecuteChanged();
          }
       }
 
@@ -150,9 +146,11 @@ namespace vk.ViewModels {
             window => {
                var textExists = !string.IsNullOrWhiteSpace(Text);
                return !IsBusy && (textExists || Attachments.Any());
-            });
-         BrowseCommand = new DelegateCommand(browseCommandExecute);
+            })
+            .ObservesProperty(() => IsBusy)
+            .ObservesProperty(() => Text);
 
+         BrowseCommand = new DelegateCommand(browseCommandExecute);
          MovePreviousCommand = new DelegateCommand(moveToPreviousMissing);
          MoveNextCommand = new DelegateCommand(moveToNextMissing);
       }

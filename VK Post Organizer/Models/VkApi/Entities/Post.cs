@@ -1,8 +1,8 @@
 using System;
 using System.Globalization;
 using JetBrains.Annotations;
-using Microsoft.Practices.Prism.Mvvm;
 using Newtonsoft.Json;
+using Prism.Mvvm;
 using vk.Utils;
 
 namespace vk.Models.VkApi.Entities {
