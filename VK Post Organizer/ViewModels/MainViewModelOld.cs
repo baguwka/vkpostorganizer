@@ -18,7 +18,7 @@ using vk.Views;
 
 namespace vk.ViewModels {
    [UsedImplicitly]
-   public class MainViewModel : BindableBase, IViewModel {
+   public class MainViewModelOld : BindableBase, IViewModel {
       private readonly RegionManager _regionManager;
       private readonly IEventAggregator _eventAggregator;
       private bool _isAuthorized;
@@ -71,7 +71,7 @@ namespace vk.ViewModels {
          }
       }
 
-      public MainViewModel(RegionManager regionManager, IEventAggregator eventAggregator, IRegionNavigationService serv) {
+      public MainViewModelOld(RegionManager regionManager, IEventAggregator eventAggregator) {
          _regionManager = regionManager;
          _eventAggregator = eventAggregator;
 
@@ -84,14 +84,14 @@ namespace vk.ViewModels {
          _regionManager.RegisterViewWithRegion(RegionNames.AuthRegion, typeof(AuthBarView));
 
 
-         _eventAggregator.GetEvent<WallSelectedEvent>().Subscribe(onWallItemClicked);
+         _eventAggregator.GetEvent<WallSelectorEvents.WallSelected>().Subscribe(onWallItemClicked);
 
          ConfigureScheduleCommand = new DelegateCommand(configureScheduleCommandExecute, () => !IsBusy).ObservesProperty(() => IsBusy);
 
-         _eventAggregator.GetEvent<MainBottomEvents.BackClick>().Subscribe(onBackRequested);
-         _eventAggregator.GetEvent<MainBottomEvents.RefreshClick>().Subscribe(onRefreshRequested);
-         _eventAggregator.GetEvent<MainBottomEvents.UploadClick>().Subscribe(onUploadRequested);
-         _eventAggregator.GetEvent<MainBottomEvents.SettingsClick>().Subscribe(onSettingsRequested);
+         _eventAggregator.GetEvent<MainBottomEvents.Back>().Subscribe(onBackRequested);
+         _eventAggregator.GetEvent<MainBottomEvents.Refresh>().Subscribe(onRefreshRequested);
+         _eventAggregator.GetEvent<MainBottomEvents.Upload>().Subscribe(onUploadRequested);
+         _eventAggregator.GetEvent<MainBottomEvents.Settings>().Subscribe(onSettingsRequested);
 
          _eventAggregator.GetEvent<AuthBarEvents.AuthorizationCompleted>().Subscribe(onAthorizationCompleted);
          _eventAggregator.GetEvent<AuthBarEvents.LogOutCompleted>().Subscribe(onLogOutCompleted);
@@ -127,7 +127,7 @@ namespace vk.ViewModels {
       private void onAthorizationCompleted(bool result) {
          IsAuthorized = result;
          if (result == true) {
-            _eventAggregator.GetEvent<FillWallListEvent>().Publish();
+            _eventAggregator.GetEvent<WallSelectorEvents.FillWallRequest>().Publish();
          }
          else {
             _regionManager.RequestNavigate(RegionNames.MainRegion, "StartPage");
@@ -271,7 +271,7 @@ namespace vk.ViewModels {
                await doAsyncShit(Wall.PullWithScheduleHightlightAsync(CurrentPostTypeFilter.GetFilter(), CurrentSchedule));
             }
             else {
-               _eventAggregator.GetEvent<FillWallListEvent>().Publish();
+               _eventAggregator.GetEvent<WallSelectorEvents.FillWallRequest>().Publish();
                //await doAsyncShit(fillWallList());
             }
          }

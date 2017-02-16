@@ -13,14 +13,10 @@ namespace vk.Models.VkApi {
 
       public async Task<WallGetResponse> GetAsync(int id, int count = 100, int offset = 0) {
          var parameters = makeAQuery(id, count, offset);
-         var response = await ExecuteMethodAsync("wall.get", parameters);
-         return JsonConvert.DeserializeObject<WallGetResponse>(response);
+         return await GetAsync(parameters);
       }
 
-      public async Task<WallGetResponse> GetAsync(int id, VkParameters sadsadasd) {
-         var parameters = makeAQuery(id, 100, 0);
-         parameters.AddParameters(sadsadasd);
-
+      public async Task<WallGetResponse> GetAsync(VkParameters parameters) {
          var response = await ExecuteMethodAsync("wall.get", parameters);
          return JsonConvert.DeserializeObject<WallGetResponse>(response);
       }
@@ -29,7 +25,7 @@ namespace vk.Models.VkApi {
          id = -Math.Abs(id);
          var parameters = VkParameters.New()
             .AddParameter("owner_id", id)
-            .AddParameter("filter", "postponed")
+            //.AddParameter("filter", "postponed")
             .AddParameter("offset", offset)
             .AddParameter("count", count);
          return parameters;

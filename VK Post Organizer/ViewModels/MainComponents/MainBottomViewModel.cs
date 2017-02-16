@@ -1,14 +1,16 @@
-﻿using Prism.Commands;
+﻿using System.Windows.Input;
+using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
 using vk.Events;
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace vk.ViewModels {
    public class MainBottomViewModel : BindableBase {
-      public DelegateCommand BackCommand { get; private set; }
-      public DelegateCommand RefreshCommand { get; private set; }
-      public DelegateCommand UploadCommand { get; private set; }
-      public DelegateCommand SettingsCommand { get; private set; }
+      public ICommand BackCommand { get; }
+      public ICommand RefreshCommand { get; }
+      public ICommand UploadCommand { get; }
+      public ICommand SettingsCommand { get; }
 
       private bool _isBusy;
       private bool _isWallSelected;
@@ -30,23 +32,23 @@ namespace vk.ViewModels {
          aggregator.GetEvent<ShellEvents.WallSelectedEvent>().Subscribe(onShellWallSelectedChanged);
 
          BackCommand = new DelegateCommand(() => {
-            aggregator.GetEvent<MainBottomEvents.BackClick>().Publish();
+            aggregator.GetEvent<MainBottomEvents.Back>().Publish();
          }, () => !IsBusy && IsWallSelected)
          .ObservesProperty(() => IsBusy)
          .ObservesProperty(() => IsWallSelected);
 
          RefreshCommand = new DelegateCommand(() => {
-            aggregator.GetEvent<MainBottomEvents.RefreshClick>().Publish();
+            aggregator.GetEvent<MainBottomEvents.Refresh>().Publish();
          }, () => !IsBusy)
          .ObservesProperty(() => IsBusy);
 
          UploadCommand = new DelegateCommand(() => {
-            aggregator.GetEvent<MainBottomEvents.UploadClick>().Publish();
+            aggregator.GetEvent<MainBottomEvents.Upload>().Publish();
          }, () => IsWallSelected)
          .ObservesProperty(() => IsWallSelected);
 
          SettingsCommand = new DelegateCommand(() => {
-            aggregator.GetEvent<MainBottomEvents.SettingsClick>().Publish();
+            aggregator.GetEvent<MainBottomEvents.Settings>().Publish();
          });
       }
 

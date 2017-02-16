@@ -6,10 +6,19 @@
              xmlns:local="clr-namespace:vk.Views"
              xmlns:prism="http://prismlibrary.com/"
              prism:ViewModelLocator.AutoWireViewModel="True"
+             
+             xmlns:vm="clr-namespace:vk.ViewModels"
+             d:DataContext="{d:DesignInstance d:Type=vm:WallPostponeContentViewModel, IsDesignTimeCreatable=False}"
+             
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="5" 
+    <StackPanel>
+        <Label Content="Hello there! ^-^ I'ma postpone wall content view!"></Label>
+        <Label Content="Ow! Looks like i got a payload from master o3o. Here it is:"></Label>
+        <Label Content="{Binding Message, UpdateSourceTrigger=PropertyChanged}"></Label>
+    </StackPanel>
+    <!--<ScrollViewer VerticalScrollBarVisibility="Auto" Margin="5" 
                           Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityNegativeConverter}, UpdateSourceTrigger=PropertyChanged}">
         <ItemsControl BorderThickness="0" Background="Transparent" VerticalAlignment="Top" HorizontalAlignment="Stretch"
                           ItemsSource="{Binding Wall.Items, UpdateSourceTrigger=PropertyChanged}" >
@@ -37,9 +46,9 @@
                                 <Label Grid.Column="1" Height="25" Content="{Binding Post.Text}"
                                                Visibility="{Binding PostType, Converter={StaticResource MissingPostIsHiddenConverter}, UpdateSourceTrigger=PropertyChanged}"></Label>
 
-                                <!--<Button Grid.Column="1" HorizontalAlignment="Stretch" Margin="4" Height="21" Content="Rapid-upload" Style="{StaticResource VkMimic}"
+                                --><!--<Button Grid.Column="1" HorizontalAlignment="Stretch" Margin="4" Height="21" Content="Rapid-upload" Style="{StaticResource VkMimic}"
                                                 Visibility="{Binding PostType, Converter={StaticResource MissingPostIsShowingConverter}}"
-                                                Command="{Binding RapidUploadModeCommand}"/>-->
+                                                Command="{Binding RapidUploadModeCommand}"/>--><!--
 
                                 <Button Grid.Column="2" HorizontalAlignment="Right" Margin="4" Height="21" Width="96" Content="Upload" Style="{StaticResource VkCommon}"
                                                 Visibility="{Binding PostType, Converter={StaticResource MissingPostIsShowingConverter}, UpdateSourceTrigger=PropertyChanged}"
@@ -71,5 +80,5 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-    </ScrollViewer>
+    </ScrollViewer>-->
 </UserControl>

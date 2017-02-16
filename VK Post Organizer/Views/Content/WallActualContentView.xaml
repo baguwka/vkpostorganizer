@@ -4,9 +4,19 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:vk.Views"
+             xmlns:prism="http://prismlibrary.com/"
+             prism:ViewModelLocator.AutoWireViewModel="True"
              mc:Ignorable="d" 
+             
+             xmlns:vm="clr-namespace:vk.ViewModels"
+             d:DataContext="{d:DesignInstance d:Type=vm:WallActualContentViewModel, IsDesignTimeCreatable=False}"
+             
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
-            
+        <StackPanel>
+            <Label Content="Hello there! ^-^ I'ma actual wall content view!"></Label>
+            <Label Content="Ow! Looks like i got a payload from master o3o. Here it is:"></Label>
+            <Label Content="{Binding Message, UpdateSourceTrigger=PropertyChanged}"></Label>
+        </StackPanel>
     </Grid>
 </UserControl>

@@ -5,12 +5,12 @@ using Data_Persistence_Provider;
 using vk.ViewModels;
 
 namespace vk.Views {
-   public partial class MainView : Window {
-      private readonly MainViewModel _viewModel;
+   public partial class Shell : Window {
+      private readonly ShellViewModel _viewModel;
 
-      public MainView() {
+      public Shell() {
          InitializeComponent();
-         _viewModel = (MainViewModel)DataContext;
+         _viewModel = (ShellViewModel)DataContext;
       }
 
       private async void onLoaded(object sender, RoutedEventArgs e) {
@@ -18,10 +18,10 @@ namespace vk.Views {
          var windowData = await SaveLoaderHelper.TryLoadAsync<MainViewData>("Main Window Data");
 
          if (windowData.Successful) {
-            MainWindow.Width = windowData.Result.Width;
-            MainWindow.Height = windowData.Result.Heigth;
-            MainWindow.Left = windowData.Result.X;
-            MainWindow.Top = windowData.Result.Y;
+            ShellWindow.Width = windowData.Result.Width;
+            ShellWindow.Height = windowData.Result.Heigth;
+            ShellWindow.Left = windowData.Result.X;
+            ShellWindow.Top = windowData.Result.Y;
          }
       }
 
@@ -34,17 +34,10 @@ namespace vk.Views {
       private void onClosing(object sender, CancelEventArgs e) {
          _viewModel.OnClosing();
          SaveLoaderHelper.Save("Main Window Data", 
-            new MainViewData(MainWindow.Width, MainWindow.Height, MainWindow.Left, MainWindow.Top));
+            new MainViewData(ShellWindow.Width, ShellWindow.Height, ShellWindow.Left, ShellWindow.Top));
       }
 
       private void onInitialized(object sender, EventArgs e) {
-      }
-
-      private void onFilesDropToUpload(object sender, DragEventArgs e) {
-         //todo: upload files here pls
-         //var files = (string[])e.Data.GetData(DataFormats.FileDrop);
-         //await _viewModel.ImportFilesAsync(files);
-         //e.Handled = true;
       }
    }
 

@@ -109,37 +109,6 @@ namespace vk.ViewModels {
          return this;
       }
 
-      //public PostControl([NotNull] Post post) {
-      //   if (post == null) {
-      //      throw new ArgumentNullException(nameof(post));
-      //   }
-
-      //   Images = new SmartCollection<ImageItem>();
-
-      //   ExpandToggleCommand = new DelegateCommand(expandToggle, () => PostType != PostType.Missing);
-      //   OpenPost = new DelegateCommand(openPostCommand, () => IsExisting == true && PostType != PostType.Missing);
-      //   UploadAtThisDateCommand = new DelegateCommand(uploadAtThisDateCommandExecute, () => PostType == PostType.Missing);
-
-      //   Post = post;
-
-      //   //if copy history is null it's not a repost
-      //   var prev = Post.CopyHistory?.FirstOrDefault();
-      //   if (prev == null) {
-      //      loadImages();
-      //      PostType = PostType.Post;
-      //      return;
-      //   }
-
-      //   //it's a repost
-      //   var groupName = GroupNameCache.GetGroupName(prev.OwnerId);
-
-      //   PostType = PostType.Repost;
-      //   Post.Text = $"{groupName.Substring(0, groupName.Length > 10 ? 10 : groupName.Length)}... {prev.Text}";
-      //   Post.Attachments = prev.Attachments;
-
-      //   loadImages();
-      //}
-
       private void uploadAtThisDateCommandExecute() {
          OnUploadRequested();
       }

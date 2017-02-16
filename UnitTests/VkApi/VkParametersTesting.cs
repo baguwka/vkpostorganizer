@@ -32,7 +32,7 @@ namespace UnitTests.VkApi {
             .AddParameter("externalParam1", "externalValue1")
             .AddParameter("externalParam2", "externalValue2");
 
-         parameters.AddParameters(externalParameters);
+         parameters.AppendParameters(externalParameters);
 
          Assert.That(parameters["param1"], Is.EqualTo("value1"));
          Assert.That(parameters["param2"], Is.EqualTo("value2"));

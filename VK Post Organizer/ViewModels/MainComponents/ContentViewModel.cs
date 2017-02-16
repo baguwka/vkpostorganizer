@@ -13,9 +13,7 @@ namespace vk.ViewModels {
          _eventAggregator = eventAggregator;
          _regionManager = regionManager;
 
-         _regionManager.RegisterViewWithRegion(RegionNames.ContentMainRegion, typeof(StartPageView));
+         _regionManager.RegisterViewWithRegion(RegionNames.ContentLeftBlockRegion, typeof(WallContentLeftBlockView));
       }
-
-
    }
 }

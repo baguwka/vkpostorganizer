@@ -2,6 +2,8 @@
 using vk.Models;
 
 namespace vk.Events {
-   public class WallSelectedEvent : PubSubEvent<WallItem> {}
-   public class FillWallListEvent : PubSubEvent {}
+   public class WallSelectorEvents {
+      public class WallSelected : PubSubEvent<WallItem> { }
+      public class FillWallRequest : PubSubEvent { }
+   }
 }

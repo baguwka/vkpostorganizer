@@ -10,6 +10,8 @@ using vk.Models.VkApi.Entities;
 
 namespace vk.Models.VkApi {
    public abstract class VkApiBase {
+      public const string VERSION = "5.62";
+
       public VkApiBase([NotNull] AccessToken token, [NotNull] IWebClient webClient) {
          WebClient = webClient;
          Token = token;
@@ -143,8 +145,6 @@ namespace vk.Models.VkApi {
       protected Error deserializeError(string jsonString) {
          return JsonConvert.DeserializeObject<ErrorResponse>(jsonString).Error;
       }
-
-      public const string VERSION = "5.62";
    }
 
    [UsedImplicitly]

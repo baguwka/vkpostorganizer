@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Windows;
+using JetBrains.Annotations;
 using Prism.Events;
 using Prism.Mvvm;
 using vk.Events;
@@ -7,6 +8,7 @@ using vk.Models;
 using vk.Models.VkApi;
 
 namespace vk.ViewModels {
+   [UsedImplicitly]
    public class AvailableWallsViewModel : BindableBase {
       private readonly IEventAggregator _eventAggregator;
       private WallList _wallList;
@@ -27,7 +29,7 @@ namespace vk.ViewModels {
          _eventAggregator = eventAggregator;
          WallList = wallList;
          WallList.ItemClicked += onWallItemClicked;
-         _eventAggregator.GetEvent<FillWallListEvent>().Subscribe(fillWallList);
+         _eventAggregator.GetEvent<WallSelectorEvents.FillWallRequest>().Subscribe(fillWallList);
          _eventAggregator.GetEvent<AuthBarEvents.AuthorizationCompleted>()
             .Subscribe(authorized => IsAuthorized = authorized);
          _eventAggregator.GetEvent<AuthBarEvents.LogOutCompleted>()
@@ -37,7 +39,7 @@ namespace vk.ViewModels {
       private void onWallItemClicked(object sender, WallItem e) {
          if (!IsAuthorized) return;
 
-         _eventAggregator.GetEvent<WallSelectedEvent>().Publish(e);
+         _eventAggregator.GetEvent<WallSelectorEvents.WallSelected>().Publish(e);
       }
 
       private async void fillWallList() {

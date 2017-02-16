@@ -31,7 +31,7 @@ namespace vk.Models.VkApi {
          return AddParameter(paramName, paramValue.ToString());
       }
 
-      public VkParameters AddParameters([NotNull] VkParameters parameters) {
+      public VkParameters AppendParameters([NotNull] VkParameters parameters) {
          if (parameters == null) {
             throw new ArgumentNullException(nameof(parameters));
          }

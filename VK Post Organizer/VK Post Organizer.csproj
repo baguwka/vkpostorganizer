@@ -265,19 +265,21 @@
     <Compile Include="Models\UrlHelper\IImageUrlObtainer.cs" />
     <Compile Include="Utils\UrlHelper.cs" />
     <Compile Include="Models\AttachmentItem.cs" />
-    <Compile Include="ViewModels\AuthBarViewModel.cs" />
+    <Compile Include="ViewModels\MainComponents\AuthBarViewModel.cs" />
     <Compile Include="ViewModels\AuthViewModel.cs" />
-    <Compile Include="ViewModels\AvailableWallsViewModel.cs" />
-    <Compile Include="ViewModels\ContentViewModel.cs" />
-    <Compile Include="ViewModels\HistoryContentViewModel.cs" />
+    <Compile Include="ViewModels\Content\AvailableWallsViewModel.cs" />
+    <Compile Include="ViewModels\MainComponents\ContentViewModel.cs" />
+    <Compile Include="ViewModels\Content\HistoryContentViewModel.cs" />
+    <Compile Include="ViewModels\Content\WallActualContentViewModel.cs" />
     <Compile Include="ViewModels\ImageItem.cs" />
-    <Compile Include="ViewModels\MainBottomViewModel.cs" />
+    <Compile Include="ViewModels\MainComponents\MainBottomViewModel.cs" />
     <Compile Include="ViewModels\ScheduleNameEditViewModel.cs" />
     <Compile Include="ViewModels\ScheduleViewModel.cs" />
     <Compile Include="ViewModels\SettingsViewModel.cs" />
+    <Compile Include="ViewModels\ShellViewModel.cs" />
     <Compile Include="ViewModels\UploadViewModel.cs" />
-    <Compile Include="ViewModels\WallContentLeftBlockViewModel.cs" />
-    <Compile Include="ViewModels\WallPostponeContentViewModel.cs" />
+    <Compile Include="ViewModels\Content\Components\WallContentLeftBlockViewModel.cs" />
+    <Compile Include="ViewModels\Content\WallPostponeContentViewModel.cs" />
     <Compile Include="Models\WallControl.cs" />
     <Compile Include="Models\WallItem.cs" />
     <Compile Include="Models\WallList.cs" />
@@ -298,8 +300,8 @@
     <Compile Include="Models\VkApi\UsersGet.cs" />
     <Compile Include="Models\VkApi\WallGet.cs" />
     <Compile Include="ViewModels\IViewModel.cs" />
-    <Compile Include="ViewModels\MainViewModel.cs" />
-    <Compile Include="Views\ContentView.xaml.cs">
+    <Compile Include="ViewModels\MainViewModelOld.cs" />
+    <Compile Include="Views\MainComponents\ContentView.xaml.cs">
       <DependentUpon>ContentView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Content\HistoryContentView.xaml.cs">
@@ -311,23 +313,17 @@
     <Compile Include="Views\StartPageView.xaml.cs">
       <DependentUpon>StartPageView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\VkAuthorizationView.xaml.cs">
-      <DependentUpon>VkAuthorizationView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\AuthBarView.xaml.cs">
+    <Compile Include="Views\MainComponents\AuthBarView.xaml.cs">
       <DependentUpon>AuthBarView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\AuthView.xaml.cs">
       <DependentUpon>AuthView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\MainBottomView.xaml.cs">
+    <Compile Include="Views\MainComponents\MainBottomView.xaml.cs">
       <DependentUpon>MainBottomView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Page1.xaml.cs">
       <DependentUpon>Page1.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\ScheduleNameEdit.xaml.cs">
-      <DependentUpon>ScheduleNameEdit.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ScheduleWindow.xaml.cs">
       <DependentUpon>ScheduleWindow.xaml</DependentUpon>
@@ -338,19 +334,19 @@
     <Compile Include="Views\UploadView.xaml.cs">
       <DependentUpon>UploadView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\AvailableWallsView.xaml.cs">
+    <Compile Include="Views\Content\AvailableWallsView.xaml.cs">
       <DependentUpon>AvailableWallsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Content\WallActualContentView.xaml.cs">
       <DependentUpon>WallActualContentView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\WallContentLeftBlockView.xaml.cs">
+    <Compile Include="Views\Content\Components\WallContentLeftBlockView.xaml.cs">
       <DependentUpon>WallContentLeftBlockView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Content\WallPostponeContentView.xaml.cs">
       <DependentUpon>WallPostponeContentView.xaml</DependentUpon>
     </Compile>
-    <Page Include="Views\ContentView.xaml">
+    <Page Include="Views\MainComponents\ContentView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -366,11 +362,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\VkAuthorizationView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\AuthBarView.xaml">
+    <Page Include="Views\MainComponents\AuthBarView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -378,11 +370,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\MainBottomView.xaml">
+    <Page Include="Views\MainComponents\MainBottomView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\MainView.xaml">
+    <Page Include="Views\Shell.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -390,15 +382,11 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Views\MainView.xaml.cs">
-      <DependentUpon>MainView.xaml</DependentUpon>
+    <Compile Include="Views\Shell.xaml.cs">
+      <DependentUpon>Shell.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Views\Page1.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\ScheduleNameEdit.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -414,7 +402,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\AvailableWallsView.xaml">
+    <Page Include="Views\Content\AvailableWallsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -422,7 +410,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\WallContentLeftBlockView.xaml">
+    <Page Include="Views\Content\Components\WallContentLeftBlockView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

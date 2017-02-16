@@ -7,8 +7,16 @@
              xmlns:prism="http://prismlibrary.com/"
              prism:ViewModelLocator.AutoWireViewModel="True"
              mc:Ignorable="d" 
+             
+             xmlns:vm="clr-namespace:vk.ViewModels"
+             d:DataContext="{d:DesignInstance d:Type=vm:HistoryContentViewModel, IsDesignTimeCreatable=False}"
+             
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
-            
+        <StackPanel>
+            <Label Content="Hi! ^-^ I'ma history view!"></Label>
+            <Label Content="Ow! Looks like i got a payload from master o3o. Here it is:"></Label>
+            <Label Content="{Binding Message, UpdateSourceTrigger=PropertyChanged}"></Label>
+        </StackPanel>
     </Grid>
 </UserControl>

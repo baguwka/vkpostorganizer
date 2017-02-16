@@ -4,9 +4,9 @@ using Prism.Events;
 namespace vk.Events {
    [UsedImplicitly]
    public class MainBottomEvents {
-      public class BackClick : PubSubEvent { }
-      public class RefreshClick : PubSubEvent { }
-      public class UploadClick : PubSubEvent { }
-      public class SettingsClick : PubSubEvent {}
+      public class Back : PubSubEvent { }
+      public class Refresh : PubSubEvent { }
+      public class Upload : PubSubEvent { }
+      public class Settings : PubSubEvent {}
    }
 }
