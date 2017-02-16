@@ -1,4 +1,6 @@
-﻿using System.Collections.Specialized;
+﻿using System;
+using System.Collections.Specialized;
+using JetBrains.Annotations;
 
 namespace vk.Models.VkApi {
    public class VkParameters {
@@ -11,6 +13,8 @@ namespace vk.Models.VkApi {
       public static VkParameters New() {
          return new VkParameters();
       }
+
+      public string this[string key] => Query[key];
 
       public VkParameters() {
          Query = new NameValueCollection();
@@ -25,6 +29,15 @@ namespace vk.Models.VkApi {
 
       public VkParameters AddParameter(string paramName, object paramValue) {
          return AddParameter(paramName, paramValue.ToString());
+      }
+
+      public VkParameters AddParameters([NotNull] VkParameters parameters) {
+         if (parameters == null) {
+            throw new ArgumentNullException(nameof(parameters));
+         }
+
+         Query.Add(parameters.Query);
+         return this;
       }
    }
 }

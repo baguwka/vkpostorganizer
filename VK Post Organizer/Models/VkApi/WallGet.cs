@@ -3,38 +3,25 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
-using vk.Models.Logger;
 using vk.Models.VkApi.Entities;
 
 namespace vk.Models.VkApi {
    [UsedImplicitly]
    public class WallGet : VkApiBase {
-      [NotNull] private readonly IPublishLogger _publishLogger;
-
-      public WallGet([NotNull] AccessToken token, [NotNull] IWebClient webClient, 
-         [NotNull] IPublishLogger publishLogger) : base(token, webClient) {
-
-         if (publishLogger == null) {
-            throw new ArgumentNullException(nameof(publishLogger));
-         }
-
-         _publishLogger = publishLogger;
-      }
-
-      [Obsolete]
-      public WallGetResponse Get(int id, int count = 100, int offset = 0) {
-         var parameters = makeAQuery(id, count, offset);
-         var response = ExecuteMethod("wall.get", parameters);
-         //_publishLogger.Log(response);
-         return JsonConvert.DeserializeObject<WallGetResponse>(response);
+      public WallGet([NotNull] AccessToken token, [NotNull] IWebClient webClient) : base(token, webClient) {
       }
 
       public async Task<WallGetResponse> GetAsync(int id, int count = 100, int offset = 0) {
          var parameters = makeAQuery(id, count, offset);
          var response = await ExecuteMethodAsync("wall.get", parameters);
-#pragma warning disable 4014
-         //_publishLogger.LogAsync(response);
-#pragma warning restore 4014
+         return JsonConvert.DeserializeObject<WallGetResponse>(response);
+      }
+
+      public async Task<WallGetResponse> GetAsync(int id, VkParameters sadsadasd) {
+         var parameters = makeAQuery(id, 100, 0);
+         parameters.AddParameters(sadsadasd);
+
+         var response = await ExecuteMethodAsync("wall.get", parameters);
          return JsonConvert.DeserializeObject<WallGetResponse>(response);
       }
 

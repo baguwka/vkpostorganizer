@@ -209,6 +209,8 @@
     <Compile Include="Infrastructure\AutoPopulateExportedViewsBehavior.cs" />
     <Compile Include="Infrastructure\IViewRegionRegistration.cs" />
     <Compile Include="Infrastructure\ViewExportAttribute.cs" />
+    <Compile Include="Models\Content\IContentPopulator.cs" />
+    <Compile Include="Models\Content\PostponeContentPopulator.cs" />
     <Compile Include="Models\VkAuthorization.cs" />
     <Compile Include="Models\AppDataFolderProvider.cs" />
     <Compile Include="Models\Configuration\ProxySettings.cs" />
@@ -233,6 +235,7 @@
     <Compile Include="Models\VkApi\StatsTrackVisitor.cs" />
     <Compile Include="Models\VkApi\VkParameters.cs" />
     <Compile Include="Infrastructure\WebBrowserUtility.cs" />
+    <Compile Include="Models\Content\WallContentFiller.cs" />
     <Compile Include="Models\WinInetHelper.cs" />
     <Compile Include="ProgramInfo.cs" />
     <Compile Include="Infrastructure\RegionNames.cs" />
@@ -275,7 +278,7 @@
     <Compile Include="ViewModels\UploadViewModel.cs" />
     <Compile Include="ViewModels\WallContentLeftBlockViewModel.cs" />
     <Compile Include="ViewModels\WallPostponeContentViewModel.cs" />
-    <Compile Include="ViewModels\WallControl.cs" />
+    <Compile Include="Models\WallControl.cs" />
     <Compile Include="Models\WallItem.cs" />
     <Compile Include="Models\WallList.cs" />
     <Compile Include="ViewModels\PostControl.cs" />
@@ -432,11 +435,6 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
@@ -444,7 +442,7 @@
     </Compile>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="packages.config">
       <SubType>Designer</SubType>

@@ -6,13 +6,13 @@ using System.Windows.Input;
 using JetBrains.Annotations;
 using Prism.Commands;
 using Prism.Mvvm;
-using vk.Models;
 using vk.Models.Filter;
 using vk.Models.VkApi;
 using vk.Models.VkApi.Entities;
 using vk.Utils;
+using vk.ViewModels;
 
-namespace vk.ViewModels {
+namespace vk.Models {
    [UsedImplicitly]
    public class WallControl : BindableBase {
       public const int MAX_POSTPONED = 150;
@@ -48,31 +48,6 @@ namespace vk.ViewModels {
       public ICommand ExpandAllCommand { get; private set; }
       public ICommand CollapseAllCommand { get; private set; }
 
-      //public void Pull() {
-      //   if (WallHolder == null) {
-      //      return;
-      //   }
-
-      //   Clear();
-      //   Items.AddRange(Pull(WallHolder));
-      //}
-
-      //public void Pull([NotNull] PostFilter filter) {
-      //   if (filter == null) {
-      //      throw new ArgumentNullException(nameof(filter));
-      //   }
-
-      //   if (WallHolder == null) {
-      //      return;
-      //   }
-
-      //   Clear();
-      //   var tempList = new List<PostControl>();
-      //   tempList.AddRange(Pull(WallHolder));
-      //   tempList = filter.FilterPosts(tempList).ToList();
-      //   Items.AddRange(tempList);
-      //}
-
       private static async Task<IEnumerable<PostControl>> pullPostsWithAnOffset(WallGet wall, int wallHolderId, int count, int offset) {
          var posts = await wall.GetAsync(wallHolderId, count, offset);
          var tasks = posts.Response.Wall.Select(async p => {
@@ -107,49 +82,9 @@ namespace vk.ViewModels {
          }
       } 
 
-      //public IEnumerable<PostControl> Pull([NotNull] IWallHolder wallHolder) {
-      //   if (wallHolder == null) {
-      //      throw new ArgumentNullException(nameof(wallHolder));
-      //   }
-
-      //   var wall = App.Container.GetInstance<WallGet>();
-
-      //   try {
-      //      var postList = new List<PostControl>();
-
-      //      var posts1 = wall.Get(wallHolder.ID);
-      //      postList.AddRange(posts1.Response.Wall.Select(p => new PostControl(p) { IsExisting = true }));
-
-      //      if (postList.Count == 100) {
-      //         var posts2 = wall.Get(wallHolder.ID, 50, 100);
-      //         postList.AddRange(posts2.Response.Wall.Select(p => new PostControl(p) {IsExisting = true}));
-      //      }
-
-      //      return postList;
-      //   }
-      //   catch (VkException) {
-      //      Clear();
-      //      throw;
-      //   }
-      //}
-
       private void onPostUploadRequested(object sender, EventArgs eventArgs) {
          OnUploadRequested((PostControl)sender);
       }
-
-      //public void PullWithScheduleHightlight([NotNull] PostFilter filter, [NotNull] Schedule schedule) {
-      //   if (filter == null) {
-      //      throw new ArgumentNullException(nameof(filter));
-      //   }
-      //   if (schedule == null) {
-      //      throw new ArgumentNullException(nameof(schedule));
-      //   }
-      //   if (WallHolder == null) {
-      //      return;
-      //   }
-
-      //   PullWithScheduleHightlight(WallHolder, filter, schedule);
-      //}
 
       public async Task PullWithScheduleHightlightAsync([NotNull] PostFilter filter, [NotNull] Schedule schedule) {
          if (filter == null) {
@@ -164,29 +99,6 @@ namespace vk.ViewModels {
 
          await PullWithScheduleHightlightAsync(WallHolder, filter, schedule);
       }
-
-
-      //public void PullWithScheduleHightlight([NotNull] IWallHolder other, [NotNull] PostFilter filter, [NotNull] Schedule schedule) {
-      //   if (other == null) {
-      //      throw new ArgumentNullException(nameof(other));
-      //   }
-      //   if (filter == null) {
-      //      throw new ArgumentNullException(nameof(filter));
-      //   }
-      //   if (schedule == null) {
-      //      throw new ArgumentNullException(nameof(schedule));
-      //   }
-
-      //   WallHolder = other;
-
-      //   Clear();
-
-      //   var tempList = new List<PostControl>();
-
-      //   tempList.AddRange(Pull(WallHolder));
-
-      //   addMissingFakePosts(filter, schedule, tempList);
-      //}
 
       public async Task PullWithScheduleHightlightAsync([NotNull] IWallHolder other, [NotNull] PostFilter filter, [NotNull] Schedule schedule) {
          if (other == null) {
@@ -293,8 +205,6 @@ namespace vk.ViewModels {
       public int GetMissingPostCount() {
          return GetMissingPostCountWithReserve() - RESERVE;
       }
-
-
 
       public bool IsTimeCorrectlyScheduled(int unixTime, ScheduleItem scheduleItem) {
          var dateTime = UnixTimeConverter.ToDateTime(unixTime);

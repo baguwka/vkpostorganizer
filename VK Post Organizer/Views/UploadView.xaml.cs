@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows;
 using JetBrains.Annotations;
+using vk.Models;
 using vk.ViewModels;
 
 namespace vk.Views {
