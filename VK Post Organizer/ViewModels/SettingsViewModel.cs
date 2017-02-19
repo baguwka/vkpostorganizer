@@ -11,6 +11,7 @@ using vk.Utils;
 
 namespace vk.ViewModels {
    public class SettingsViewModel : BindableBase {
+      private readonly VkPostponeSaveLoader _saveLoader;
       private bool _isBusy;
       private string _proxyPingMs;
       private string _historyServerPingMs;
@@ -54,7 +55,8 @@ namespace vk.ViewModels {
       public DelegateCommand PingProxyCommand { get; private set; }
       public DelegateCommand PingHistoryServerCommand { get; private set; }
 
-      public SettingsViewModel() {
+      public SettingsViewModel(VkPostponeSaveLoader saveLoader) {
+         _saveLoader = saveLoader;
          OkCommand = new DelegateCommand<Window>(okCommandexecute);
          RevertSettingsCommand = new DelegateCommand(revert);
 
@@ -107,7 +109,7 @@ namespace vk.ViewModels {
             var settings = App.Container.GetInstance<Settings>();
             settings.ApplySettings(CurrentSettings);
 
-            await SaveLoaderHelper.SaveAsync("Settings", settings);
+            await _saveLoader.SaveAsync("Settings", settings);
          }
       }
 

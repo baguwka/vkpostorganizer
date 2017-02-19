@@ -3,7 +3,6 @@ using System.Windows;
 using System.Windows.Threading;
 using Data_Persistence_Provider;
 using Microsoft.Practices.Unity;
-using Prism.Events;
 using Prism.Mvvm;
 using SimpleInjector;
 using vk.Models;
@@ -22,7 +21,6 @@ namespace vk {
             return;
          }
 
-
          base.OnStartup(e);
 
          Current.DispatcherUnhandledException += CurrentOnDispatcherUnhandledException;
@@ -38,8 +36,6 @@ namespace vk {
 
       public static Container Bootstrap() {
          var container = new Container();
-
-         container.Register<IEventAggregator, EventAggregator>(Lifestyle.Singleton);
 
          container.Register<AccessToken>(Lifestyle.Singleton);
          container.Register<Settings>(Lifestyle.Singleton);

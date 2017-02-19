@@ -7,7 +7,6 @@ namespace vk.ViewModels {
    [UsedImplicitly]
    public class WallActualContentViewModel : BindableBase, INavigationAware {
       private readonly IEventAggregator _eventAggregator;
-
       private string _message;
 
       public string Message {

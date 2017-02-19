@@ -1,4 +1,5 @@
 using System;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
@@ -13,12 +14,12 @@ namespace vk.Models.VkApi.Entities {
       private int _ownerId;
       private string _text;
       private int _dateUnix;
-      private SmartCollection<Attachment> _attachments;
+      private ObservableCollection<Attachment> _attachments;
       private string _dateString;
-      private SmartCollection<Post> _copyHistory;
+      private ObservableCollection<Post> _copyHistory;
 
       public Post() {
-         Attachments = new SmartCollection<Attachment>();
+         Attachments = new ObservableCollection<Attachment>();
       }
       
       [JsonProperty(PropertyName = "id")]
@@ -62,13 +63,13 @@ namespace vk.Models.VkApi.Entities {
       }
 
       [JsonProperty(PropertyName = "attachments")]
-      public SmartCollection<Attachment> Attachments {
+      public ObservableCollection<Attachment> Attachments {
          get { return _attachments; }
          set { SetProperty(ref _attachments, value); }
       }
 
       [JsonProperty(PropertyName = "copy_history", Required = Required.Default)]
-      public SmartCollection<Post> CopyHistory {
+      public ObservableCollection<Post> CopyHistory {
          get { return _copyHistory; }
          set { SetProperty(ref _copyHistory, value); }
       }

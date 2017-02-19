@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -97,14 +98,14 @@ namespace vk.ViewModels {
          }
       }
 
-      public WallControl Wall { get; }
+      public WallContainer Wall { get; }
 
       public float UploadProgress {
          get { return _uploadProgress; }
          set { SetProperty(ref _uploadProgress, value); }
       }
 
-      public SmartCollection<AttachmentItem> Attachments { get; }
+      public ObservableCollection<AttachmentItem> Attachments { get; }
 
       public string ImagePreviewUrl {
          get { return _imagePreviewUrl; }
@@ -127,16 +128,16 @@ namespace vk.ViewModels {
       public UploadViewModel() {
          _cancellationToken = new CancellationTokenSource();
 
-         Attachments = new SmartCollection<AttachmentItem>();
+         Attachments = new ObservableCollection<AttachmentItem>();
          Attachments.CollectionChanged += (sender, args) => {
             PublishCommand.RaiseCanExecuteChanged();
          };
 
-         Wall = App.Container.GetInstance<WallControl>();
+         Wall = App.Container.GetInstance<WallContainer>();
 
          Wall.Items.CollectionChanged += (sender, args) => {
             var missing = Wall.GetMissingPostCount();
-            InfoPanel = $"{WallControl.MAX_POSTPONED - missing}/{WallControl.MAX_POSTPONED}";
+            InfoPanel = $"{WallContainer.MAX_POSTPONED - missing}/{WallContainer.MAX_POSTPONED}";
          };
 
          _appSettings = App.Container.GetInstance<Settings>();
@@ -363,7 +364,7 @@ namespace vk.ViewModels {
             var uploadServer = await getUploadServerMethod.GetAsync(-Wall.WallHolder.ID);
 
             if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath)) {
-               return new UploadPhotoInfo(null, false);
+               return new UploadPhotoInfo {Successful = false};
             }
 
             byte[] uploadBytes;
@@ -373,13 +374,13 @@ namespace vk.ViewModels {
             }
 
             if (uploadBytes == null) {
-               return new UploadPhotoInfo(null, false);
+               return new UploadPhotoInfo { Successful = false };
             }
 
             var uploadResponse = Encoding.UTF8.GetString(uploadBytes);
 
             if (string.IsNullOrEmpty(uploadResponse)) {
-               return new UploadPhotoInfo(null, false);
+               return new UploadPhotoInfo { Successful = false };
             }
 
             var savePhotoMethod = App.Container.GetInstance<PhotosSaveWallPhoto>();
@@ -387,12 +388,12 @@ namespace vk.ViewModels {
 
             var savedPhoto = savePhotoProperty?.Response.FirstOrDefault();
 
-            return new UploadPhotoInfo(savedPhoto, savedPhoto != null);
+            return new UploadPhotoInfo {Result = savedPhoto, Successful = savedPhoto != null};
          }
          catch (VkException ex) {
             MessageBox.Show($"{ex.Message}\n\nStackTrace:\n{ex.StackTrace}", ex.ToString(), MessageBoxButton.OK,
                MessageBoxImage.Error);
-            return new UploadPhotoInfo(null, false);
+            return new UploadPhotoInfo {Successful = false};
          }
       }
 

@@ -8,7 +8,7 @@ using vk.Models.VkApi.Entities;
 
 namespace vk.Models.VkApi {
    [UsedImplicitly]
-   public class PhotosSaveWallPhoto : VkApiBase {
+   public class PhotosSaveWallPhoto : VkApiBase, IPhotosSaveWallPhoto {
       public PhotosSaveWallPhoto([NotNull] AccessToken token, [NotNull] IWebClient webClient) : base(token, webClient) {
       }
 
@@ -81,12 +81,8 @@ namespace vk.Models.VkApi {
    }
 
    public class UploadPhotoInfo {
-      public UploadPhotoInfo(Photo result, bool successful) {
-         Result = result;
-         Successful = successful;
-      }
-
-      public Photo Result { get; private set; }
-      public bool Successful { get; private set; }
+      [CanBeNull]
+      public Photo Result { get;  set; }
+      public bool Successful { get;  set; }
    }
 }

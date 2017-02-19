@@ -28,7 +28,7 @@ namespace vk.ViewModels {
       private bool _isBusy;
       private bool _showUploadUi;
 
-      public WallControl Wall { get; }
+      public WallContainer Wall { get; }
 
       public DelegateCommand ConfigureScheduleCommand { get; private set; }
       public DelegateCommand ApplyScheduleCommand { get; private set; }
@@ -101,7 +101,7 @@ namespace vk.ViewModels {
          ShowHistoryCommand = new DelegateCommand(showHistoryCommand);
          CloseUploadUiCommand = new DelegateCommand(() => ShowUploadUi = false);
 
-         Wall = App.Container.GetInstance<WallControl>();
+         Wall = App.Container.GetInstance<WallContainer>();
 
          Wall.UploadRequested += onWallsUploadRequested;
 
@@ -111,7 +111,7 @@ namespace vk.ViewModels {
             var postCount = Wall.GetPostOnlyCount();
             var missingPosts = Wall.GetMissingPostCount();
 
-            InfoPanel = $"Total: {totalPostCount} / {WallControl.MAX_POSTPONED}" +
+            InfoPanel = $"Total: {totalPostCount} / {WallContainer.MAX_POSTPONED}" +
                         $"\nPosts: {postCount}" +
                         $"\nReposts: {repostCount}" +
                         $"\nMissing {missingPosts}";
@@ -148,7 +148,7 @@ namespace vk.ViewModels {
       private async void onWallsUploadRequested(object sender, PostControl control) {
          if (UploadView.IsOpened == false) {
             var upload = App.Container.GetInstance<UploadView>();
-            await upload.ConfigureAsync(new UploadInfo(new WallControl(Wall.WallHolder), null, control.Post.DateUnix));
+            await upload.ConfigureAsync(new UploadInfo(new WallContainer(Wall.WallHolder), null, control.Post.DateUnix));
             upload.Show();
          }
          else {
@@ -205,7 +205,7 @@ namespace vk.ViewModels {
 
          if (UploadView.IsOpened == false) {
             var upload = App.Container.GetInstance<UploadView>();
-            await upload.ConfigureAsync(new UploadInfo(new WallControl(Wall.WallHolder), null));
+            await upload.ConfigureAsync(new UploadInfo(new WallContainer(Wall.WallHolder), null));
             upload.Show();
          }
          else {
@@ -320,21 +320,21 @@ namespace vk.ViewModels {
       public async void OnLoad() {
          IsBusy = true;
 
-         var mainVmData = await SaveLoaderHelper.TryLoadAsync<MainVMSaveInfo>("MainVM");
-         if (mainVmData.Successful) {
+         //var mainVmData = await VkPostponeSaveLoader.TryLoadAsync<MainVMSaveInfo>("MainVM");
+         //if (mainVmData.Successful) {
             //TestingGroup = data.TestingGroup;
-         }
+         //}
 
-         var loadedSettings = await SaveLoaderHelper.TryLoadAsync<Settings>("Settings");
+         //var loadedSettings = await VkPostponeSaveLoader.TryLoadAsync<Settings>("Settings");
          var currentSettings = App.Container.GetInstance<Settings>();
 
-         if (loadedSettings.Successful) {
-            currentSettings.ApplySettings(loadedSettings.Result);
-         }
-         else {
-            //defaults
-            currentSettings.ApplySettings(new Settings());
-         }
+         //if (loadedSettings.Successful) {
+         //   //currentSettings.ApplySettings(loadedSettings.Result);
+         //}
+         //else {
+         //   //defaults
+         //   currentSettings.ApplySettings(new Settings());
+         //}
 
          //SetUpAvatar(DEFAULT_AVATAR);
 
@@ -348,8 +348,8 @@ namespace vk.ViewModels {
 
       public void OnClosing() {
          var some = App.Container.GetInstance<Settings>();
-         SaveLoaderHelper.Save("MainVM", new MainVMSaveInfo());
-         SaveLoaderHelper.Save("Settings", some);
+         //VkPostponeSaveLoader.Save("MainVM", new MainVMSaveInfo());
+         //VkPostponeSaveLoader.Save("Settings", some);
       }
 
       public void OnClosed() {

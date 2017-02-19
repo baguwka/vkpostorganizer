@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
-using Awesomium.Core;
 using vk.ViewModels;
 using NavigationEventArgs = System.Windows.Navigation.NavigationEventArgs;
 

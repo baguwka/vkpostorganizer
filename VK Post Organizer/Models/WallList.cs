@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using JetBrains.Annotations;
 using Prism.Mvvm;
@@ -7,16 +8,16 @@ using Prism.Mvvm;
 namespace vk.Models {
    [UsedImplicitly]
    public class WallList : BindableBase {
-      private SmartCollection<WallItem> _items;
+      private ObservableCollection<WallItem> _items;
       public event EventHandler<WallItem> ItemClicked;
 
-      public SmartCollection<WallItem> Items {
+      public ObservableCollection<WallItem> Items {
          get { return _items; }
          set { SetProperty(ref _items, value); }
       }
 
       public WallList() {
-         Items = new SmartCollection<WallItem>();
+         Items = new ObservableCollection<WallItem>();
          Items.CollectionChanged += (sender, args) => OnPropertyChanged(nameof(Items));
       }
 
@@ -39,12 +40,7 @@ namespace vk.Models {
             item.Clicked -= OnItemClicked;
          }
       }
-
-      public void Fill(IEnumerable<WallItem> items) {
-         _items.Clear();
-         _items.AddRange(items);
-      }
-
+      
       public void Clear() {
          foreach (var wallItem in _items.ToList()) {
             Remove(wallItem);

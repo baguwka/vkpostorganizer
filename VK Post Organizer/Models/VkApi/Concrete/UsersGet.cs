@@ -6,8 +6,9 @@ using Newtonsoft.Json;
 using vk.Models.VkApi.Entities;
 
 namespace vk.Models.VkApi {
+
    [UsedImplicitly]
-   public class UsersGet : VkApiBase {
+   public class UsersGet : VkApiBase, IUsersGet {
       public UsersGet(AccessToken token, IWebClient webClient) : base(token, webClient) {
       }
 

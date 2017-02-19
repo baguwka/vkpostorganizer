@@ -6,16 +6,18 @@ using vk.ViewModels;
 
 namespace vk.Views {
    public partial class Shell : Window {
+      private readonly VkPostponeSaveLoader _saveLoader;
       private readonly ShellViewModel _viewModel;
 
-      public Shell() {
+      public Shell(VkPostponeSaveLoader saveLoader) {
+         _saveLoader = saveLoader;
          InitializeComponent();
          _viewModel = (ShellViewModel)DataContext;
       }
 
       private async void onLoaded(object sender, RoutedEventArgs e) {
          _viewModel.OnLoad();
-         var windowData = await SaveLoaderHelper.TryLoadAsync<MainViewData>("Main Window Data");
+         var windowData = await _saveLoader.TryLoadAsync<MainViewData>("Main Window Data");
 
          if (windowData.Successful) {
             ShellWindow.Width = windowData.Result.Width;
@@ -33,7 +35,7 @@ namespace vk.Views {
 
       private void onClosing(object sender, CancelEventArgs e) {
          _viewModel.OnClosing();
-         SaveLoaderHelper.Save("Main Window Data", 
+         _saveLoader.Save("Main Window Data", 
             new MainViewData(ShellWindow.Width, ShellWindow.Height, ShellWindow.Left, ShellWindow.Top));
       }
 

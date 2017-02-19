@@ -1,22 +1,26 @@
-﻿using System.Linq;
+﻿using System;
 using System.Windows;
 using JetBrains.Annotations;
+using Prism;
 using Prism.Events;
 using Prism.Mvvm;
 using vk.Events;
 using vk.Models;
-using vk.Models.VkApi;
 
 namespace vk.ViewModels {
    [UsedImplicitly]
-   public class AvailableWallsViewModel : BindableBase {
+   public class AvailableWallsViewModel : BindableBase, IActiveAware {
       private readonly IEventAggregator _eventAggregator;
+      private readonly AvailableWallsFiller _filler;
       private WallList _wallList;
 
       public WallList WallList {
          get { return _wallList; }
          set { SetProperty(ref _wallList, value); }
       }
+
+      public bool IsActive { get; set; }
+      public event EventHandler IsActiveChanged;
 
       private bool _isAuthorized;
 
@@ -25,11 +29,15 @@ namespace vk.ViewModels {
          set { SetProperty(ref _isAuthorized, value); }
       }
 
-      public AvailableWallsViewModel(IEventAggregator eventAggregator, WallList wallList) {
+      public AvailableWallsViewModel(IEventAggregator eventAggregator, AvailableWallsFiller filler) {
          _eventAggregator = eventAggregator;
-         WallList = wallList;
+         _filler = filler;
+         WallList = new WallList();
+
          WallList.ItemClicked += onWallItemClicked;
          _eventAggregator.GetEvent<WallSelectorEvents.FillWallRequest>().Subscribe(fillWallList);
+         _eventAggregator.GetEvent<MainBottomEvents.Refresh>().Subscribe(fillWallList);
+
          _eventAggregator.GetEvent<AuthBarEvents.AuthorizationCompleted>()
             .Subscribe(authorized => IsAuthorized = authorized);
          _eventAggregator.GetEvent<AuthBarEvents.LogOutCompleted>()
@@ -43,34 +51,11 @@ namespace vk.ViewModels {
       }
 
       private async void fillWallList() {
-         var methodGroupsGet = App.Container.GetInstance<GroupsGet>();
-         var groups = await methodGroupsGet.GetAsync();
-         if (groups.Collection == null) {
-            MessageBox.Show("Groups not found", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            return;
-         }
+         if (!IsActive) return;
 
-         var userget = App.Container.GetInstance<UsersGet>();
-         var users = await userget.GetAsync();
-         var user = users.Users.FirstOrDefault();
-         if (user == null) {
-            MessageBox.Show("User not found", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            return;
-         }
-
-         //todo: get rid of workaround
-         var item = new WallItem(new EmptyWallHolder {
-            Name = user.Name,
-            Description = user.Description,
-            Photo200 = user.Photo200,
-            Photo50 = user.Photo50
-         });
-
-         _wallList.Clear();
-         _wallList.Add(item);
-
-         foreach (var group in groups.Collection.Groups) {
-            _wallList.Add(new WallItem(group));
+         var result = await _filler.FillAsync(_wallList);
+         if (result.Succeed == false) {
+            MessageBox.Show(result.ErrorMessage, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
          }
       }
    }

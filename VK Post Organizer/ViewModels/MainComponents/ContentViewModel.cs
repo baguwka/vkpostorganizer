@@ -1,8 +1,6 @@
 ﻿using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
-using vk.Infrastructure;
-using vk.Views;
 
 namespace vk.ViewModels {
    public class ContentViewModel : BindableBase {
@@ -13,7 +11,6 @@ namespace vk.ViewModels {
          _eventAggregator = eventAggregator;
          _regionManager = regionManager;
 
-         _regionManager.RegisterViewWithRegion(RegionNames.ContentLeftBlockRegion, typeof(WallContentLeftBlockView));
       }
    }
 }

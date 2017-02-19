@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -14,22 +15,22 @@ using vk.ViewModels;
 
 namespace vk.Models {
    [UsedImplicitly]
-   public class WallControl : BindableBase {
+   public class WallContainer : BindableBase {
       public const int MAX_POSTPONED = 150;
       public const int RESERVE = 100;
 
       private IWallHolder _wallHolder;
-      private SmartCollection<PostControl> _items;
+      private ObservableCollection<PostControl> _items;
 
       public event EventHandler<PostControl> UploadRequested;
 
-      public WallControl([NotNull] IWallHolder wallHolder) {
+      public WallContainer([NotNull] IWallHolder wallHolder) {
          if (wallHolder == null) {
             throw new ArgumentNullException(nameof(wallHolder));
          }
 
          _wallHolder = wallHolder;
-         Items = new SmartCollection<PostControl>();
+         Items = new ObservableCollection<PostControl>();
 
          ExpandAllCommand = new DelegateCommand(expandAllCommandExecute);
          CollapseAllCommand = new DelegateCommand(collapseAllCommandExecute);
@@ -40,7 +41,7 @@ namespace vk.Models {
          set { SetProperty(ref _wallHolder, value); }
       }
 
-      public SmartCollection<PostControl> Items {
+      public ObservableCollection<PostControl> Items {
          get { return _items; }
          set { SetProperty(ref _items, value); }
       }

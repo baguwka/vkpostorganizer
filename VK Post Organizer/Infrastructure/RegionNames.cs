@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Web.UI;
-
-namespace vk.Infrastructure {
+﻿namespace vk.Infrastructure {
    public static class RegionNames {
       public const string AuthRegion = "AuthRegion";
       public const string MainRegion = "MainRegion";

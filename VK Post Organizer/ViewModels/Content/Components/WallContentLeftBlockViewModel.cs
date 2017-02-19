@@ -5,11 +5,10 @@ using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
 using vk.Infrastructure;
-using vk.Views;
 
 namespace vk.ViewModels {
    [UsedImplicitly]
-   public class WallContentLeftBlockViewModel : BindableBase {
+   public class WallContentLeftBlockViewModel : BindableBase, INavigationAware {
       private readonly IEventAggregator _eventAggregator;
       private readonly IRegionManager _regionManager;
 
@@ -21,11 +20,8 @@ namespace vk.ViewModels {
          _eventAggregator = eventAggregator;
          _regionManager = regionManager;
 
-         _regionManager.RegisterViewWithRegion(RegionNames.ContentMainRegion, typeof(WallPostponeContentView));
-
          ShowActualWallCommand = new DelegateCommand(() => {
             var parameters = new NavigationParameters {{"filter", "howdy"}};
-
             _regionManager.RequestNavigate(RegionNames.ContentMainRegion, ViewNames.WallActualContent, parameters);
          });
 
@@ -36,6 +32,16 @@ namespace vk.ViewModels {
          ShowHistoryCommand = new DelegateCommand(() => {
             _regionManager.RequestNavigate(RegionNames.ContentMainRegion, $"{ViewNames.HistoryContent}?filter=sayhello");
          });
+      }
+
+      public void OnNavigatedTo(NavigationContext navigationContext) {
+      }
+
+      public bool IsNavigationTarget(NavigationContext navigationContext) {
+         return true;
+      }
+
+      public void OnNavigatedFrom(NavigationContext navigationContext) {
       }
    }
 }

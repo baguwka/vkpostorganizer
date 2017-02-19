@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace vk.Models.VkApi {
    [UsedImplicitly]
-   public class PhotosGetWallUploadSever : VkApiBase {
+   public class PhotosGetWallUploadSever : VkApiBase, IPhotosGetWallUploadSever {
       public PhotosGetWallUploadSever([NotNull] AccessToken token, [NotNull] IWebClient webClient) : base(token, webClient) {
       }
 

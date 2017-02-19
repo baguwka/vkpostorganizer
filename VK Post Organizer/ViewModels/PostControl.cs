@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -19,7 +20,7 @@ namespace vk.ViewModels {
       public Post Post { get; private set; }
       public event EventHandler UploadRequested;
 
-      public SmartCollection<ImageItem> Images { get; private set; }
+      public ObservableCollection<ImageItem> Images { get; private set; }
 
       public bool Expanded {
          get { return _expanded; }
@@ -77,7 +78,7 @@ namespace vk.ViewModels {
             throw new ArgumentNullException(nameof(postReference));
          }
 
-         Images = new SmartCollection<ImageItem>();
+         Images = new ObservableCollection<ImageItem>();
 
          ExpandToggleCommand = new DelegateCommand(expandToggle,
             () => PostType != PostType.Missing).ObservesProperty(() => PostType);

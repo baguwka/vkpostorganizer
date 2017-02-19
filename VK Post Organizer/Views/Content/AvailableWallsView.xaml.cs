@@ -1,6 +1,4 @@
-﻿using System.Windows;
-using System.Windows.Controls;
-using vk.Models;
+﻿using System.Windows.Controls;
 
 namespace vk.Views {
    /// <summary>

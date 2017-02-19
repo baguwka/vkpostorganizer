@@ -2,23 +2,31 @@
 using System.Threading.Tasks;
 using System.Windows;
 using Data_Persistence_Provider;
+using JetBrains.Annotations;
 
 namespace vk {
-   public static class SaveLoaderHelper {
-      public static void Save<T>(string key, T data) where T : class {
-         App.Container.GetInstance<SaveLoadController>().Save(key, data, onSaveCorrupted);
+   [UsedImplicitly]
+   public class VkPostponeSaveLoader {
+      private readonly SaveLoadController _controller;
+
+      public VkPostponeSaveLoader(SaveLoadController controller) {
+         _controller = controller;
+      }
+
+      public void Save<T>(string key, T data) where T : class {
+         _controller.Save(key, data, onSaveCorrupted);
       }
 
       [Obsolete("Use LoadInfo<T> TryLoad<T> instead")]
-      public static bool TryLoad<T>(string key, out T data) where T : class {
-         return App.Container.GetInstance<SaveLoadController>().TryLoad(key, out data, onLoadCorrupted);
+      public bool TryLoad<T>(string key, out T data) where T : class {
+         return _controller.TryLoad(key, out data, onLoadCorrupted);
       }
 
-      public static LoadInfo<T> TryLoad<T>(string key) where T : class {
-         return App.Container.GetInstance<SaveLoadController>().TryLoad<T>(key, onLoadCorrupted);
+      public LoadInfo<T> TryLoad<T>(string key) where T : class {
+         return _controller.TryLoad<T>(key, onLoadCorrupted);
       }
 
-      private static bool onLoadCorrupted(DataCorruptedException exception) {
+      private bool onLoadCorrupted(DataCorruptedException exception) {
          var result = MessageBox.Show("SaveData corrupted and cannot be loaded. " +
                                       "\nWipe all save data to prevent this error next time? " +
                                       "(Yes is recomended, but if you can restore it somehow manually, then select No)" +
@@ -36,15 +44,15 @@ namespace vk {
          }
       }
 
-      public static async Task SaveAsync<T>(string key, T data) where T : class {
-         await App.Container.GetInstance<SaveLoadController>().SaveAsync(key, data, onSaveCorrupted);
+      public async Task SaveAsync<T>(string key, T data) where T : class {
+         await _controller.SaveAsync(key, data, onSaveCorrupted);
       }
 
-      public static async Task<LoadInfo<T>> TryLoadAsync<T>(string key) where T : class {
-         return await App.Container.GetInstance<SaveLoadController>().TryLoadAsync<T>(key, onLoadCorrupted);
+      public async Task<LoadInfo<T>> TryLoadAsync<T>(string key) where T : class {
+         return await _controller.TryLoadAsync<T>(key, onLoadCorrupted);
       }
 
-      private static bool onSaveCorrupted(DataCorruptedException exception) {
+      private bool onSaveCorrupted(DataCorruptedException exception) {
          var result = MessageBox.Show("SaveData corrupted and cannot be saved. " +
                                          "\nBlock writing attempt to not to corrupt the save file? " +
                                          "(Yes is recomended, but if you can restore it somehow manually, then select No)" +

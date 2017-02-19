@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using JetBrains.Annotations;
 using Prism.Mvvm;
 
@@ -73,10 +74,10 @@ namespace vk.Models {
          set { SetProperty(ref _name, value); }
       }
 
-      public SmartCollection<ScheduleItem> Items { get; }
+      public ObservableCollection<ScheduleItem> Items { get; }
 
       public Schedule() {
-         Items = new SmartCollection<ScheduleItem> {
+         Items = new ObservableCollection<ScheduleItem> {
             new ScheduleItem(9, 00),
             new ScheduleItem(9, 05),
             new ScheduleItem(9, 10),
