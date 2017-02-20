@@ -14,13 +14,18 @@
 
     <Grid Margin="10">
         <Grid.RowDefinitions>
-            <RowDefinition Height="25"/>
+            <RowDefinition Height="250"/>
             <RowDefinition Height="200"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <Label Grid.Row="0" Content="{Binding Wall.WallHolder.Name, UpdateSourceTrigger=PropertyChanged}" FontWeight="DemiBold"/>
+        <StackPanel Grid.Row="0" Orientation="Vertical">
+            <Label Height="35" Content="{Binding ProgressString, UpdateSourceTrigger=PropertyChanged}" FontWeight="DemiBold"/>
+            <TextBox Height="35" Text="{Binding UrlToDownload, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+            <TextBox Height="35" Text="{Binding ResultUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+            <Button Style="{StaticResource VkBlue}" Content="Cancel" Command="{Binding CancelCommand}"></Button>
+        </StackPanel>
         <Image Grid.Row="1" ToolTip="{Binding Wall.WallHolder.Description, UpdateSourceTrigger=PropertyChanged}"
-                           Source="{Binding Wall.WallHolder.Photo200, UpdateSourceTrigger=PropertyChanged}"/>
+                           Source="{Binding ImageTest, UpdateSourceTrigger=PropertyChanged}"/>
         <StackPanel Grid.Row="2" Orientation="Vertical" HorizontalAlignment="Center">
             <Button Width="150" Height="25" Margin="5,5,0,0" Content="Expand all" Style="{StaticResource VkCommon}"
                                 Command="{Binding Wall.ExpandAllCommand}"/>

@@ -216,6 +216,50 @@
             </Setter>
         </Style>
 
+        <Style TargetType="{x:Type ToggleButton}" x:Key="VkToggleCommon">
+            <Setter Property="Background" Value="#ffffff"/>
+            <Setter Property="Foreground" Value="#4a7198"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Border CornerRadius="2" BorderBrush="#357ebd" BorderThickness="0" Background="{TemplateBinding Background}">
+                            <Grid>
+                                <TextBlock x:Name="MyContentPresenter" Text="{TemplateBinding Content}"
+                                                  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter Property="Background" Value="#4a7198"></Setter>
+                                <Setter Property="Foreground" Value="#ffffff"></Setter>
+                            </Trigger>
+                            
+                            <Trigger Property="IsChecked" Value="False">
+                                <Setter Property="Background" Value="#ffffff"></Setter>
+                                <Setter Property="Foreground" Value="#4a7198"></Setter>
+                            </Trigger>
+                            
+                            <!--<Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#e5ebf1"></Setter>
+                                <Setter Property="Foreground" Value="#4a7198"></Setter>
+                            </Trigger>-->
+
+                            <!--<Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#dae2ea"></Setter>
+                                <Setter Property="Foreground" Value="#4a7198"></Setter>
+                            </Trigger>-->
+
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#DCE0E3"></Setter>
+                                <Setter Property="Foreground" Value="#868E96"></Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <Style TargetType="{x:Type Button}" x:Key="VkCommon">
             <Setter Property="Background" Value="#ffffff"/>
             <Setter Property="Foreground" Value="#4a7198"/>

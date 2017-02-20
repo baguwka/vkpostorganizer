@@ -62,6 +62,8 @@ namespace vk.Models.VkApi {
                await Task.Delay(TimeSpan.FromSeconds(0.3f));
                return await ExecuteMethodAsync(method, query);
             }
+
+            throw;
          }
          //catch (VkException ex) {
          //   //captcha needed
@@ -69,34 +71,6 @@ namespace vk.Models.VkApi {
          //      // do captcha
          //      doCaptcha(parameters, result);
          //      await ExecuteMethodAsync(method, parameters);
-         //   }
-         //}
-         return string.Empty;
-      }
-
-      [Obsolete]
-      public string ExecuteMethod(string method, [NotNull] VkParameters query) {
-         if (query == null) {
-            throw new ArgumentNullException(nameof(query));
-         }
-
-         var finalUri = buildFinalUri(method, query);
-         var result = string.Empty;
-         try {
-            result = WebClient.DownloadString(finalUri);
-            checkForErrors(result);
-            return result;
-         }
-         catch (WebException ex) {
-            if (tryToHandleException(ex) == false) {
-               throw;
-            }
-         }
-         //catch (VkException ex) {
-         //   //captcha needed
-         //   if (ex.ErrorCode == 14) {
-         //      doCaptcha(parameters, result);
-         //      ExecuteMethod(method, parameters);
          //   }
          //}
          return string.Empty;

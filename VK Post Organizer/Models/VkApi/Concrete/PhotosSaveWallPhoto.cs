@@ -12,13 +12,6 @@ namespace vk.Models.VkApi {
       public PhotosSaveWallPhoto([NotNull] AccessToken token, [NotNull] IWebClient webClient) : base(token, webClient) {
       }
 
-      [Obsolete]
-      public PhotosSaveWallPhotoResponse Save(int groupID, string uploadResponse) {
-         var query = buildAQuery(groupID, uploadResponse);
-         var response = ExecuteMethod("photos.saveWallPhoto", query);
-         return JsonConvert.DeserializeObject<PhotosSaveWallPhotoResponse>(response);
-      }
-
       public async Task<PhotosSaveWallPhotoResponse> SaveAsync(int groupID, string uploadResponse) {
          var query = buildAQuery(groupID, uploadResponse);
          var response = await ExecuteMethodAsync("photos.saveWallPhoto", query);
@@ -84,5 +77,6 @@ namespace vk.Models.VkApi {
       [CanBeNull]
       public Photo Result { get;  set; }
       public bool Successful { get;  set; }
+      public string ErrorMessage { get; set; }
    }
 }

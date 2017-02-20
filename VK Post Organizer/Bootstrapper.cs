@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Net.Http;
+using System.Windows;
 using Data_Persistence_Provider;
 using Microsoft.Practices.Unity;
 using Prism.Regions;
@@ -52,8 +53,11 @@ namespace vk {
          Container.RegisterType<IPhotosGetWallUploadSever, PhotosGetWallUploadSever>();
          Container.RegisterType<IPhotosSaveWallPhoto, PhotosSaveWallPhoto>();
 
-         Container.RegisterType<VkUploaderFactory>(Lifetime.Singleton);
-         Container.RegisterType<VkUploader>(new InjectionFactory(container => container.Resolve<VkUploaderFactory>().BuildNewVkUploader()));
+         //Container.RegisterType<VkUploaderFactory>(Lifetime.Singleton);
+         Container.RegisterType<HttpClientHandlerFactory>(Lifetime.Singleton);
+         Container.RegisterType<HttpMessageHandler>(
+            new InjectionFactory(container => container.Resolve<HttpClientHandlerFactory>().BuildHttpClientHandlerWithProxyIfEnabled()));
+         //Container.RegisterType<VkUploader>(new InjectionFactory(container => container.Resolve<VkUploaderFactory>().BuildNewVkUploader()));
 
          Container.RegisterType<VkPostponeSaveLoader>(Lifetime.Singleton);
          //container.Register<SaveLoadController>();

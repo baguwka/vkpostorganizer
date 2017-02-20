@@ -163,19 +163,20 @@ namespace vk.ViewModels {
       }
 
       private void authorizeIfAlreadyLoggined() {
-         try {
-            var cookies = Application.GetCookie(new Uri("https://www.vk.com"));
-            if (!string.IsNullOrEmpty(cookies)) {
-               var values = cookies.Split(';');
+         Authorize(false);
+         //try {
+         //   var cookies = Application.GetCookie(new Uri("https://www.vk.com"));
+         //   if (!string.IsNullOrEmpty(cookies)) {
+         //      var values = cookies.Split(';');
 
-               if (values.Where(s => s.IndexOf('=') > 0).Any(s => s.Substring(0, s.IndexOf('=')).Trim() == "remixsid")) {
-                  Authorize(false);
-               }
-            }
-         }
-         catch {
-            // ignored
-         }
+         //      if (values.Where(s => s.IndexOf('=') > 0).Any(s => s.Substring(0, s.IndexOf('=')).Trim() == "remixsid")) {
+         //         Authorize(false);
+         //      }
+         //   }
+         //}
+         //catch {
+         //   // ignored
+         //}
       }
    }
 

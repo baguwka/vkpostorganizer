@@ -11,15 +11,6 @@ namespace vk.Models.VkApi {
       public GroupsGet(AccessToken token, IWebClient webClient) : base(token, webClient) {
       }
 
-      [Obsolete]
-      public GroupsGetResponse Get(VkParameters parameters) {
-         var query = buildAQuery();
-         query.AppendParameters(parameters);
-
-         var response = ExecuteMethod("groups.get", query);
-         return JsonConvert.DeserializeObject<GroupsGetResponse>(response);
-      }
-
       public async Task<GroupsGetResponse> GetAsync(VkParameters parameters) {
          var query = buildAQuery();
          query.AppendParameters(parameters);

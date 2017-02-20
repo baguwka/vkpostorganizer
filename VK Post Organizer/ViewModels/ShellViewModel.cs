@@ -1,4 +1,8 @@
-﻿using System.Windows;
+﻿using System;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows;
 using JetBrains.Annotations;
 using Prism.Events;
 using Prism.Mvvm;
@@ -8,6 +12,7 @@ using vk.Infrastructure;
 using vk.Models;
 using vk.Models.VkApi.Entities;
 using vk.Views;
+using static System.Threading.Tasks.Task<string>;
 
 namespace vk.ViewModels {
    [UsedImplicitly]
@@ -15,13 +20,11 @@ namespace vk.ViewModels {
       private readonly IRegionManager _regionManager;
       private readonly IEventAggregator _eventAggregator;
       private readonly VkPostponeSaveLoader _saveLoader;
-      private readonly VkUploader _uploader;
 
-      public ShellViewModel(IRegionManager regionManager, IEventAggregator eventAggregator, VkPostponeSaveLoader saveLoader, VkUploader uploader) {
+      public ShellViewModel(IRegionManager regionManager, IEventAggregator eventAggregator, VkPostponeSaveLoader saveLoader) {
          _regionManager = regionManager;
          _eventAggregator = eventAggregator;
          _saveLoader = saveLoader;
-         _uploader = uploader;
 
          _eventAggregator.GetEvent<VkAuthorizationEvents.AcquiredTheToken>().Subscribe((accessToken) => {
             _regionManager.RequestNavigate(RegionNames.MainRegion, ViewNames.AvailableWalls);

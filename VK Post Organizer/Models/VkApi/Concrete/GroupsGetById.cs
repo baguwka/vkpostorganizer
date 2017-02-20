@@ -10,13 +10,6 @@ namespace vk.Models.VkApi {
       public GroupsGetById(AccessToken token, IWebClient webClient) : base(token, webClient) {
       }
 
-      [Obsolete]
-      public GroupsGetByIdResponse Get(int id, string fields = "") {
-         var query = buildAQuery(id, fields);
-         var response = ExecuteMethod("groups.getById", query);
-         return JsonConvert.DeserializeObject<GroupsGetByIdResponse>(response);
-      }
-
       public async Task<GroupsGetByIdResponse> GetAsync(int id, string fields = "") {
          var query = buildAQuery(id, fields);
          var response = await ExecuteMethodAsync("groups.getById", query);

@@ -20,7 +20,7 @@
 
         <!-- Left block -->
         <Border Grid.Column="0" Style="{StaticResource VkBorder}" Margin="0,10,0,10">
-            <ContentControl prism:RegionManager.RegionName="{x:Static inf:RegionNames.ContentLeftBlockRegion}"/>
+            <ContentControl prism:RegionManager.RegionName="{x:Static inf:RegionNames.ContentLeftBlockRegion}" Width="250" Height="555"/>
         </Border>
 
         <Grid Grid.Column="1">

@@ -207,6 +207,8 @@
     <Compile Include="Infrastructure\ViewExportAttribute.cs" />
     <Compile Include="Models\Content\IContentPopulator.cs" />
     <Compile Include="Models\Content\PostponeContentPopulator.cs" />
+    <Compile Include="Models\Extensions\WebClientExtensions.cs" />
+    <Compile Include="Models\HttpClientHandlerFactory.cs" />
     <Compile Include="Models\VkApi\Interfaces\IPhotosGetWallUploadSever.cs" />
     <Compile Include="Models\VkApi\Interfaces\IPhotosSaveWallPhoto.cs" />
     <Compile Include="Models\VkApi\Interfaces\IGroupsGet.cs" />
