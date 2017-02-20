@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
@@ -34,54 +33,13 @@ namespace vk.Models {
          try {
             var response = await _client.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead, ct);
             if (!response.IsSuccessStatusCode) {
-               return null;
+               return new DownloadPhotoInfo {
+                  Successful = false,
+                  ErrorMessage = response.StatusCode.ToString() 
+               };
             }
 
-            if (response.Content.Headers.ContentLength == null) {
-               return null;
-            }
-
-            var totalBytes = response.Content.Headers.ContentLength.Value;
-
-            using (var contentStream = await response.Content.ReadAsStreamAsync()) {
-               using (var stream = new MemoryStream(8192)) {
-                  var totalRead = 0L;
-                  var buffer = new byte[8192];
-                  var isMoreToRead = true;
-
-                  do {
-                     if (ct.IsCancellationRequested) break;
-
-                     var read = await contentStream.ReadAsync(buffer, 0, buffer.Length, ct);
-                     if (read == 0) {
-                        isMoreToRead = false;
-                     }
-                     else {
-                        await stream.WriteAsync(buffer, 0, read, ct);
-
-                        totalRead += read;
-
-                        var progressPercent = (((float)totalRead / (float)totalBytes) * 100);
-                        progress.Report((int)progressPercent);
-                     }
-                  }
-                  while (isMoreToRead);
-
-                  var bytes = stream.ToArray();
-                  if (bytes.Length == 0) {
-                     return new DownloadPhotoInfo {
-                        Successful = false,
-                        Photo = bytes,
-                        ErrorMessage = "File size is 0 bytes"
-                     };
-                  }
-
-                  return new DownloadPhotoInfo {
-                     Successful = true,
-                     Photo = bytes
-                  };
-               }
-            }
+            return await readContentStreamAsync(progress, ct, response);
          }
          catch (OperationCanceledException ex) {
             return new DownloadPhotoInfo {
@@ -89,6 +47,59 @@ namespace vk.Models {
                Photo = null,
                ErrorMessage = ex.Message
             };
+         }
+      }
+
+      /// <summary>
+      /// Reads incoming content async with progress report.
+      /// </summary>
+      private static async Task<DownloadPhotoInfo> readContentStreamAsync(IProgress<int> progress, CancellationToken ct, HttpResponseMessage response) {
+         if (response.Content.Headers.ContentLength == null) {
+            return new DownloadPhotoInfo {
+               Successful = false,
+               ErrorMessage = "У загружаемого контента отсутствуют заголовки (Headers.ContentLenght == null)."
+            };
+         }
+
+         var totalBytes = response.Content.Headers.ContentLength.Value;
+
+         using (var contentStream = await response.Content.ReadAsStreamAsync()) {
+            using (var stream = new MemoryStream(8192)) {
+               var totalRead = 0L;
+               var buffer = new byte[8192];
+               var isMoreToRead = true;
+
+               do {
+                  if (ct.IsCancellationRequested) break;
+
+                  var read = await contentStream.ReadAsync(buffer, 0, buffer.Length, ct);
+                  if (read == 0) {
+                     isMoreToRead = false;
+                  }
+                  else {
+                     await stream.WriteAsync(buffer, 0, read, ct);
+
+                     totalRead += read;
+
+                     var progressPercent = (((float)totalRead / (float)totalBytes) * 100);
+                     progress.Report((int)progressPercent);
+                  }
+               } while (isMoreToRead);
+
+               var bytes = stream.ToArray();
+               if (bytes.Length == 0) {
+                  return new DownloadPhotoInfo {
+                     Successful = false,
+                     Photo = bytes,
+                     ErrorMessage = "File size is 0 bytes"
+                  };
+               }
+
+               return new DownloadPhotoInfo {
+                  Successful = true,
+                  Photo = bytes
+               };
+            }
          }
       }
 
@@ -104,7 +115,7 @@ namespace vk.Models {
             if (!response.IsSuccessStatusCode || response.Content == null) {
                return new UploadPhotoInfo {
                   Successful = false,
-                  ErrorMessage = "POST isn't successful, or content == null"
+                  ErrorMessage = "Метод POST не удался или Content == null"
                };
             }
 
@@ -121,7 +132,7 @@ namespace vk.Models {
          catch (VkException ex) {
             var errmessage = "";
             if (ex.ErrorCode == 100) {
-               errmessage = "Can't upload this file. Probably it's isn't a image or it's corrupted. Details below:\n\n";
+               errmessage = "Не удалось загрузить данный файл как фото вк. Либо это не изображение, либо файл поврежден. Детали ниже:";
             }
 
             errmessage += ex.Message;
