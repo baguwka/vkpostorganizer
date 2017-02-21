@@ -7,15 +7,18 @@ using vk.Models.VkApi.Entities;
 
 namespace vk.Models.VkApi {
    [UsedImplicitly]
-   public class GroupsGet : VkApiBase, IGroupsGet {
-      public GroupsGet(AccessToken token, IWebClient webClient) : base(token, webClient) {
+   public class GroupsGet: IGroupsGet {
+      private readonly VkApiBase _api;
+
+      public GroupsGet(VkApiBase api) {
+         _api = api;
       }
 
       public async Task<GroupsGetResponse> GetAsync(VkParameters parameters) {
          var query = buildAQuery();
          query.AppendParameters(parameters);
 
-         var response = await ExecuteMethodAsync("groups.get", query);
+         var response = await _api.ExecuteMethodAsync("groups.get", query);
          return JsonConvert.DeserializeObject<GroupsGetResponse>(response);
       }
 

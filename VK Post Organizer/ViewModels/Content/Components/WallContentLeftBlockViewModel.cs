@@ -1,21 +1,11 @@
-﻿using System;
-using System.IO;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
-using System.Windows.Media.Imaging;
+﻿using System.Windows.Input;
 using JetBrains.Annotations;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
-using vk.Events;
 using vk.Infrastructure;
 using vk.Models;
-using vk.Views;
 
 namespace vk.ViewModels {
    [UsedImplicitly]
@@ -23,104 +13,62 @@ namespace vk.ViewModels {
       private readonly IEventAggregator _eventAggregator;
       private readonly IRegionManager _regionManager;
       private readonly VkUploader _uploader;
+      private string _description;
+      private string _profilePhoto;
+      private string _name;
+      private string _infoPanel;
 
       public ICommand ShowActualWallCommand { get; private set; }
       public ICommand ShowPostponeWallCommand { get; private set; }
       public ICommand ShowHistoryCommand { get; private set; }
+      public ICommand ExpandAllCommand { get; private set; }
+      public ICommand CollapseAllCommand { get; private set; }
 
-      public ICommand CancelCommand { get; private set; }
-      public ICommand UploadRequest { get; private set; }
+      public string Description {
+         get { return _description; }
+         set { SetProperty(ref _description, value); }
+      }
 
+      public string ProfilePhoto {
+         get { return _profilePhoto; }
+         set { SetProperty(ref _profilePhoto, value); }
+      }
 
-      private CancellationTokenSource cts;
+      public string Name {
+         get { return _name; }
+         set { SetProperty(ref _name, value); }
+      }
 
-      public WallContentLeftBlockViewModel(IEventAggregator eventAggregator, IRegionManager regionManager, VkUploader uploader) {
+      public string InfoPanel {
+         get { return _infoPanel; }
+         set { SetProperty(ref _infoPanel, value); }
+      }
+
+      public WallContentLeftBlockViewModel(IEventAggregator eventAggregator, IRegionManager regionManager,
+         VkUploader uploader) {
          _eventAggregator = eventAggregator;
          _regionManager = regionManager;
          _uploader = uploader;
-
-         cts = new CancellationTokenSource();
 
          ShowActualWallCommand = new DelegateCommand(() => {
             var parameters = new NavigationParameters {{"filter", "howdy"}};
             _regionManager.RequestNavigate(RegionNames.ContentMainRegion, ViewNames.WallActualContent, parameters);
          });
 
-         ShowPostponeWallCommand = new DelegateCommand(() => {
-            _regionManager.RequestNavigate(RegionNames.ContentMainRegion, $"{ViewNames.WallPostponeContent}?filter=sayhello");
-         });
+         ShowPostponeWallCommand =
+            new DelegateCommand(
+               () => {
+                  _regionManager.RequestNavigate(RegionNames.ContentMainRegion,
+                     $"{ViewNames.WallPostponeContent}?filter=sayhello");
+               });
 
-         ShowHistoryCommand = new DelegateCommand(() => {
-            _regionManager.RequestNavigate(RegionNames.ContentMainRegion, $"{ViewNames.HistoryContent}?filter=sayhello");
-         });
-
-         CancelCommand = new DelegateCommand(() => {
-            cts.Cancel();
-         });
-
-         UploadRequest = new DelegateCommand(() => {
-            _eventAggregator.GetEvent<UploaderEvents.SetVisibility>().Publish(true);
-         });
+         ShowHistoryCommand =
+            new DelegateCommand(
+               () => {
+                  _regionManager.RequestNavigate(RegionNames.ContentMainRegion,
+                     $"{ViewNames.HistoryContent}?filter=sayhello");
+               });
       }
-
-      private async void somemethod(Uri uri) {
-         var progress = new Progress<int>();
-         progress.ProgressChanged += onProgressChanged;
-
-         var downloadResult = await _uploader.DownloadPhotoByUriAsync(uri, progress, cts.Token);
-
-         if (!downloadResult.Successful) {
-            if (!cts.IsCancellationRequested) {
-               MessageBox.Show(downloadResult.ErrorMessage, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            ProgressString = string.Empty;
-            return;
-         }
-
-         ProgressString = "Uploading...";
-         var result = await _uploader.TryUploadPhotoToWallAsync(downloadResult.Photo, -127092063, cts.Token);
-         if (result.Successful) {
-            ResultUrl = result.Photo?.GetLargest();
-         }
-         else {
-            if (!cts.IsCancellationRequested) {
-               MessageBox.Show(result.ErrorMessage, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            ProgressString = string.Empty;
-            return;
-         }
-         ProgressString = string.Empty;
-      }
-
-      private string _progressString;
-
-      public string ProgressString {
-         get { return _progressString; }
-         set { SetProperty(ref _progressString, value); }
-      }
-
-      private void onProgressChanged(object sender, int i) {
-         ProgressString = i.ToString();
-      }
-
-      private string _urlToDownload;
-
-      public string UrlToDownload {
-         get { return _urlToDownload; }
-         set {
-            SetProperty(ref _urlToDownload, value);
-            somemethod(new Uri(_urlToDownload));
-         }
-      }
-
-      private string _resultUrl;
-
-      public string ResultUrl {
-         get { return _resultUrl; }
-         set { SetProperty(ref _resultUrl, value); }
-      }
-
-
 
       public void OnNavigatedTo(NavigationContext navigationContext) {
       }

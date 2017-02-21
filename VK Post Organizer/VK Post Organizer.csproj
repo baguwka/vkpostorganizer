@@ -214,6 +214,7 @@
     <Compile Include="Models\VkApi\Interfaces\IPhotosSaveWallPhoto.cs" />
     <Compile Include="Models\VkApi\Interfaces\IGroupsGet.cs" />
     <Compile Include="Models\VkApi\Interfaces\IUsersGet.cs" />
+    <Compile Include="Models\VkApi\VkApiProvider.cs" />
     <Compile Include="Models\VkAuthorization.cs" />
     <Compile Include="Models\AppDataFolderProvider.cs" />
     <Compile Include="Models\Configuration\ProxySettings.cs" />
@@ -235,7 +236,7 @@
     <Compile Include="Models\VkApi\Concrete\PhotosGetWallUploadSever.cs" />
     <Compile Include="Models\VkApi\Concrete\PhotosSaveWallPhoto.cs" />
     <Compile Include="Models\VkApi\Concrete\StatsTrackVisitor.cs" />
-    <Compile Include="Models\VkApi\Concrete\VkParameters.cs" />
+    <Compile Include="Models\VkApi\VkParameters.cs" />
     <Compile Include="Infrastructure\WebBrowserUtility.cs" />
     <Compile Include="Models\Content\WallContentFiller.cs" />
     <Compile Include="Models\VkUploaderFactory.cs" />
@@ -304,7 +305,7 @@
     <Compile Include="Models\VkApi\Concrete\GroupsGet.cs" />
     <Compile Include="Models\IWebClient.cs" />
     <Compile Include="Models\VkApi\Entities\Photo.cs" />
-    <Compile Include="Models\VkApi\Concrete\VkApiBase.cs" />
+    <Compile Include="Models\VkApi\VkApiBase.cs" />
     <Compile Include="Models\VkApi\Concrete\UsersGet.cs" />
     <Compile Include="Models\VkApi\Concrete\WallGet.cs" />
     <Compile Include="ViewModels\IViewModel.cs" />

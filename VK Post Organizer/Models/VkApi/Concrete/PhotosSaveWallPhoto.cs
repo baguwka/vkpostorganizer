@@ -8,13 +8,16 @@ using vk.Models.VkApi.Entities;
 
 namespace vk.Models.VkApi {
    [UsedImplicitly]
-   public class PhotosSaveWallPhoto : VkApiBase, IPhotosSaveWallPhoto {
-      public PhotosSaveWallPhoto([NotNull] AccessToken token, [NotNull] IWebClient webClient) : base(token, webClient) {
+   public class PhotosSaveWallPhoto : IPhotosSaveWallPhoto {
+      private readonly VkApiBase _api;
+
+      public PhotosSaveWallPhoto(VkApiBase api) {
+         this._api = api;
       }
 
       public async Task<PhotosSaveWallPhotoResponse> SaveAsync(int groupID, string uploadResponse) {
          var query = buildAQuery(groupID, uploadResponse);
-         var response = await ExecuteMethodAsync("photos.saveWallPhoto", query);
+         var response = await _api.ExecuteMethodAsync("photos.saveWallPhoto", query);
          return JsonConvert.DeserializeObject<PhotosSaveWallPhotoResponse>(response);
       }
 

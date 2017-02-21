@@ -6,13 +6,16 @@ using Newtonsoft.Json;
 
 namespace vk.Models.VkApi {
    [UsedImplicitly]
-   public class GroupsGetById : VkApiBase {
-      public GroupsGetById(AccessToken token, IWebClient webClient) : base(token, webClient) {
+   public class GroupsGetById {
+      private readonly VkApiBase _api;
+
+      public GroupsGetById(VkApiBase api) {
+         _api = api;
       }
 
       public async Task<GroupsGetByIdResponse> GetAsync(int id, string fields = "") {
          var query = buildAQuery(id, fields);
-         var response = await ExecuteMethodAsync("groups.getById", query);
+         var response = await _api.ExecuteMethodAsync("groups.getById", query);
          return JsonConvert.DeserializeObject<GroupsGetByIdResponse>(response);
       }
 

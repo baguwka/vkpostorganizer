@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:prism="http://prismlibrary.com/"
              xmlns:vm="clr-namespace:vk.ViewModels"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              prism:ViewModelLocator.AutoWireViewModel="True"
              d:DataContext="{d:DesignInstance d:Type=vm:UploaderViewModel, IsDesignTimeCreatable=False}"
@@ -90,7 +91,8 @@
                     <Label Style="{StaticResource VkLabel}" Content="{Binding InfoPanel, UpdateSourceTrigger=PropertyChanged}"></Label>
                     <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
                         <Button Content="«" Height="25" Width="25" Margin="5,0,5,0" Style="{StaticResource VkCommon}" Command="{Binding MovePreviousCommand}"/>
-                        <Label Content="{Binding DateString}" Height="30" Style="{StaticResource VkLabel}" HorizontalAlignment="Left" Width="100"/>
+                        <Label  Content="{Binding DateString}" Height="30" MouseWheel="onMouseWheel"
+                                Style="{StaticResource VkLabel}" HorizontalAlignment="Left" Width="100"/>
                         <Button Content="»" Height="25" Width="25" Margin="5,0,5,0" Style="{StaticResource VkCommon}" Command="{Binding MoveNextCommand}"/>
                     </StackPanel>
                 </Grid>
@@ -102,7 +104,7 @@
                     <Button Style="{StaticResource VkBlue}" Command="{Binding PublishCommand}" 
                             HorizontalAlignment="Center" Margin="5" Content="Пост" Width="100"/>
 
-                    <CheckBox Content="Свернуть после поста" Width="150" HorizontalAlignment="Right" VerticalAlignment="Center"  Margin="0,0,10,0"
+                    <CheckBox Style="{StaticResource VkCheckBox}" Content="Свернуть после поста" Width="150" HorizontalAlignment="Right" VerticalAlignment="Center"  Margin="0,0,10,0"
                                           IsChecked="{Binding ShrinkAfterPublish, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 </Grid>
             </Grid>

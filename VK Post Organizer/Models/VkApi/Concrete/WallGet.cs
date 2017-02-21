@@ -7,8 +7,11 @@ using vk.Models.VkApi.Entities;
 
 namespace vk.Models.VkApi {
    [UsedImplicitly]
-   public class WallGet : VkApiBase {
-      public WallGet([NotNull] AccessToken token, [NotNull] IWebClient webClient) : base(token, webClient) {
+   public class WallGet {
+      private readonly VkApiBase _api;
+
+      public WallGet(VkApiBase api) {
+         this._api = api;
       }
 
       public async Task<WallGetResponse> GetAsync(int id, int count = 100, int offset = 0) {
@@ -17,7 +20,7 @@ namespace vk.Models.VkApi {
       }
 
       public async Task<WallGetResponse> GetAsync(VkParameters parameters) {
-         var response = await ExecuteMethodAsync("wall.get", parameters);
+         var response = await _api.ExecuteMethodAsync("wall.get", parameters);
          return JsonConvert.DeserializeObject<WallGetResponse>(response);
       }
 

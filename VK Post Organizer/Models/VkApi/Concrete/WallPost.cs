@@ -6,13 +6,16 @@ using Newtonsoft.Json;
 
 namespace vk.Models.VkApi {
    [UsedImplicitly]
-   public class WallPost : VkApiBase {
-      public WallPost([NotNull] AccessToken token, [NotNull] IWebClient webClient) : base(token, webClient) {
+   public class WallPost {
+      private VkApiBase _api;
+      
+      public WallPost(VkApiBase api) {
+         this._api = api;
       }
 
       public async Task<WallPostResponse> PostAsync(int wallId, string message, bool signed, bool fromGroup, int date, IEnumerable<string> attachments = null) {
          var parameters = makeAQuery(wallId, message, signed, fromGroup, date, attachments);
-         var response = await ExecuteMethodAsync("wall.post", parameters);
+         var response = await _api.ExecuteMethodAsync("wall.post", parameters);
          return JsonConvert.DeserializeObject<WallPostResponse>(response);
       }
 

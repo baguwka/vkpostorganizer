@@ -8,13 +8,16 @@ using vk.Models.VkApi.Entities;
 namespace vk.Models.VkApi {
 
    [UsedImplicitly]
-   public class UsersGet : VkApiBase, IUsersGet {
-      public UsersGet(AccessToken token, IWebClient webClient) : base(token, webClient) {
+   public class UsersGet : IUsersGet {
+      private readonly VkApiBase _api;
+
+      public UsersGet(VkApiBase api) {
+         this._api = api;
       }
 
       public async Task<UsersGetResponse> GetAsync() {
          var query = buildAQuery();
-         var response = await ExecuteMethodAsync("users.get", query);
+         var response = await _api.ExecuteMethodAsync("users.get", query);
          return JsonConvert.DeserializeObject<UsersGetResponse>(response);
       }
 

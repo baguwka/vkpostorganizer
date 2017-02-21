@@ -5,13 +5,16 @@ using Newtonsoft.Json;
 
 namespace vk.Models.VkApi {
    [UsedImplicitly]
-   public class PhotosGetWallUploadSever : VkApiBase, IPhotosGetWallUploadSever {
-      public PhotosGetWallUploadSever([NotNull] AccessToken token, [NotNull] IWebClient webClient) : base(token, webClient) {
+   public class PhotosGetWallUploadSever: IPhotosGetWallUploadSever {
+      private readonly VkApiBase _api;
+
+      public PhotosGetWallUploadSever(VkApiBase api) {
+         this._api = api;
       }
 
       public async Task<UploadServerInfo> GetAsync(int groupId) {
          groupId = Math.Abs(groupId);
-         var response = await ExecuteMethodAsync("photos.getWallUploadServer", VkParameters.New().AddParameter("group_id", groupId));
+         var response = await _api.ExecuteMethodAsync("photos.getWallUploadServer", VkParameters.New().AddParameter("group_id", groupId));
          return JsonConvert.DeserializeObject<PhotosGetWallUploadServerResponse>(response)?.Response;
       }
    }

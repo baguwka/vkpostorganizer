@@ -5,12 +5,15 @@ using Newtonsoft.Json;
 
 namespace vk.Models.VkApi {
    [UsedImplicitly]
-   public class StatsTrackVisitor : VkApiBase {
-      public StatsTrackVisitor([NotNull] AccessToken token, [NotNull] IWebClient webClient) : base(token, webClient) {
+   public class StatsTrackVisitor {
+      private readonly VkApiBase _api;
+
+      public StatsTrackVisitor(VkApiBase api) {
+         this._api = api;
       }
 
       public async Task<int> TrackAsync() {
-         var response = await ExecuteMethodAsync("stats.trackVisitor", VkParameters.No());
+         var response = await _api.ExecuteMethodAsync("stats.trackVisitor", VkParameters.No());
          return JsonConvert.DeserializeObject<StatsTrackVisitorResponse>(response).Response;
       }
    }

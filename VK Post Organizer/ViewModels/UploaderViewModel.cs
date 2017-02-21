@@ -208,8 +208,9 @@ namespace vk.ViewModels {
          }
 
          _wallContainer.WallHolder = new WallHolder(config.WallId);
-         await _wallContainer.PullWithScheduleHightlightAsync(new MissingPostFilter(), new Schedule());
          WallName = config.WallId.ToString();
+
+         await _wallContainer.PullWithScheduleHightlightAsync(new MissingPostFilter(), new Schedule());
 
          if (config.DateOverride == -1) {
             var firstMissed = _wallContainer.Items.FirstOrDefault();
@@ -228,7 +229,7 @@ namespace vk.ViewModels {
          return Attachments.Count < 10;
       }
 
-      private void moveToPreviousMissing() {
+      public void moveToPreviousMissing() {
          if (_wallContainer.Items.None() || DateUnix <= 0) {
             return;
          }
@@ -246,7 +247,7 @@ namespace vk.ViewModels {
          }
       }
 
-      private void moveToNextMissing() {
+      public void moveToNextMissing() {
          if (_wallContainer.Items.None() || DateUnix <= 0) {
             return;
          }

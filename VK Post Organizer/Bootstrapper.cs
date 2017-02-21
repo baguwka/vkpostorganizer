@@ -43,7 +43,21 @@ namespace vk {
          Container.RegisterTypeForNavigation<WallActualContentView>(ViewNames.WallActualContent);
          Container.RegisterTypeForNavigation<HistoryContentView>(ViewNames.HistoryContent);
 
+         Container.RegisterType<IWebClient, WebClientWithProxy>();
          Container.RegisterType<AccessToken>(Lifetime.Singleton);
+
+         Container.RegisterType<VkApiBase>(Lifetime.Singleton);
+         Container.RegisterType<VkApiProvider>(Lifetime.Singleton);
+
+         Container.RegisterType<GroupsGet>(new InjectionFactory(container => container.Resolve<VkApiProvider>().GroupsGet));
+         Container.RegisterType<GroupsGetById>(new InjectionFactory(container => container.Resolve<VkApiProvider>().GroupsGetById));
+         Container.RegisterType<PhotosGetWallUploadSever>(new InjectionFactory(container => container.Resolve<VkApiProvider>().PhotosGetWallUploadSever));
+         Container.RegisterType<PhotosSaveWallPhoto>(new InjectionFactory(container => container.Resolve<VkApiProvider>().PhotosSaveWallPhoto));
+         Container.RegisterType<StatsTrackVisitor>(new InjectionFactory(container => container.Resolve<VkApiProvider>().StatsTrackVisitor));
+         Container.RegisterType<UsersGet>(new InjectionFactory(container => container.Resolve<VkApiProvider>().UsersGet));
+         Container.RegisterType<WallGet>(new InjectionFactory(container => container.Resolve<VkApiProvider>().WallGet));
+         Container.RegisterType<WallPost>(new InjectionFactory(container => container.Resolve<VkApiProvider>().WallPost));
+
          Container.RegisterType<Settings>(Lifetime.Singleton);
          Container.RegisterType<ProxySettings>(new InjectionFactory(container => container.Resolve<Settings>().Proxy));
          Container.RegisterType<UploadSettings>(new InjectionFactory(container => container.Resolve<Settings>().Upload));
@@ -56,16 +70,12 @@ namespace vk {
          Container.RegisterType<IPhotosGetWallUploadSever, PhotosGetWallUploadSever>();
          Container.RegisterType<IPhotosSaveWallPhoto, PhotosSaveWallPhoto>();
 
-         //Container.RegisterType<VkUploaderFactory>(Lifetime.Singleton);
          Container.RegisterType<HttpClientHandlerFactory>(Lifetime.Singleton);
          Container.RegisterType<HttpMessageHandler>(
             new InjectionFactory(container => container.Resolve<HttpClientHandlerFactory>().BuildHttpClientHandlerWithProxyIfEnabled()));
-         //Container.RegisterType<VkUploader>(new InjectionFactory(container => container.Resolve<VkUploaderFactory>().BuildNewVkUploader()));
 
          Container.RegisterType<VkPostponeSaveLoader>(Lifetime.Singleton);
-         //container.Register<SaveLoadController>();
 
-         Container.RegisterType<IWebClient, WebClientWithProxy>();
          Container.RegisterType<IWallHolder, EmptyWallHolder>();
 
          Container.RegisterType<IPublishLogger, JsonServerPublishLogger>();

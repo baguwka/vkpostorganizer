@@ -20,9 +20,7 @@ namespace vk.ViewModels {
 
       private readonly IEventAggregator _eventAggregator;
       private readonly IRegionManager _regionManager;
-      private readonly AccessToken _accessToken;
-      private readonly UsersGet _usersGet;
-      private readonly StatsTrackVisitor _statsTrackVisitor;
+      private readonly VkApiProvider _vkApi;
       private bool _isAuthorized;
       private bool _isBusy;
       private ImageSource _profilePhoto;
@@ -51,12 +49,10 @@ namespace vk.ViewModels {
       public DelegateCommand AuthorizeCommand { get; private set; }
       public DelegateCommand LogOutCommand { get; private set; }
 
-      public AuthBarViewModel(IEventAggregator eventAggregator, IRegionManager regionManager, AccessToken accessToken, UsersGet usersGet, StatsTrackVisitor statsTrackVisitor) {
+      public AuthBarViewModel(IEventAggregator eventAggregator, IRegionManager regionManager, VkApiProvider vkApi) {
          _eventAggregator = eventAggregator;
          _regionManager = regionManager;
-         _accessToken = accessToken;
-         _usersGet = usersGet;
-         _statsTrackVisitor = statsTrackVisitor;
+         _vkApi = vkApi;
 
          AuthorizeCommand = new DelegateCommand(authorizeCommandExecute, () => !IsBusy).ObservesProperty(() => IsBusy);
          LogOutCommand = new DelegateCommand(logOutCommandExecute, () => !IsBusy).ObservesProperty(() => IsBusy);
@@ -100,7 +96,7 @@ namespace vk.ViewModels {
          UserName = string.Empty;
          SetUpAvatar(DEFAULT_AVATAR);
 
-         _accessToken.Set(new AccessToken());
+         _vkApi.Token.Set(new AccessToken());
 
          var authWindow = new AuthView();//App.Container.GetInstance<AuthView>();
          authWindow.Action = AuthAction.Deauthorize;
@@ -121,10 +117,10 @@ namespace vk.ViewModels {
             return;
          }
 
-         _accessToken.Set(accessToken);
+         _vkApi.Token.Set(accessToken);
 
          try {
-            var users = await _usersGet.GetAsync();
+            var users = await _vkApi.UsersGet.GetAsync();
 
             var user = users.Users.FirstOrDefault();
             if (user == null) {
@@ -141,7 +137,7 @@ namespace vk.ViewModels {
 
             _eventAggregator.GetEvent<AuthBarEvents.AuthorizationCompleted>().Publish(true);
 
-            await _statsTrackVisitor.TrackAsync();
+            await _vkApi.StatsTrackVisitor.TrackAsync();
          }
          catch (VkException ex) {
             MessageBox.Show(ex.Message, $"Error while authoriazation occured\n{ex.Message}", MessageBoxButton.OK, MessageBoxImage.Error);

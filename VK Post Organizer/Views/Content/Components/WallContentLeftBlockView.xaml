@@ -14,55 +14,45 @@
 
     <Grid Margin="10">
         <Grid.RowDefinitions>
-            <RowDefinition Height="350"/>
+            <RowDefinition Height="35"/>
             <RowDefinition Height="200"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0" Orientation="Vertical">
-            <Label Height="35" Margin="2" Content="{Binding ProgressString, UpdateSourceTrigger=PropertyChanged}" FontWeight="DemiBold"/>
-            <TextBox Height="35" Margin="2" Text="{Binding UrlToDownload, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-            <TextBox Height="35" Margin="2" Text="{Binding ResultUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-            <Button Height="35" Margin="2" Style="{StaticResource VkBlue}" Content="Cancel" Command="{Binding CancelCommand}"></Button>
-            <Button Height="35" Margin="2" Style="{StaticResource VkBlue}" Content="Upload request" Command="{Binding UploadRequest}"></Button>
+        <!--<StackPanel Grid.Row="0" Orientation="Vertical">
             <Button Height="35" Margin="2" Style="{StaticResource VkBlue}" Content="Postponed" Command="{Binding ShowPostponeWallCommand}"></Button>
             <Button Height="35" Margin="2" Style="{StaticResource VkBlue}" Content="Actual" Command="{Binding ShowActualWallCommand}"></Button>
-            <Button Height="35" Margin="2" Style="{StaticResource VkBlue}" Content="History" Command="{Binding ShowHistoryCommand}"></Button>
-        </StackPanel>
-        <!--<Image Grid.Row="1" ToolTip="{Binding Wall.WallHolder.Description, UpdateSourceTrigger=PropertyChanged}"
-                           Source="{Binding ImageTest, UpdateSourceTrigger=PropertyChanged}"/>
+            <Button IsEnabled="False" Height="35" Margin="2" Style="{StaticResource VkBlue}" Content="History" Command="{Binding ShowHistoryCommand}"></Button>
+        </StackPanel>-->
+        
+        <Label Grid.Row="0" Style="{StaticResource VkLabel}" Content="{Binding Name, UpdateSourceTrigger=PropertyChanged}" FontSize="16"/>
+        
+        <Image Grid.Row="1" ToolTip="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
+                           Source="{Binding ProfilePhoto, UpdateSourceTrigger=PropertyChanged}"/>
+        
         <StackPanel Grid.Row="2" Orientation="Vertical" HorizontalAlignment="Center">
-            <Button Width="150" Height="25" Margin="5,5,0,0" Content="Expand all" Style="{StaticResource VkCommon}"
-                                Command="{Binding Wall.ExpandAllCommand}"/>
+            <Label Height="120" Style="{StaticResource VkLabel}" Content="{Binding InfoPanel, UpdateSourceTrigger=PropertyChanged}"/>
 
-            <Button Width="150" Height="25" Margin="5,5,0,0" Content="Collapse all" Style="{StaticResource VkCommon}"
-                                Command="{Binding Wall.CollapseAllCommand}"/>
+            <Separator Style="{StaticResource VkSeparator}"/>
 
-            --><!--<CheckBox Margin="0,5,0,0" Content="Show photos" IsChecked="{Binding Wall.ShowPhotos, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"></CheckBox>--><!--
-            <ComboBox Margin="0,5,0,5" SelectedValuePath="Value" 
-                                  IsEnabled="{Binding IsBusy, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}"
-                                  Style="{StaticResource ComboBoxFlatStyle}"
-                                  Width="150" Height="25"
-                              ItemsSource="{Binding PostTypes}"
-                              SelectedValue="{Binding CurrentPostTypeFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Margin="3,0,0,0" Height="18" Text="{Binding Description}"/>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
-
-            <Label Style="{StaticResource VkLabel}" Content="{Binding InfoPanel, UpdateSourceTrigger=PropertyChanged}"
-                               Visibility="{Binding IsBusy, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityNegativeConverter}}"/>
-
-            <Button Margin="0,5,0,5" Content="Actual wall" Style="{StaticResource VkBlue}" 
+            <Button Margin="2" Content="Актуальная стена" Style="{StaticResource VkCommon}" 
                                 Command="{Binding ShowActualWallCommand}"
                                 Height="25" Width="150" IsEnabled="True"></Button>
-            <Button Margin="0,5,0,5" Content="Postpones" Style="{StaticResource VkBlue}" 
+            <Button Margin="2" Content="Отложенные посты" Style="{StaticResource VkCommon}" 
                                 Command="{Binding ShowPostponeWallCommand}"
                                 Height="25" Width="150" IsEnabled="True"></Button>
-            <Button Margin="0,5,0,5" Content="History" Style="{StaticResource VkBlue}" 
+            <Button Margin="2" Content="История" Style="{StaticResource VkCommon}" 
                                 Command="{Binding ShowHistoryCommand}"
                                 Height="25" Width="150" IsEnabled="True"></Button>
-        </StackPanel>-->
+
+            <Separator Style="{StaticResource VkSeparator}"/>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button Width="50" Height="25" Margin="5" Content="Expand" Style="{StaticResource VkCommon}"
+                                Command="{Binding ExpandAllCommand}"/>
+
+                <Button Width="50" Height="25" Margin="5" Content="Collapse" Style="{StaticResource VkCommon}"
+                                Command="{Binding CollapseAllCommand}"/>
+            </StackPanel>
+        </StackPanel>
     </Grid>
 </UserControl>

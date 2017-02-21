@@ -9,16 +9,17 @@ using Newtonsoft.Json;
 using vk.Models.VkApi.Entities;
 
 namespace vk.Models.VkApi {
-   public abstract class VkApiBase {
+   [UsedImplicitly]
+   public class VkApiBase {
       public const string VERSION = "5.62";
 
-      public VkApiBase([NotNull] AccessToken token, [NotNull] IWebClient webClient) {
-         WebClient = webClient;
-         Token = token;
-      }
+      private readonly IWebClient _webClient;
+      private readonly AccessToken _token;
 
-      public IWebClient WebClient { get; }
-      public AccessToken Token { get; }
+      public VkApiBase([NotNull] AccessToken token, [NotNull] IWebClient webClient) {
+         this._webClient = webClient;
+         _token = token;
+      }
 
       private void checkForErrors(string response) {
          if (string.IsNullOrEmpty(response) || response.Length < 5) {
@@ -41,7 +42,7 @@ namespace vk.Models.VkApi {
          var finalUri = buildFinalUri(method, query);
          var result = string.Empty;
          try {
-            result = await WebClient.DownloadStringAsync(finalUri);
+            result = await _webClient.DownloadStringAsync(finalUri);
             checkForErrors(result);
             _failedAttempts = 0;
             return result;
@@ -107,7 +108,7 @@ namespace vk.Models.VkApi {
             uriParameters.Add(parameters.Query);
          }
 
-         uriParameters["access_token"] = Token.Token;
+         uriParameters["access_token"] = _token.Token;
          uriParameters["v"] = VERSION;
 
          uriBuilder.Query = string.Join("&", uriParameters.AllKeys
