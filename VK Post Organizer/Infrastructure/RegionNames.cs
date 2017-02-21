@@ -6,6 +6,7 @@
 
       public const string ContentLeftBlockRegion = "ContentLeftBlockRegion";
       public const string ContentMainRegion = "ContentMainRegion";
+      public const string ContentOverlayRegion = "ContentOverlayRegion";
    }
 
    public static class ViewNames {

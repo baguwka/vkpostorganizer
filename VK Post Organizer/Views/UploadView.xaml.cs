@@ -31,7 +31,7 @@ namespace vk.Views {
    /// Interaction logic for UploadWindow.xaml
    /// </summary>
    public partial class UploadView : Window {
-      private readonly UploadViewModel _viewModel;
+      //private readonly UploadViewModel _viewModel;
 
       public static bool IsOpened { get; private set; }
       [CanBeNull]
@@ -47,7 +47,7 @@ namespace vk.Views {
          IsOpened = true;
          OpenedInstance = this;
          //base.DataContext = _viewModel;
-         _viewModel = (UploadViewModel)DataContext; //viewModel;
+         //_viewModel = (UploadViewModel)DataContext; //viewModel;
       }
 
 
@@ -55,7 +55,7 @@ namespace vk.Views {
          if (info == null) {
             throw new ArgumentNullException(nameof(info));
          }
-         await _viewModel.ConfigureAsync(info);
+         //await _viewModel.ConfigureAsync(info);
       }
 
       private void onCloseClick(object sender, RoutedEventArgs e) {
@@ -64,32 +64,31 @@ namespace vk.Views {
 
       protected override void OnClosing(CancelEventArgs e) {
          base.OnClosing(e);
-         if (_viewModel.IsBusy) {
-            var result = MessageBox.Show("Some work in progress, interrupt?", "App is busy", MessageBoxButton.YesNo,
-               MessageBoxImage.Question);
+         //if (_viewModel.IsBusy) {
+         //   var result = MessageBox.Show("Some work in progress, interrupt?", "App is busy", MessageBoxButton.YesNo,
+         //      MessageBoxImage.Question);
 
-            if (result == MessageBoxResult.Yes) {
-               _viewModel.InterruptAllWork();
-            }
-            else {
-               e.Cancel = true;
-            }
-         }
-
+         //   if (result == MessageBoxResult.Yes) {
+         //      _viewModel.InterruptAllWork();
+         //   }
+         //   else {
+         //      e.Cancel = true;
+         //   }
       }
 
-      private async void onFilesDrop(object sender, DragEventArgs e) {
-         var files = (string[])e.Data.GetData(DataFormats.FileDrop);
-         await _viewModel.ImportFilesAsync(files);
-         e.Handled = true;
+
+      private void onFilesDrop(object sender, DragEventArgs e) {
+         //var files = (string[])e.Data.GetData(DataFormats.FileDrop);
+         //await _viewModel.ImportFilesAsync(files);
+         //e.Handled = true;
       }
 
       private void onLoaded(object sender, RoutedEventArgs e) {
       }
 
-      private void onClosed(object sender, EventArgs e) {
-         IsOpened = false;
-         OpenedInstance = null;
-      }
+      //private void onClosed(object sender, EventArgs e) {
+      //   IsOpened = false;
+      //   OpenedInstance = null;
+      //}
    }
 }

@@ -14,17 +14,21 @@
 
     <Grid Margin="10">
         <Grid.RowDefinitions>
-            <RowDefinition Height="250"/>
+            <RowDefinition Height="350"/>
             <RowDefinition Height="200"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Orientation="Vertical">
-            <Label Height="35" Content="{Binding ProgressString, UpdateSourceTrigger=PropertyChanged}" FontWeight="DemiBold"/>
-            <TextBox Height="35" Text="{Binding UrlToDownload, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-            <TextBox Height="35" Text="{Binding ResultUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-            <Button Style="{StaticResource VkBlue}" Content="Cancel" Command="{Binding CancelCommand}"></Button>
+            <Label Height="35" Margin="2" Content="{Binding ProgressString, UpdateSourceTrigger=PropertyChanged}" FontWeight="DemiBold"/>
+            <TextBox Height="35" Margin="2" Text="{Binding UrlToDownload, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+            <TextBox Height="35" Margin="2" Text="{Binding ResultUrl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+            <Button Height="35" Margin="2" Style="{StaticResource VkBlue}" Content="Cancel" Command="{Binding CancelCommand}"></Button>
+            <Button Height="35" Margin="2" Style="{StaticResource VkBlue}" Content="Upload request" Command="{Binding UploadRequest}"></Button>
+            <Button Height="35" Margin="2" Style="{StaticResource VkBlue}" Content="Postponed" Command="{Binding ShowPostponeWallCommand}"></Button>
+            <Button Height="35" Margin="2" Style="{StaticResource VkBlue}" Content="Actual" Command="{Binding ShowActualWallCommand}"></Button>
+            <Button Height="35" Margin="2" Style="{StaticResource VkBlue}" Content="History" Command="{Binding ShowHistoryCommand}"></Button>
         </StackPanel>
-        <Image Grid.Row="1" ToolTip="{Binding Wall.WallHolder.Description, UpdateSourceTrigger=PropertyChanged}"
+        <!--<Image Grid.Row="1" ToolTip="{Binding Wall.WallHolder.Description, UpdateSourceTrigger=PropertyChanged}"
                            Source="{Binding ImageTest, UpdateSourceTrigger=PropertyChanged}"/>
         <StackPanel Grid.Row="2" Orientation="Vertical" HorizontalAlignment="Center">
             <Button Width="150" Height="25" Margin="5,5,0,0" Content="Expand all" Style="{StaticResource VkCommon}"
@@ -33,7 +37,7 @@
             <Button Width="150" Height="25" Margin="5,5,0,0" Content="Collapse all" Style="{StaticResource VkCommon}"
                                 Command="{Binding Wall.CollapseAllCommand}"/>
 
-            <!--<CheckBox Margin="0,5,0,0" Content="Show photos" IsChecked="{Binding Wall.ShowPhotos, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"></CheckBox>-->
+            --><!--<CheckBox Margin="0,5,0,0" Content="Show photos" IsChecked="{Binding Wall.ShowPhotos, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"></CheckBox>--><!--
             <ComboBox Margin="0,5,0,5" SelectedValuePath="Value" 
                                   IsEnabled="{Binding IsBusy, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}"
                                   Style="{StaticResource ComboBoxFlatStyle}"
@@ -59,6 +63,6 @@
             <Button Margin="0,5,0,5" Content="History" Style="{StaticResource VkBlue}" 
                                 Command="{Binding ShowHistoryCommand}"
                                 Height="25" Width="150" IsEnabled="True"></Button>
-        </StackPanel>
+        </StackPanel>-->
     </Grid>
 </UserControl>

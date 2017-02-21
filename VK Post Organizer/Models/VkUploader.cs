@@ -2,8 +2,10 @@
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using JetBrains.Annotations;
 using Prism.Mvvm;
 using vk.Models.VkApi;
@@ -29,13 +31,24 @@ namespace vk.Models {
          _client = new HttpClient(_messageHandler);
       }
 
+      public static MultipartContent CreateContentFromBytes(byte[] photo) {
+         var content = new MultipartFormDataContent();
+         var file = new ByteArrayContent(photo);
+         file.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data") {
+            Name = "photo",
+            FileName = "photo.jpg"
+         };
+         content.Add(file);
+         return content;
+      }
+
       public async Task<DownloadPhotoInfo> DownloadPhotoByUriAsync(Uri uri, [NotNull] IProgress<int> progress, CancellationToken ct) {
          try {
             var response = await _client.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead, ct);
             if (!response.IsSuccessStatusCode) {
                return new DownloadPhotoInfo {
                   Successful = false,
-                  ErrorMessage = response.StatusCode.ToString() 
+                  ErrorMessage = response.StatusCode.ToString()
                };
             }
 
@@ -47,6 +60,14 @@ namespace vk.Models {
                Photo = null,
                ErrorMessage = ex.Message
             };
+         }
+         catch (HttpRequestException ex) {
+            return new DownloadPhotoInfo {
+               Successful = false,
+               Photo = null,
+               ErrorMessage = ex.Message
+            };
+            //throw;
          }
       }
 
@@ -87,13 +108,6 @@ namespace vk.Models {
                } while (isMoreToRead);
 
                var bytes = stream.ToArray();
-               if (bytes.Length == 0) {
-                  return new DownloadPhotoInfo {
-                     Successful = false,
-                     Photo = bytes,
-                     ErrorMessage = "File size is 0 bytes"
-                  };
-               }
 
                return new DownloadPhotoInfo {
                   Successful = true,
@@ -103,9 +117,20 @@ namespace vk.Models {
          }
       }
 
-      public async Task<UploadPhotoInfo> TryUploadPhotoToWallAsync(MultipartContent photo, int wallId, [NotNull] IProgress<int> progress, CancellationToken ct) {
+      public async Task<UploadPhotoInfo> TryUploadPhotoToWallAsync(byte[] photo, int wallId, CancellationToken ct) {
+         var content = CreateContentFromBytes(photo);
+         if (content == null) {
+            return new UploadPhotoInfo {
+               Successful = false,
+               ErrorMessage = "Не удалось создать контент из массива байт."
+            };
+         }
+
+         return await TryUploadPhotoToWallAsync(content, wallId, ct).ConfigureAwait(false);
+      }
+
+      public async Task<UploadPhotoInfo> TryUploadPhotoToWallAsync(MultipartContent photo, int wallId, CancellationToken ct) {
          if (photo == null) throw new ArgumentNullException(nameof(photo));
-         if (progress == null) throw new ArgumentNullException(nameof(progress));
 
          try {
             var uploadServer = await _getWallUploadServer.GetAsync(wallId);
@@ -125,14 +150,14 @@ namespace vk.Models {
             var savedPhoto = savePhotoProperty?.Response.FirstOrDefault();
 
             return new UploadPhotoInfo {
-               Result = savedPhoto,
+               Photo = savedPhoto,
                Successful = savedPhoto != null
             };
          }
          catch (VkException ex) {
             var errmessage = "";
             if (ex.ErrorCode == 100) {
-               errmessage = "Не удалось загрузить данный файл как фото вк. Либо это не изображение, либо файл поврежден. Детали ниже:";
+               errmessage = "Не удалось загрузить данный файл как фото вк. Либо это не изображение, либо файл поврежден. Детали ниже:\n\n";
             }
 
             errmessage += ex.Message;

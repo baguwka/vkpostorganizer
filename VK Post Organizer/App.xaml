@@ -295,6 +295,37 @@
             </Setter>
         </Style>
 
+        <Style TargetType="{x:Type Button}" x:Key="VkDanger" BasedOn="{StaticResource VkCommon}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border CornerRadius="2" BorderBrush="#357ebd" BorderThickness="0" Background="{TemplateBinding Background}">
+                            <Grid>
+                                <TextBlock x:Name="MyContentPresenter" Text="{TemplateBinding Content}"
+                                                  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#d9534f"></Setter>
+                                <Setter Property="Foreground" Value="#f9f9f9"></Setter>
+                            </Trigger>
+
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#DF342F"></Setter>
+                                <Setter Property="Foreground" Value="#f9f9f9"></Setter>
+                            </Trigger>
+
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#DCE0E3"></Setter>
+                                <Setter Property="Foreground" Value="#868E96"></Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <Style TargetType="{x:Type Button}" x:Key="VkBlue" BasedOn="{StaticResource VkCommon}">
             <Setter Property="Background" Value="#5E81A8"></Setter>
             <Setter Property="Foreground" Value="#ffffff"></Setter>

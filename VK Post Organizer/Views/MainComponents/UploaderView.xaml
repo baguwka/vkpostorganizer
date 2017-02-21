@@ -1,0 +1,112 @@
+﻿<UserControl x:Class="vk.Views.UploaderView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:prism="http://prismlibrary.com/"
+             xmlns:vm="clr-namespace:vk.ViewModels"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             d:DataContext="{d:DesignInstance d:Type=vm:UploaderViewModel, IsDesignTimeCreatable=False}"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="500">
+    <Border Style="{StaticResource VkBorder}" VerticalAlignment="Bottom">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Border Grid.Row="0" BorderThickness="0,0,0,1" BorderBrush="#DCDCDC" Margin="5,0,5,0">
+                <Grid>
+                    <Label Style="{StaticResource VkLabel}" Content="{Binding WallName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left"/>
+
+                    <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Margin="-60,0,0,0">
+                        <ProgressBar Style="{StaticResource VkProgressBar}" Width="100" Height="15"
+                             Minimum="0" Maximum="100" Margin="3"
+                             Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityConverter}}"
+                             Value="{Binding UploadProgress, UpdateSourceTrigger=PropertyChanged}" >
+                        </ProgressBar>
+                        <Label Style="{StaticResource VkLabel}" Content="{Binding ProgressString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+                    
+                    <Button Style="{StaticResource VkCommon}" Command="{Binding ShowHideCommand}"
+                            Content="Show / Hide" Width="75" HorizontalAlignment="Right"/>
+                </Grid>
+            </Border>
+            
+            <Grid Grid.Row="1" Visibility="{Binding IsShowing, Converter={StaticResource BoolToVisibilityConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  Height="270">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="75"/>
+                    <RowDefinition Height="125"/>
+                    <RowDefinition Height="35"/>
+                    <RowDefinition Height="35"/>
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0" Orientation="Vertical" Margin="5">
+                    <xctk:WatermarkTextBox Style="{StaticResource VkTextBox}" Watermark="Ваше сообщение к посту..."
+                                    FontSize="16" Text="{Binding Message, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    
+                    <Grid>
+                        <xctk:WatermarkTextBox Style="{StaticResource VkTextBox}" Watermark="Вставьте url изображения сюда" Margin="0,5,0,0"
+                                               HorizontalAlignment="Left" FontSize="16" Width="330"
+                                               Text="{Binding UrlOfImageToUpload, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        
+                        <Button Style="{StaticResource VkCommon}" Content="Или загрузить с носителя"
+                                HorizontalAlignment="Right" Command="{Binding BrowseCommand}"/>
+                    </Grid>
+                </StackPanel>
+
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Hidden">
+                    <ItemsControl ItemsSource="{Binding Attachments, UpdateSourceTrigger=PropertyChanged}" FlowDirection="LeftToRight" Margin="5">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Style="{StaticResource VkMimic}" Command="{Binding OpenInBrowserCommand}" Height="75" Width="75" Margin="2">
+                                    <Grid>
+                                        <Image Source="{Binding Photo.Photo75, UpdateSourceTrigger=PropertyChanged}" 
+                                               Height="75" Width="75"/>
+                                        <Button Content="x" Width="20" Height="20" Style="{StaticResource VkCommon}" 
+                                                VerticalAlignment="Top" HorizontalAlignment="Right"
+                                                Command="{Binding RemoveCommand}"/>
+                                    </Grid>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+
+                    </ItemsControl>
+
+                </ScrollViewer>
+                
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Label Style="{StaticResource VkLabel}" Content="{Binding InfoPanel, UpdateSourceTrigger=PropertyChanged}"></Label>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button Content="«" Height="25" Width="25" Margin="5,0,5,0" Style="{StaticResource VkCommon}" Command="{Binding MovePreviousCommand}"/>
+                        <Label Content="{Binding DateString}" Height="30" Style="{StaticResource VkLabel}" HorizontalAlignment="Left" Width="100"/>
+                        <Button Content="»" Height="25" Width="25" Margin="5,0,5,0" Style="{StaticResource VkCommon}" Command="{Binding MoveNextCommand}"/>
+                    </StackPanel>
+                </Grid>
+
+                <Grid Grid.Row="3">
+                    <Button Style="{StaticResource VkDanger}" Command="{Binding WipeCommand}" 
+                            HorizontalAlignment="Left" Margin="5" Content="Стереть" Width="100"/>
+
+                    <Button Style="{StaticResource VkBlue}" Command="{Binding PublishCommand}" 
+                            HorizontalAlignment="Center" Margin="5" Content="Пост" Width="100"/>
+
+                    <CheckBox Content="Свернуть после поста" Width="150" HorizontalAlignment="Right" VerticalAlignment="Center"  Margin="0,0,10,0"
+                                          IsChecked="{Binding ShrinkAfterPublish, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                </Grid>
+            </Grid>
+
+        </Grid>
+    </Border>
+</UserControl>

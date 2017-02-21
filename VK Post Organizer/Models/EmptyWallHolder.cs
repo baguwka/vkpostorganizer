@@ -2,6 +2,15 @@ using JetBrains.Annotations;
 
 namespace vk.Models {
    [UsedImplicitly]
+   public class WallHolder : IWallHolder {
+      public WallHolder(int id) {
+         ID = id;
+      }
+
+      public int ID { get; set; }
+   }
+
+   [UsedImplicitly]
    public class EmptyWallHolder : IWallHolder {
       public int ID { get; set; }
       public string Name { get; set; }

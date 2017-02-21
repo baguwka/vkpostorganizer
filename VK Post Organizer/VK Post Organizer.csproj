@@ -200,6 +200,7 @@
     <Compile Include="Events\AuthBarEvents.cs" />
     <Compile Include="Events\MainBottomEvents.cs" />
     <Compile Include="Events\ShellEvents.cs" />
+    <Compile Include="Events\UploaderEvents.cs" />
     <Compile Include="Events\VkAuthorizationEvents.cs" />
     <Compile Include="Events\WallSelectorEvents.cs" />
     <Compile Include="Infrastructure\AutoPopulateExportedViewsBehavior.cs" />
@@ -251,6 +252,10 @@
     <Compile Include="Models\VkApi\Concrete\GroupsGetById.cs" />
     <Compile Include="Models\VkApi\Concrete\WallPost.cs" />
     <Compile Include="Models\AvailableWallsFiller.cs" />
+    <Compile Include="ViewModels\UploaderViewModel.cs" />
+    <Compile Include="Views\MainComponents\UploaderView.xaml.cs">
+      <DependentUpon>UploaderView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="VkPostponeSaveLoader.cs" />
     <Compile Include="Converter\BoolToVisibilityConverter.cs" />
     <Compile Include="Models\Filter\PostFilters.cs" />
@@ -358,6 +363,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\LoadingPlaceholder.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\MainComponents\UploaderView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

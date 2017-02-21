@@ -25,7 +25,7 @@ namespace vk.Models.VkApi {
          id = -Math.Abs(id);
          var parameters = VkParameters.New()
             .AddParameter("owner_id", id)
-            //.AddParameter("filter", "postponed")
+            .AddParameter("filter", "postponed")
             .AddParameter("offset", offset)
             .AddParameter("count", count);
          return parameters;

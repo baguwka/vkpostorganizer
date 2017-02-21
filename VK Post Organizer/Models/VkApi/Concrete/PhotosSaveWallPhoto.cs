@@ -74,8 +74,7 @@ namespace vk.Models.VkApi {
    }
 
    public class UploadPhotoInfo {
-      [CanBeNull]
-      public Photo Result { get;  set; }
+      public Photo Photo { get;  set; }
       public bool Successful { get;  set; }
       public string ErrorMessage { get; set; }
    }

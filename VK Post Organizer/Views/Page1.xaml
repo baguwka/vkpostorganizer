@@ -6,7 +6,7 @@
       xmlns:local="clr-namespace:vk.Views"
       xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
       mc:Ignorable="d" 
-      d:DesignHeight="300" d:DesignWidth="300"
+      d:DesignHeight="600" d:DesignWidth="600"
       Title="Page1">
 
     <Border VerticalAlignment="Bottom" Margin="10" Height="400" Style="{StaticResource VkBorder}" Background="#fbfbfb"

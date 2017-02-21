@@ -1,7 +1,9 @@
+using JetBrains.Annotations;
 using vk.Models.VkApi.Entities;
 using vk.ViewModels;
 
 namespace vk.Models.UrlHelper {
+   [UsedImplicitly]
    public class PhotoUrlObtainer : IImageUrlObtainer {
       public ImageItem Obtain(Attachment attachment, ImageSize preferableImageSize = ImageSize.Any) {
 

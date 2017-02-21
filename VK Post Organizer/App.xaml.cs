@@ -1,18 +1,12 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Threading;
-using Data_Persistence_Provider;
 using Microsoft.Practices.Unity;
 using Prism.Mvvm;
-using SimpleInjector;
-using vk.Models;
-using vk.Models.Logger;
-using vk.Models.UrlHelper;
-using vk.Models.VkApi;
 
 namespace vk {
    public partial class App : Application {
-      public static Container Container { get; set; }
+      public static IUnityContainer Container { get; private set; }
 
       protected override void OnStartup(StartupEventArgs e) {
          if (SingleInstance.IsOnlyInstance() == false) {
@@ -29,33 +23,9 @@ namespace vk {
          var bs = new Bootstrapper();
 
          ViewModelLocationProvider.SetDefaultViewModelFactory(type => bs.Container.Resolve(type));
-
-         Container = Bootstrap();
          bs.Run();
-      }
 
-      public static Container Bootstrap() {
-         var container = new Container();
-
-         container.Register<AccessToken>(Lifestyle.Singleton);
-         container.Register<Settings>(Lifestyle.Singleton);
-
-         container.Register<ISerializer, SaveLoadJsonSerializer>();
-         container.Register<IDataProvider, AppDataFolderProvider>();
-         //container.Register<SaveLoadController>();
-
-         container.Register<IWebClient, WebClientWithProxy>();
-         container.Register<IWallHolder, EmptyWallHolder>();
-
-         container.Register<IPublishLogger, JsonServerPublishLogger>();
-
-         container.Register<PhotoUrlObtainer>(Lifestyle.Singleton);
-         container.Register<DocumentPreviewUrlObtainer>(Lifestyle.Singleton);
-         //container.Register<ImageExtensionChecker>();
-         //container.Register<UploadWindow>();
-         container.Verify();
-
-         return container;
+         Container = bs.Container;
       }
 
       //[System.Runtime.InteropServices.DllImport("wininet.dll", CharSet = System.Runtime.InteropServices.CharSet.Auto, SetLastError = true)]

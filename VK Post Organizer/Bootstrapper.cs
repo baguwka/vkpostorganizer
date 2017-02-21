@@ -26,6 +26,7 @@ namespace vk {
 
          regionManager.RegisterViewWithRegion(RegionNames.ContentLeftBlockRegion, typeof(WallContentLeftBlockView));
          regionManager.RegisterViewWithRegion(RegionNames.ContentMainRegion, typeof(StartPageView));
+         regionManager.RegisterViewWithRegion(RegionNames.ContentOverlayRegion, typeof(UploaderView));
 
          Application.Current.MainWindow.Show();
       }
@@ -44,6 +45,8 @@ namespace vk {
 
          Container.RegisterType<AccessToken>(Lifetime.Singleton);
          Container.RegisterType<Settings>(Lifetime.Singleton);
+         Container.RegisterType<ProxySettings>(new InjectionFactory(container => container.Resolve<Settings>().Proxy));
+         Container.RegisterType<UploadSettings>(new InjectionFactory(container => container.Resolve<Settings>().Upload));
 
          Container.RegisterType<ISerializer, SaveLoadJsonSerializer>();
          Container.RegisterType<IDataProvider, AppDataFolderProvider>();

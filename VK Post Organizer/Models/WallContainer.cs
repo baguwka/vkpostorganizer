@@ -16,25 +16,22 @@ using vk.ViewModels;
 namespace vk.Models {
    [UsedImplicitly]
    public class WallContainer : BindableBase {
+      private readonly WallGet _wallGet;
       public const int MAX_POSTPONED = 150;
       public const int RESERVE = 100;
 
       private IWallHolder _wallHolder;
       private ObservableCollection<PostControl> _items;
 
-      public event EventHandler<PostControl> UploadRequested;
+      public WallContainer(WallGet wallGet) {
+         _wallGet = wallGet;
 
-      public WallContainer([NotNull] IWallHolder wallHolder) {
-         if (wallHolder == null) {
-            throw new ArgumentNullException(nameof(wallHolder));
-         }
-
-         _wallHolder = wallHolder;
          Items = new ObservableCollection<PostControl>();
-
          ExpandAllCommand = new DelegateCommand(expandAllCommandExecute);
          CollapseAllCommand = new DelegateCommand(collapseAllCommandExecute);
       }
+
+      public event EventHandler<PostControl> UploadRequested;
 
       public IWallHolder WallHolder {
          get { return _wallHolder; }
@@ -65,14 +62,12 @@ namespace vk.Models {
             throw new ArgumentNullException(nameof(wallHolder));
          }
 
-         var wall = App.Container.GetInstance<WallGet>();
-
          try {
             var postList = new List<PostControl>();
 
-            postList.AddRange(await pullPostsWithAnOffset(wall, wallHolder.ID, 100, 0));
+            postList.AddRange(await pullPostsWithAnOffset(_wallGet, wallHolder.ID, 100, 0));
             if (postList.Count == 100) {
-               postList.AddRange(await pullPostsWithAnOffset(wall, wallHolder.ID, 50, 100));
+               postList.AddRange(await pullPostsWithAnOffset(_wallGet, wallHolder.ID, 50, 100));
             }
 
             return postList;

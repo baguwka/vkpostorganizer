@@ -53,11 +53,11 @@ namespace vk.ViewModels {
       private void loadImages() {
          Images.AddRange(from attachment in Post.Attachments
                          where attachment.Type == "photo"
-                         select attachment.ObtainPhotoUrl(ImageSize.Medium));
+                         select attachment.ObtainPhotoUrl(ImageSize.Medium, new PhotoUrlObtainer()));
 
          Images.AddRange(from attachment in Post.Attachments
                          where attachment.Type == "doc" && (attachment.Document.Type == (int)DocType.Image || attachment.Document.Type == (int)DocType.Gif)
-                         select attachment.ObtainDocumentPreview(ImageSize.Large));
+                         select attachment.ObtainDocumentPreview(ImageSize.Large, new DocumentPreviewUrlObtainer()));
       }
 
       private PostControl() {

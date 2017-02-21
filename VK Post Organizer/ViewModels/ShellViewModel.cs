@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using Data_Persistence_Provider;
 using JetBrains.Annotations;
 using Prism.Events;
 using Prism.Mvvm;
@@ -20,11 +21,13 @@ namespace vk.ViewModels {
       private readonly IRegionManager _regionManager;
       private readonly IEventAggregator _eventAggregator;
       private readonly VkPostponeSaveLoader _saveLoader;
+      private readonly Settings _settings;
 
-      public ShellViewModel(IRegionManager regionManager, IEventAggregator eventAggregator, VkPostponeSaveLoader saveLoader) {
+      public ShellViewModel(IRegionManager regionManager, IEventAggregator eventAggregator, VkPostponeSaveLoader saveLoader, Settings settings) {
          _regionManager = regionManager;
          _eventAggregator = eventAggregator;
          _saveLoader = saveLoader;
+         _settings = settings;
 
          _eventAggregator.GetEvent<VkAuthorizationEvents.AcquiredTheToken>().Subscribe((accessToken) => {
             _regionManager.RequestNavigate(RegionNames.MainRegion, ViewNames.AvailableWalls);
@@ -61,6 +64,9 @@ namespace vk.ViewModels {
       private void onBackRequested() {
          _regionManager.RequestNavigate(RegionNames.MainRegion, ViewNames.AvailableWalls);
          _eventAggregator.GetEvent<ShellEvents.WallSelectedEvent>().Publish(false);
+         _eventAggregator.GetEvent<UploaderEvents.Configure>().Publish(new UploaderViewModelConfiguration {
+            IsEnabled = false
+         });
       }
 
       private void onWallItemClicked(WallItem wallItem) {
@@ -68,8 +74,16 @@ namespace vk.ViewModels {
             //IsBusy = true;
             //await Wall.PullWithScheduleHightlightAsync(wallItem.WallHolder, CurrentPostTypeFilter.GetFilter(),
             //      CurrentSchedule);
-            _regionManager.RequestNavigate(RegionNames.MainRegion, ViewNames.Content);
+            _regionManager.RequestNavigate(RegionNames.MainRegion, ViewNames.Content, result => {
+               _eventAggregator.GetEvent<UploaderEvents.Configure>().Publish(new UploaderViewModelConfiguration() {
+                  WallId = wallItem.WallHolder.ID,
+                  IsEnabled = true,
+                  DateOverride = -1
+               });
+            });
+
             _eventAggregator.GetEvent<ShellEvents.WallSelectedEvent>().Publish(true);
+
          }
          catch (VkException ex) {
             MessageBox.Show(ex.Message, "Error occured", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -88,14 +102,13 @@ namespace vk.ViewModels {
          }
 
          var loadedSettings = await _saveLoader.TryLoadAsync<Settings>("Settings");
-         var currentSettings = App.Container.GetInstance<Settings>();
 
          if (loadedSettings.Successful) {
-            currentSettings.ApplySettings(loadedSettings.Result);
+            _settings.ApplySettings(loadedSettings.Result);
          }
          else {
             //defaults
-            currentSettings.ApplySettings(new Settings());
+            _settings.ApplySettings(new Settings());
          }
 
          //SetUpAvatar(DEFAULT_AVATAR);
@@ -109,9 +122,14 @@ namespace vk.ViewModels {
       }
 
       public void OnClosing() {
-         var some = App.Container.GetInstance<Settings>();
          _saveLoader.Save("MainVM", new MainVMSaveInfo());
-         _saveLoader.Save("Settings", some);
+         _saveLoader.Save("Settings", _settings);
+      }
+   }
+
+   [Serializable]
+   public class MainVMSaveInfo : CommonSaveData {
+      public MainVMSaveInfo() {
       }
    }
 }

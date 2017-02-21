@@ -27,6 +27,88 @@
         <Label Content="Hello there! ^-^ I'ma postpone wall content view!"></Label>
         <Label Content="Ow! Looks like i got a payload from master o3o. Here it is:"></Label>
         <Label Content="{Binding Message, UpdateSourceTrigger=PropertyChanged}"></Label>
+
+        <Border Height="35" Style="{StaticResource VkBorder}" Margin="5,10,0,0">
+            <StackPanel Orientation="Horizontal" Height="25" Margin="5,0,0,0">
+                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Posts" IsChecked="True"/>
+                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Reposts" IsChecked="True"/>
+                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Missing" IsChecked="True"/>
+            </StackPanel>
+        </Border>
+
+        <Border Height="35" Style="{StaticResource VkBorder}" Margin="5,10,0,0">
+            <StackPanel Orientation="Horizontal" Height="25" Margin="5,0,0,0">
+                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Posts" IsChecked="True"/>
+                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Reposts" IsChecked="True"/>
+                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Missing" IsChecked="True"/>
+            </StackPanel>
+        </Border>
+
+        <Border Height="35" Style="{StaticResource VkBorder}" Margin="5,10,0,0">
+            <StackPanel Orientation="Horizontal" Height="25" Margin="5,0,0,0">
+                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Posts" IsChecked="True"/>
+                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Reposts" IsChecked="True"/>
+                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Missing" IsChecked="True"/>
+            </StackPanel>
+        </Border>
+
+        <Border Height="35" Style="{StaticResource VkBorder}" Margin="5,10,0,0">
+            <StackPanel Orientation="Horizontal" Height="25" Margin="5,0,0,0">
+                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Posts" IsChecked="True"/>
+                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Reposts" IsChecked="True"/>
+                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Missing" IsChecked="True"/>
+            </StackPanel>
+        </Border>
+
+        <Border Height="35" Style="{StaticResource VkBorder}" Margin="5,10,0,0">
+            <StackPanel Orientation="Horizontal" Height="25" Margin="5,0,0,0">
+                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Posts" IsChecked="True"/>
+                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Reposts" IsChecked="True"/>
+                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Missing" IsChecked="True"/>
+            </StackPanel>
+        </Border>
+        <Border Height="35" Style="{StaticResource VkBorder}" Margin="5,10,0,0">
+            <StackPanel Orientation="Horizontal" Height="25" Margin="5,0,0,0">
+                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Posts" IsChecked="True"/>
+                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Reposts" IsChecked="True"/>
+                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Missing" IsChecked="True"/>
+            </StackPanel>
+        </Border>
+        <Border Height="35" Style="{StaticResource VkBorder}" Margin="5,10,0,0">
+            <StackPanel Orientation="Horizontal" Height="25" Margin="5,0,0,0">
+                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Posts" IsChecked="True"/>
+                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Reposts" IsChecked="True"/>
+                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Missing" IsChecked="True"/>
+            </StackPanel>
+        </Border>
+        <Border Height="35" Style="{StaticResource VkBorder}" Margin="5,10,0,0">
+            <StackPanel Orientation="Horizontal" Height="25" Margin="5,0,0,0">
+                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Posts" IsChecked="True"/>
+                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Reposts" IsChecked="True"/>
+                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Missing" IsChecked="True"/>
+            </StackPanel>
+        </Border>
+        <Border Height="35" Style="{StaticResource VkBorder}" Margin="5,10,0,0">
+            <StackPanel Orientation="Horizontal" Height="25" Margin="5,0,0,0">
+                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Posts" IsChecked="True"/>
+                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Reposts" IsChecked="True"/>
+                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Missing" IsChecked="True"/>
+            </StackPanel>
+        </Border>
+        <Border Height="35" Style="{StaticResource VkBorder}" Margin="5,10,0,0">
+            <StackPanel Orientation="Horizontal" Height="25" Margin="5,0,0,0">
+                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Posts" IsChecked="True"/>
+                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Reposts" IsChecked="True"/>
+                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Missing" IsChecked="True"/>
+            </StackPanel>
+        </Border>
+        <Border Height="35" Style="{StaticResource VkBorder}" Margin="5,10,0,0">
+            <StackPanel Orientation="Horizontal" Height="25" Margin="5,0,0,0">
+                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Posts" IsChecked="True"/>
+                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Reposts" IsChecked="True"/>
+                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Missing" IsChecked="True"/>
+            </StackPanel>
+        </Border>
     </StackPanel>
     <!--<ScrollViewer VerticalScrollBarVisibility="Auto" Margin="5" 
                           Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityNegativeConverter}, UpdateSourceTrigger=PropertyChanged}">

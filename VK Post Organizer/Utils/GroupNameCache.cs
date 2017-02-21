@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Concurrent;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Practices.Unity;
 using vk.Models.VkApi;
 
 namespace vk.Utils {
@@ -14,12 +14,11 @@ namespace vk.Utils {
       }
 
       public static async Task<string> GetGroupNameAsync(int groupId) {
-         Debug.WriteLine($"GET BY ID AT {DateTime.Now.Millisecond}");
          if (_groupNamesById.ContainsKey(groupId)) {
             return _groupNamesById[groupId];
          }
 
-         var groupsGetById = App.Container.GetInstance<GroupsGetById>();
+         var groupsGetById = App.Container.Resolve<GroupsGetById>();
 
          var response = await groupsGetById.GetAsync(Math.Abs(groupId));
          var group = response.Response.FirstOrDefault();

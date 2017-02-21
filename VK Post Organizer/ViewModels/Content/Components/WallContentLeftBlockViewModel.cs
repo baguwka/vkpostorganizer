@@ -12,6 +12,7 @@ using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
+using vk.Events;
 using vk.Infrastructure;
 using vk.Models;
 using vk.Views;
@@ -28,6 +29,7 @@ namespace vk.ViewModels {
       public ICommand ShowHistoryCommand { get; private set; }
 
       public ICommand CancelCommand { get; private set; }
+      public ICommand UploadRequest { get; private set; }
 
 
       private CancellationTokenSource cts;
@@ -55,11 +57,13 @@ namespace vk.ViewModels {
          CancelCommand = new DelegateCommand(() => {
             cts.Cancel();
          });
+
+         UploadRequest = new DelegateCommand(() => {
+            _eventAggregator.GetEvent<UploaderEvents.SetVisibility>().Publish(true);
+         });
       }
 
       private async void somemethod(Uri uri) {
-         cts = new CancellationTokenSource();
-
          var progress = new Progress<int>();
          progress.ProgressChanged += onProgressChanged;
 
@@ -69,27 +73,23 @@ namespace vk.ViewModels {
             if (!cts.IsCancellationRequested) {
                MessageBox.Show(downloadResult.ErrorMessage, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+            ProgressString = string.Empty;
             return;
          }
 
-         var content = new MultipartFormDataContent();
-         var file = new ByteArrayContent(downloadResult.Photo);
-         file.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data") {
-            Name = "file",
-            FileName = "file.jpg"
-         };
-         content.Add(file);
-
-         var result = await _uploader.TryUploadPhotoToWallAsync(content, -127092063, progress, cts.Token);
+         ProgressString = "Uploading...";
+         var result = await _uploader.TryUploadPhotoToWallAsync(downloadResult.Photo, -127092063, cts.Token);
          if (result.Successful) {
-            ResultUrl = result.Result?.GetLargest();
+            ResultUrl = result.Photo?.GetLargest();
          }
          else {
             if (!cts.IsCancellationRequested) {
                MessageBox.Show(result.ErrorMessage, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+            ProgressString = string.Empty;
             return;
          }
+         ProgressString = string.Empty;
       }
 
       private string _progressString;

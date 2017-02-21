@@ -31,21 +31,21 @@ namespace vk.Models.VkApi.Entities {
    }
 
    public static class AttachmentExtensions {
-      public static ImageItem ObtainPhotoUrl(this Attachment attachment, ImageSize imageSize) {
+      public static ImageItem ObtainPhotoUrl(this Attachment attachment, ImageSize imageSize, IImageUrlObtainer obtainer) {
          if (attachment.Type != "photo") {
             return null;
          }
 
-         var obtainer = App.Container.GetInstance<PhotoUrlObtainer>();
+         //var obtainer = App.Container.GetInstance<PhotoUrlObtainer>();
          return obtainer.Obtain(attachment, imageSize);
       }
 
-      public static ImageItem ObtainDocumentPreview(this Attachment attachment, ImageSize imageSize) {
+      public static ImageItem ObtainDocumentPreview(this Attachment attachment, ImageSize imageSize, IImageUrlObtainer obtainer) {
          if (attachment.Type != "doc") {
             return null;
          }
 
-         var obtainer = App.Container.GetInstance<DocumentPreviewUrlObtainer>();
+         //var obtainer = App.Container.GetInstance<DocumentPreviewUrlObtainer>();
          return obtainer.Obtain(attachment, imageSize);
       }
    }
