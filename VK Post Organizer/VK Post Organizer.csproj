@@ -208,24 +208,21 @@
     <Compile Include="Infrastructure\ViewExportAttribute.cs" />
     <Compile Include="Models\Content\IContentPopulator.cs" />
     <Compile Include="Models\Content\PostponeContentPopulator.cs" />
-    <Compile Include="Models\Extensions\WebClientExtensions.cs" />
     <Compile Include="Models\HttpClientHandlerFactory.cs" />
     <Compile Include="Models\VkApi\Interfaces\IPhotosGetWallUploadSever.cs" />
     <Compile Include="Models\VkApi\Interfaces\IPhotosSaveWallPhoto.cs" />
     <Compile Include="Models\VkApi\Interfaces\IGroupsGet.cs" />
     <Compile Include="Models\VkApi\Interfaces\IUsersGet.cs" />
     <Compile Include="Models\VkApi\VkApiProvider.cs" />
-    <Compile Include="Models\VkAuthorization.cs" />
+    <Compile Include="Models\VkApi\VkAuthorization.cs" />
     <Compile Include="Models\AppDataFolderProvider.cs" />
     <Compile Include="Models\Configuration\ProxySettings.cs" />
     <Compile Include="Models\Configuration\UploadSettings.cs" />
     <Compile Include="Models\Configuration\UrlSettings.cs" />
     <Compile Include="Models\Configuration\HistorySettings.cs" />
-    <Compile Include="Models\DefaultWebClient.cs" />
     <Compile Include="Models\Files\ExtensionChecker.cs" />
     <Compile Include="Models\Files\FileFilter.cs" />
     <Compile Include="Models\Files\GifExtensionChecker.cs" />
-    <Compile Include="Models\HttpWebClient.cs" />
     <Compile Include="Models\Logger\IPublishLogger.cs" />
     <Compile Include="Models\Logger\JsonServerPublishLogger.cs" />
     <Compile Include="Models\Logger\NoPublishLogger.cs" />
@@ -297,13 +294,11 @@
     <Compile Include="Models\SmartCollection.cs" />
     <Compile Include="Models\Schedule.cs" />
     <Compile Include="Models\VkApi\Concrete\AccessToken.cs" />
-    <Compile Include="Models\WebClientWithProxy.cs" />
     <Compile Include="Models\VkApi\Entities\Attachment.cs" />
     <Compile Include="Models\VkApi\Entities\Group.cs" />
     <Compile Include="Models\VkApi\Entities\Post.cs" />
     <Compile Include="Models\VkApi\Entities\User.cs" />
     <Compile Include="Models\VkApi\Concrete\GroupsGet.cs" />
-    <Compile Include="Models\IWebClient.cs" />
     <Compile Include="Models\VkApi\Entities\Photo.cs" />
     <Compile Include="Models\VkApi\VkApi.cs" />
     <Compile Include="Models\VkApi\Concrete\UsersGet.cs" />
@@ -464,7 +459,9 @@
   <ItemGroup>
     <Resource Include="Resources\default_avatar.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Models\Extensions\" />
+  </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\16x16 icon.ico" />
   </ItemGroup>

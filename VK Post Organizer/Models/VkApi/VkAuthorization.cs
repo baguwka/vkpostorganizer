@@ -3,9 +3,8 @@ using System.Web;
 using System.Windows;
 using JetBrains.Annotations;
 using Prism.Mvvm;
-using vk.Models.VkApi;
 
-namespace vk.Models {
+namespace vk.Models.VkApi {
    public class AuthorizationResponse {
       public bool Successful { get; set; }
       public string TokenResponse { get; set; }
@@ -53,16 +52,14 @@ namespace vk.Models {
       }
 
       public static Uri GetLogoutUri() {
-          //_webClient.DownloadStringAsync("http://api.vk.com/oauth/logout");
          var uriBuilder = new UriBuilder("https://oauth.vk.com/oauth/logout");
          var queryBuilder = HttpUtility.ParseQueryString(string.Empty);
-         //queryBuilder["response_type"] = "token";
          queryBuilder["redirect_uri"] = "oauth.vk.com/blank.html";
 
          queryBuilder["client_id"] = CLIENT_ID;
          queryBuilder["scope"] = SCOPES;
          queryBuilder["display"] = "popup";
-         queryBuilder["v"] = VkApi.VkApi.VERSION;
+         queryBuilder["v"] = Models.VkApi.VkApi.VERSION;
 
          uriBuilder.Query = queryBuilder.ToString();
          return uriBuilder.Uri;
@@ -81,7 +78,7 @@ namespace vk.Models {
          queryBuilder["client_id"] = CLIENT_ID;
          queryBuilder["scope"] = SCOPES;
          queryBuilder["display"] = "popup";
-         queryBuilder["v"] = VkApi.VkApi.VERSION;
+         queryBuilder["v"] = Models.VkApi.VkApi.VERSION;
 
          uriBuilder.Query = queryBuilder.ToString();
          return uriBuilder.Uri;

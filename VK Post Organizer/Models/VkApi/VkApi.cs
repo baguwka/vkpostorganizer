@@ -63,7 +63,7 @@ namespace vk.Models.VkApi {
 
          if (response.Substring(2, 5) == "error") {
             var error = deserializeError(response);
-            throw new VkException($"Error code: {error.ErrorCode}\n{error.ErrorMessage}", error.ErrorCode);
+            throw new VkException($"Код ошибки: {error.ErrorCode}\n{error.ErrorMessage}", error.ErrorCode);
          }
       }
 
@@ -79,7 +79,7 @@ namespace vk.Models.VkApi {
                await Task.Delay(timeout).ConfigureAwait(false);
             }
 
-            await executeMethodAsync(method, query).ConfigureAwait(false);
+            return await executeMethodAsync(method, query).ConfigureAwait(false);
          }
 
          return string.Empty;
