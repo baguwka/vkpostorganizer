@@ -21,7 +21,7 @@
         <Button Margin="5,0,5,0" Height="25" Grid.Column="1" Content="Refresh" Style="{StaticResource VkCommon}" Command="{Binding RefreshCommand}"
                         Visibility="{Binding IsAuthorized, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
-        <Button Margin="5,0,5,0" Height="25"  Content="Settings" Style="{StaticResource VkBlue}" Command="{Binding SettingsCommand}"
+        <Button Margin="5,0,5,0" Height="25"  Content="Settings" Style="{StaticResource VkCommon}" Command="{Binding SettingsCommand}"
                 Grid.Column="3"/>
         
         <Label Grid.Column="4" Content="0.99" HorizontalAlignment="Right" Foreground="DarkGray" Margin="0,0,5,0"></Label>

@@ -13,7 +13,7 @@ namespace vk.Models.VkApi {
       public WallGet WallGet { get; private set; }
       public WallPost WallPost { get; private set; }
 
-      public VkApiProvider(AccessToken token, VkApiBase api) {
+      public VkApiProvider(AccessToken token, VkApi api) {
          Token = token;
          GroupsGet = new GroupsGet(api);
          GroupsGetById = new GroupsGetById(api);

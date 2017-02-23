@@ -20,7 +20,7 @@ namespace vk.Utils {
 
          var groupsGetById = App.Container.Resolve<GroupsGetById>();
 
-         var response = await groupsGetById.GetAsync(Math.Abs(groupId));
+         var response = await groupsGetById.GetAsync(groupId);
          var group = response.Response.FirstOrDefault();
 
          _groupNamesById.TryAdd(groupId, group?.Name);

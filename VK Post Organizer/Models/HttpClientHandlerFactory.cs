@@ -22,7 +22,10 @@ namespace vk.Models {
             };
          }
          else {
-            return new HttpClientHandler();
+            return new HttpClientHandler {
+               Proxy = null,
+               UseProxy = false
+            };
          }
       }
    }

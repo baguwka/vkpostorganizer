@@ -305,7 +305,7 @@
     <Compile Include="Models\VkApi\Concrete\GroupsGet.cs" />
     <Compile Include="Models\IWebClient.cs" />
     <Compile Include="Models\VkApi\Entities\Photo.cs" />
-    <Compile Include="Models\VkApi\VkApiBase.cs" />
+    <Compile Include="Models\VkApi\VkApi.cs" />
     <Compile Include="Models\VkApi\Concrete\UsersGet.cs" />
     <Compile Include="Models\VkApi\Concrete\WallGet.cs" />
     <Compile Include="ViewModels\IViewModel.cs" />

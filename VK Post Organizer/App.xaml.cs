@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Threading;
 using Microsoft.Practices.Unity;
 using Prism.Mvvm;
+using vk.Models;
 
 namespace vk {
    public partial class App : Application {
@@ -24,8 +25,8 @@ namespace vk {
 
          ViewModelLocationProvider.SetDefaultViewModelFactory(type => bs.Container.Resolve(type));
          bs.Run();
-
          Container = bs.Container;
+
       }
 
       //[System.Runtime.InteropServices.DllImport("wininet.dll", CharSet = System.Runtime.InteropServices.CharSet.Auto, SetLastError = true)]

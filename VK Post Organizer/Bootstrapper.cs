@@ -20,6 +20,11 @@ namespace vk {
       protected override void InitializeShell() {
          var regionManager = Container.Resolve<IRegionManager>();
 
+         var settings = Container.Resolve<Settings>();
+         var saveLoader = Container.Resolve<VkPostponeSaveLoader>();
+         var loadedSettings = saveLoader.TryLoad<Settings>("Settings");
+         settings.ApplySettings(loadedSettings.Successful ? loadedSettings.Result : new Settings());
+
          regionManager.RegisterViewWithRegion(RegionNames.MainRegion, typeof(StartPageView));
          regionManager.RegisterViewWithRegion(RegionNames.BottomRegion, typeof(MainBottomView));
          regionManager.RegisterViewWithRegion(RegionNames.AuthRegion, typeof(AuthBarView));
@@ -43,10 +48,19 @@ namespace vk {
          Container.RegisterTypeForNavigation<WallActualContentView>(ViewNames.WallActualContent);
          Container.RegisterTypeForNavigation<HistoryContentView>(ViewNames.HistoryContent);
 
-         Container.RegisterType<IWebClient, WebClientWithProxy>();
+         Container.RegisterType<Settings>(Lifetime.Singleton);
+         Container.RegisterType<ProxySettings>(new InjectionFactory(container => container.Resolve<Settings>().Proxy));
+         Container.RegisterType<UploadSettings>(new InjectionFactory(container => container.Resolve<Settings>().Upload));
+
+         Container.RegisterType<HttpClientHandlerFactory>(Lifetime.Singleton);
+         Container.RegisterType<HttpMessageHandler>(new InjectionFactory(container =>
+            container.Resolve<HttpClientHandlerFactory>().BuildHttpClientHandlerWithProxyIfEnabled()));
+         Container.RegisterType<HttpClientHandler>(new InjectionFactory(container =>
+            container.Resolve<HttpClientHandlerFactory>().BuildHttpClientHandlerWithProxyIfEnabled()));
+
          Container.RegisterType<AccessToken>(Lifetime.Singleton);
 
-         Container.RegisterType<VkApiBase>(Lifetime.Singleton);
+         Container.RegisterType<VkApi>(Lifetime.Singleton);
          Container.RegisterType<VkApiProvider>(Lifetime.Singleton);
 
          Container.RegisterType<GroupsGet>(new InjectionFactory(container => container.Resolve<VkApiProvider>().GroupsGet));
@@ -58,10 +72,6 @@ namespace vk {
          Container.RegisterType<WallGet>(new InjectionFactory(container => container.Resolve<VkApiProvider>().WallGet));
          Container.RegisterType<WallPost>(new InjectionFactory(container => container.Resolve<VkApiProvider>().WallPost));
 
-         Container.RegisterType<Settings>(Lifetime.Singleton);
-         Container.RegisterType<ProxySettings>(new InjectionFactory(container => container.Resolve<Settings>().Proxy));
-         Container.RegisterType<UploadSettings>(new InjectionFactory(container => container.Resolve<Settings>().Upload));
-
          Container.RegisterType<ISerializer, SaveLoadJsonSerializer>();
          Container.RegisterType<IDataProvider, AppDataFolderProvider>();
 
@@ -69,10 +79,6 @@ namespace vk {
          Container.RegisterType<IGroupsGet, GroupsGet>();
          Container.RegisterType<IPhotosGetWallUploadSever, PhotosGetWallUploadSever>();
          Container.RegisterType<IPhotosSaveWallPhoto, PhotosSaveWallPhoto>();
-
-         Container.RegisterType<HttpClientHandlerFactory>(Lifetime.Singleton);
-         Container.RegisterType<HttpMessageHandler>(
-            new InjectionFactory(container => container.Resolve<HttpClientHandlerFactory>().BuildHttpClientHandlerWithProxyIfEnabled()));
 
          Container.RegisterType<VkPostponeSaveLoader>(Lifetime.Singleton);
 

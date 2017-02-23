@@ -96,20 +96,25 @@ namespace vk.ViewModels {
       public async void OnLoad() {
          //IsBusy = true;
 
+         //todo get rid of silly workaround to preinitialize views
+         _regionManager.RequestNavigate(RegionNames.MainRegion, ViewNames.Content, result => {
+            _regionManager.RequestNavigate(RegionNames.MainRegion, ViewNames.AvailableWalls);
+         });
+
          var mainVmData = await _saveLoader.TryLoadAsync<MainVMSaveInfo>("MainVM");
          if (mainVmData.Successful) {
             //TestingGroup = data.TestingGroup;
          }
 
-         var loadedSettings = await _saveLoader.TryLoadAsync<Settings>("Settings");
+         //var loadedSettings = await _saveLoader.TryLoadAsync<Settings>("Settings");
 
-         if (loadedSettings.Successful) {
-            _settings.ApplySettings(loadedSettings.Result);
-         }
-         else {
-            //defaults
-            _settings.ApplySettings(new Settings());
-         }
+         //if (loadedSettings.Successful) {
+         //   _settings.ApplySettings(loadedSettings.Result);
+         //}
+         //else {
+         //   //defaults
+         //   _settings.ApplySettings(new Settings());
+         //}
 
          //SetUpAvatar(DEFAULT_AVATAR);
 

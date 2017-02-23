@@ -33,7 +33,7 @@ namespace vk.ViewModels {
       private readonly IEventAggregator _eventAggregator;
       private readonly VkUploader _uploader;
       private readonly UploadSettings _uploadSettings;
-      private readonly WallPost _wallPostMethod;
+      private readonly VkApiProvider _vkApi;
       private readonly WallContainer _wallContainer;
       private ObservableCollection<AttachmentItem> _attachments;
 
@@ -136,16 +136,23 @@ namespace vk.ViewModels {
       public ICommand MoveNextCommand { get; private set; }
 
 
-      public UploaderViewModel(IEventAggregator eventAggregator, VkUploader uploader, UploadSettings uploadSettings, WallPost wallPostMethod, WallContainer wallContainer) {
+      public UploaderViewModel(IEventAggregator eventAggregator, VkUploader uploader, UploadSettings uploadSettings, VkApiProvider vkApi, WallContainer wallContainer) {
          _eventAggregator = eventAggregator;
          _uploader = uploader;
          _uploadSettings = uploadSettings;
-         _wallPostMethod = wallPostMethod;
+         _vkApi = vkApi;
          _wallContainer = wallContainer;
 
-         _wallContainer.Items.CollectionChanged += (sender, args) => {
+         _wallContainer.PullInvoked += (sender, args) => {
+            IsBusy = true;
+            ProgressString = "Pull...";
+         };
+
+         _wallContainer.PullCompleted += (sender, args) => {
             var missing = _wallContainer.GetMissingPostCount();
             InfoPanel = $"{WallContainer.MAX_POSTPONED - missing}/{WallContainer.MAX_POSTPONED}";
+            IsBusy = false;
+            ProgressString = "";
          };
 
          _shrinkAfterPublish = _uploadSettings.CloseUploadWindowAfterPublish;
@@ -182,7 +189,16 @@ namespace vk.ViewModels {
          MoveNextCommand = new DelegateCommand(moveToNextMissing);
 
          _eventAggregator.GetEvent<MainBottomEvents.Refresh>().Subscribe(async () => {
-            await _wallContainer.PullWithScheduleHightlightAsync(new MissingPostFilter(), new Schedule());
+            if (IsBusy || !IsEnabled) return;
+            IsBusy = true;
+            ProgressString = "Pull...";
+            try {
+               await _wallContainer.PullWithScheduleHightlightAsync(new MissingPostFilter(), new Schedule());
+            }
+            finally {
+               IsBusy = false;
+               ProgressString = "";
+            }
          });
 
          _eventAggregator.GetEvent<UploaderEvents.SetVisibility>().Subscribe(onSetVisibility);
@@ -208,7 +224,8 @@ namespace vk.ViewModels {
          }
 
          _wallContainer.WallHolder = new WallHolder(config.WallId);
-         WallName = config.WallId.ToString();
+         var thisGroup = await _vkApi.GroupsGetById.GetAsync(config.WallId);
+         WallName = thisGroup.Response.FirstOrDefault()?.Name;
 
          await _wallContainer.PullWithScheduleHightlightAsync(new MissingPostFilter(), new Schedule());
 
@@ -387,7 +404,7 @@ namespace vk.ViewModels {
       private async Task publishExecute() {
          IsBusy = true;
          try {
-            await _wallPostMethod.PostAsync(-_wallContainer.WallHolder.ID, Message, false, true, DateUnix,
+            await _vkApi.WallPost.PostAsync(-_wallContainer.WallHolder.ID, Message, false, true, DateUnix,
                Attachments.Take(10).Select(item => item.Attachment));
          }
          catch (VkException ex) {

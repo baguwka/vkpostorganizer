@@ -19,6 +19,8 @@ namespace vk.Models {
       private readonly WallGet _wallGet;
       public const int MAX_POSTPONED = 150;
       public const int RESERVE = 100;
+      public event EventHandler PullInvoked;
+      public event EventHandler PullCompleted;
 
       private IWallHolder _wallHolder;
       private ObservableCollection<PostControl> _items;
@@ -93,7 +95,13 @@ namespace vk.Models {
             return;
          }
 
-         await PullWithScheduleHightlightAsync(WallHolder, filter, schedule);
+         OnPullInvoked();
+         try {
+            await PullWithScheduleHightlightAsync(WallHolder, filter, schedule);
+         }
+         finally {
+            OnPulled();
+         }
       }
 
       public async Task PullWithScheduleHightlightAsync([NotNull] IWallHolder other, [NotNull] PostFilter filter, [NotNull] Schedule schedule) {
@@ -242,6 +250,14 @@ namespace vk.Models {
 
       protected virtual void OnUploadRequested(PostControl e) {
          UploadRequested?.Invoke(this, e);
+      }
+
+      protected virtual void OnPulled() {
+         PullCompleted?.Invoke(this, EventArgs.Empty);
+      }
+
+      protected virtual void OnPullInvoked() {
+         PullInvoked?.Invoke(this, EventArgs.Empty);
       }
    }
 }

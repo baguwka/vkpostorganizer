@@ -9,15 +9,15 @@ namespace vk.Models.VkApi {
 
    [UsedImplicitly]
    public class UsersGet : IUsersGet {
-      private readonly VkApiBase _api;
+      private readonly VkApi _api;
 
-      public UsersGet(VkApiBase api) {
+      public UsersGet(VkApi api) {
          this._api = api;
       }
 
       public async Task<UsersGetResponse> GetAsync() {
          var query = buildAQuery();
-         var response = await _api.ExecuteMethodAsync("users.get", query);
+         var response = await _api.ExecuteMethodAsync("users.get", query).ConfigureAwait(false);
          return JsonConvert.DeserializeObject<UsersGetResponse>(response);
       }
 

@@ -43,7 +43,7 @@ namespace UnitTests.VkApi {
          Assert.That(query["redirect_uri"], Is.EqualTo("oauth.vk.com/blank.html"));
          Assert.That(query["client_id"], Is.EqualTo(VkAuthorization.CLIENT_ID));
          Assert.That(query["scope"], Is.EqualTo(VkAuthorization.SCOPES));
-         Assert.That(query["v"], Is.EqualTo(VkApiBase.VERSION));
+         Assert.That(query["v"], Is.EqualTo(vk.Models.VkApi.VkApi.VERSION));
       }
 
 

@@ -6,14 +6,14 @@ using Newtonsoft.Json;
 namespace vk.Models.VkApi {
    [UsedImplicitly]
    public class StatsTrackVisitor {
-      private readonly VkApiBase _api;
+      private readonly VkApi _api;
 
-      public StatsTrackVisitor(VkApiBase api) {
+      public StatsTrackVisitor(VkApi api) {
          this._api = api;
       }
 
       public async Task<int> TrackAsync() {
-         var response = await _api.ExecuteMethodAsync("stats.trackVisitor", VkParameters.No());
+         var response = await _api.ExecuteMethodAsync("stats.trackVisitor", VkParameters.No()).ConfigureAwait(false);
          return JsonConvert.DeserializeObject<StatsTrackVisitorResponse>(response).Response;
       }
    }

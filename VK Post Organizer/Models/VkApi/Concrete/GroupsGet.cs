@@ -8,9 +8,9 @@ using vk.Models.VkApi.Entities;
 namespace vk.Models.VkApi {
    [UsedImplicitly]
    public class GroupsGet: IGroupsGet {
-      private readonly VkApiBase _api;
+      private readonly VkApi _api;
 
-      public GroupsGet(VkApiBase api) {
+      public GroupsGet(VkApi api) {
          _api = api;
       }
 
@@ -18,7 +18,7 @@ namespace vk.Models.VkApi {
          var query = buildAQuery();
          query.AppendParameters(parameters);
 
-         var response = await _api.ExecuteMethodAsync("groups.get", query);
+         var response = await _api.ExecuteMethodAsync("groups.get", query).ConfigureAwait(false);
          return JsonConvert.DeserializeObject<GroupsGetResponse>(response);
       }
 

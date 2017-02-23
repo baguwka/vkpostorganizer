@@ -30,9 +30,6 @@
             
             <ContentControl Grid.Column="0" Margin="5,10,5,10" Height="300" VerticalAlignment="Bottom"
                             prism:RegionManager.RegionName="{x:Static inf:RegionNames.ContentOverlayRegion}"/>
-            <!--<Border Grid.Column="0" Style="{StaticResource VkBorder}" Margin="5,10,5,10" Height="300" VerticalAlignment="Bottom"
-                    Visibility="{Binding IsOverlayVisible, Converter={StaticResource BoolToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}">
-            </Border>-->
 
         </Grid>
     </Grid>

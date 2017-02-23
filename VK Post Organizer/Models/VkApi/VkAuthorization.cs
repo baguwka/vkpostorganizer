@@ -62,7 +62,7 @@ namespace vk.Models {
          queryBuilder["client_id"] = CLIENT_ID;
          queryBuilder["scope"] = SCOPES;
          queryBuilder["display"] = "popup";
-         queryBuilder["v"] = VkApiBase.VERSION;
+         queryBuilder["v"] = VkApi.VkApi.VERSION;
 
          uriBuilder.Query = queryBuilder.ToString();
          return uriBuilder.Uri;
@@ -81,7 +81,7 @@ namespace vk.Models {
          queryBuilder["client_id"] = CLIENT_ID;
          queryBuilder["scope"] = SCOPES;
          queryBuilder["display"] = "popup";
-         queryBuilder["v"] = VkApiBase.VERSION;
+         queryBuilder["v"] = VkApi.VkApi.VERSION;
 
          uriBuilder.Query = queryBuilder.ToString();
          return uriBuilder.Uri;

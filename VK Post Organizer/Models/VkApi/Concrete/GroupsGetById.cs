@@ -7,19 +7,20 @@ using Newtonsoft.Json;
 namespace vk.Models.VkApi {
    [UsedImplicitly]
    public class GroupsGetById {
-      private readonly VkApiBase _api;
+      private readonly VkApi _api;
 
-      public GroupsGetById(VkApiBase api) {
+      public GroupsGetById(VkApi api) {
          _api = api;
       }
 
       public async Task<GroupsGetByIdResponse> GetAsync(int id, string fields = "") {
          var query = buildAQuery(id, fields);
-         var response = await _api.ExecuteMethodAsync("groups.getById", query);
+         var response = await _api.ExecuteMethodAsync("groups.getById", query).ConfigureAwait(false);
          return JsonConvert.DeserializeObject<GroupsGetByIdResponse>(response);
       }
 
       private static VkParameters buildAQuery(int id, string fields) {
+         id = Math.Abs(id);
          var query = VkParameters.New()
             .AddParameter("group_id", id)
             .AddParameter("fields", fields);

@@ -8,19 +8,19 @@ using vk.Models.VkApi.Entities;
 namespace vk.Models.VkApi {
    [UsedImplicitly]
    public class WallGet {
-      private readonly VkApiBase _api;
+      private readonly VkApi _api;
 
-      public WallGet(VkApiBase api) {
+      public WallGet(VkApi api) {
          this._api = api;
       }
 
       public async Task<WallGetResponse> GetAsync(int id, int count = 100, int offset = 0) {
          var parameters = makeAQuery(id, count, offset);
-         return await GetAsync(parameters);
+         return await GetAsync(parameters).ConfigureAwait(false);
       }
 
       public async Task<WallGetResponse> GetAsync(VkParameters parameters) {
-         var response = await _api.ExecuteMethodAsync("wall.get", parameters);
+         var response = await _api.ExecuteMethodAsync("wall.get", parameters).ConfigureAwait(false);
          return JsonConvert.DeserializeObject<WallGetResponse>(response);
       }
 

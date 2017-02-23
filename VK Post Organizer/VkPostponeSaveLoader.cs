@@ -27,10 +27,10 @@ namespace vk {
       }
 
       private bool onLoadCorrupted(DataCorruptedException exception) {
-         var result = MessageBox.Show("SaveData corrupted and cannot be loaded. " +
-                                      "\nWipe all save data to prevent this error next time? " +
-                                      "(Yes is recomended, but if you can restore it somehow manually, then select No)" +
-                                      $"\n\n\n Details:\n{exception.Message}" +
+         var result = MessageBox.Show("Сохраненная информация на носители повреждена и не может быть загружена." +
+                                      "\nСтереть всю сохраненную информацию что бы предотвратить эту ошибку в будущем?" +
+                                      "(Рекомендуется стереть. Но если вы можете восстановить ее каким либо образом, тогда не нужно)" +
+                                      $"\n\n\n Детали:\n{exception.Message}" +
                                       $"\n\n StackTrace:\n{exception.StackTrace}",
             "Error", MessageBoxButton.YesNo, MessageBoxImage.Error, MessageBoxResult.Yes);
 
@@ -53,10 +53,10 @@ namespace vk {
       }
 
       private bool onSaveCorrupted(DataCorruptedException exception) {
-         var result = MessageBox.Show("SaveData corrupted and cannot be saved. " +
-                                         "\nBlock writing attempt to not to corrupt the save file? " +
-                                         "(Yes is recomended, but if you can restore it somehow manually, then select No)" +
-                                         $"\n\n\n Details:\n{exception.Message}" +
+         var result = MessageBox.Show("Информация для сохранения на носитель повреждена и не может быть записана." +
+                                         "\nЗаблокировать попытку записи что бы не повредить основной файл сохранения?" +
+                                         "(Рекомендуется заблокировать. Но если вы сможете ее почниить позже вручную, тогда не нужно)" +
+                                         $"\n\n\n Детали:\n{exception.Message}" +
                                          $"\n\n StackTrace:\n{exception.StackTrace}",
                "Error", MessageBoxButton.YesNo,
                MessageBoxImage.Error, MessageBoxResult.Yes);
