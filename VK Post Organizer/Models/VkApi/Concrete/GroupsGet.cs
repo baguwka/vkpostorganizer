@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
@@ -14,12 +15,16 @@ namespace vk.Models.VkApi {
          _api = api;
       }
 
-      public async Task<GroupsGetResponse> GetAsync(VkParameters parameters) {
+      public async Task<GroupsGetResponse> GetAsync(VkParameters parameters, CancellationToken ct) {
          var query = buildAQuery();
          query.AppendParameters(parameters);
 
-         var response = await _api.ExecuteMethodAsync("groups.get", query).ConfigureAwait(false);
+         var response = await _api.ExecuteMethodAsync("groups.get", query, ct).ConfigureAwait(false);
          return JsonConvert.DeserializeObject<GroupsGetResponse>(response);
+      }
+
+      public async Task<GroupsGetResponse> GetAsync(VkParameters parameters) {
+         return await GetAsync(parameters, CancellationToken.None).ConfigureAwait(false);
       }
 
       private static VkParameters buildAQuery() {

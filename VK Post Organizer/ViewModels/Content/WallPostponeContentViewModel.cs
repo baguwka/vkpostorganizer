@@ -1,35 +1,69 @@
-﻿using Prism.Events;
-using Prism.Mvvm;
+﻿using System.Windows.Input;
+using JetBrains.Annotations;
+using Prism.Commands;
+using Prism.Events;
 using Prism.Regions;
+using vk.Models;
+using vk.Models.Filter;
 
 namespace vk.ViewModels {
-   public class WallPostponeContentViewModel : BindableBase, INavigationAware {
-      private readonly IEventAggregator _eventAggregator;
+   public class FlagsChangedEvent : PubSubEvent<PostType> { }
 
-      private string _message;
+   [UsedImplicitly]
+   public class WallPostponeContentViewModel : WallContentViewModel {
+      private bool _filterMissingIsChecked;
 
-      public string Message {
-         get { return _message; }
-         set { SetProperty(ref _message, value); }
+      public bool FilterMissingIsChecked {
+         get { return _filterMissingIsChecked; }
+         set { SetProperty(ref _filterMissingIsChecked, value); }
       }
 
-      public WallPostponeContentViewModel(IEventAggregator eventAggregator) {
-         _eventAggregator = eventAggregator;
+      public ICommand MissingFilterCheckedCommand { get; private set; }
+      public ICommand MissingFilterUncheckedCommand { get; private set; }
+
+      public WallPostponeContentViewModel(IEventAggregator eventAggregator, WallContainerController wallContainerController, SharedWallContext sharedWallContext) : base(eventAggregator, wallContainerController, sharedWallContext) {
+         FilterMissingIsChecked = true;
+
+         MissingFilterCheckedCommand = DelegateCommand.FromAsyncHandler(async () => {
+            updateFilter();
+            await filterOutAsync(_wallContainerController.Container.Items).ConfigureAwait(false);
+         }, () => !IsBusy)
+            .ObservesProperty(() => IsBusy);
+
+         MissingFilterUncheckedCommand = DelegateCommand.FromAsyncHandler(async () => {
+            updateFilter();
+            await filterOutAsync(_wallContainerController.Container.Items).ConfigureAwait(false);
+         }, () => !IsBusy)
+            .ObservesProperty(() => IsBusy);
       }
 
-      public void OnNavigatedTo(NavigationContext navigationContext) {
-         var filter = (string)navigationContext.Parameters["filter"];
-         if (!string.IsNullOrEmpty(filter)) {
-            Message = filter;
+      protected override void updateFilter() {
+         if (FilterMissingIsChecked) {
+            CurrentPostFilter.CompositePostType = CurrentPostFilter.CompositePostType | PostType.Missing;
+         }
+         else {
+            CurrentPostFilter.CompositePostType &= ~PostType.Missing;
+         }
+         base.updateFilter();
+
+         _eventAggregator.GetEvent<FlagsChangedEvent>().Publish(CurrentPostFilter.CompositePostType);
+      }
+
+      public override async void OnNavigatedTo(NavigationContext navigationContext) {
+         base.OnNavigatedTo(navigationContext);
+
+         IsBusy = true;
+         try {
+            _wallContainerController.Container.WallHolder = _sharedWallContext.SelectedWallHolder;
+            await _wallContainerController.Container.PullWithScheduleHightlightAsync(new NoPostFilter(), new Schedule());
+         }
+         finally {
+            IsBusy = false;
          }
       }
 
-      public bool IsNavigationTarget(NavigationContext navigationContext) {
-         return true;
-      }
-
-      public void OnNavigatedFrom(NavigationContext navigationContext) {
-         
+      public override void OnNavigatedFrom(NavigationContext navigationContext) {
+         base.OnNavigatedFrom(navigationContext);
       }
    }
 }

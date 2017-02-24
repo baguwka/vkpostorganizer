@@ -12,6 +12,7 @@ namespace vk.ViewModels {
    public class AvailableWallsViewModel : BindableBase, IActiveAware {
       private readonly IEventAggregator _eventAggregator;
       private readonly AvailableWallsFiller _filler;
+      private readonly SharedWallContext _sharedWallContext;
       private WallList _wallList;
 
       public WallList WallList {
@@ -29,9 +30,10 @@ namespace vk.ViewModels {
          set { SetProperty(ref _isAuthorized, value); }
       }
 
-      public AvailableWallsViewModel(IEventAggregator eventAggregator, AvailableWallsFiller filler) {
+      public AvailableWallsViewModel(IEventAggregator eventAggregator, AvailableWallsFiller filler, SharedWallContext sharedWallContext) {
          _eventAggregator = eventAggregator;
          _filler = filler;
+         _sharedWallContext = sharedWallContext;
          WallList = new WallList();
 
          WallList.ItemClicked += onWallItemClicked;
@@ -47,6 +49,7 @@ namespace vk.ViewModels {
       private void onWallItemClicked(object sender, WallItem e) {
          if (!IsAuthorized) return;
 
+         _sharedWallContext.SelectedWallHolder = e.WallHolder;
          _eventAggregator.GetEvent<WallSelectorEvents.WallSelected>().Publish(e);
       }
 

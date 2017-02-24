@@ -1,15 +1,34 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
+using RateLimiter;
 using vk.Models.VkApi.Entities;
 
 namespace vk.Models.VkApi {
+   public class VkApiResponse {
+      public VkApiResponse(string response, DateTimeOffset storedAt) {
+         Response = response;
+         StoredAt = storedAt;
+      }
+
+      public string Response { get; private set; }
+      public DateTimeOffset StoredAt { get; private set; }
+   }
+
+   public class VkCall {
+      public Action<string> Callback { get; set; }
+      public Task<string> Task { get; set; }
+   }
+
    [UsedImplicitly]
    public class VkApi {
       public const string VERSION = "5.62";
@@ -17,43 +36,20 @@ namespace vk.Models.VkApi {
       private readonly HttpClient _httpClient;
       private readonly HttpClientHandler _httpClientHandler;
       private readonly AccessToken _token;
+      private readonly ConcurrentDictionary<string, VkApiResponse> _responseCache;
 
-      private int _failedAttempts;
+      private readonly TimeLimiter _rateLimiter;
+      private int _tooMuchRequestsOccurrences;
       private int _timeoutRetry;
-      private float _requestsPerSecond;
-      private float _minInterval;
 
-      public DateTimeOffset? LastExecuteTime { get; private set; }
-
-      public TimeSpan? LastExecuteTimeSpan {
-         get {
-            if (LastExecuteTime.HasValue) {
-               return DateTimeOffset.Now - LastExecuteTime.Value;
-            }
-            return null;
-         }
-      }
-
-      public float RequestsPerSecond {
-         get { return _requestsPerSecond; }
-         set {
-            if (value < 0) {
-               throw new ArgumentException(@"Value must be positive", $@"RequestsPerSecond");
-            }
-            _requestsPerSecond = value;
-            if (_requestsPerSecond > 0) {
-               _minInterval = (int)(1000 / _requestsPerSecond) + 1;
-            }
-         }
-      }
 
       public VkApi(AccessToken token, HttpClientHandler httpClientHandler) {
          _token = token;
          _httpClientHandler = httpClientHandler;
          _httpClient = new HttpClient(httpClientHandler) {Timeout = TimeSpan.FromSeconds(4)};
+         _responseCache = new ConcurrentDictionary<string, VkApiResponse>();
 
-         RequestsPerSecond = 3;
-         LastExecuteTime = DateTimeOffset.Now;
+         _rateLimiter = TimeLimiter.GetFromMaxCountByInterval(6, TimeSpan.FromSeconds(1));
       }
 
       private void checkForErrors(string response) {
@@ -67,35 +63,42 @@ namespace vk.Models.VkApi {
          }
       }
 
-      public async Task<string> ExecuteMethodAsync(string method, [NotNull] VkParameters query) {
+      public async Task<string> ExecuteMethodAsync(string method, [NotNull] VkParameters query, CancellationToken ct) {
          if (query == null) {
             throw new ArgumentNullException(nameof(query));
          }
 
-         if (RequestsPerSecond > 0 && LastExecuteTime.HasValue) {
-            var span = LastExecuteTimeSpan?.TotalMilliseconds;
-            if (span < _minInterval) {
-               var timeout = (int)_minInterval - (int)span;
-               await Task.Delay(timeout).ConfigureAwait(false);
+         var uri = buildFinalUri(method, query);
+         if (_responseCache.ContainsKey(uri.ToString())) {
+            VkApiResponse response;
+            var result = _responseCache.TryGetValue(uri.ToString(), out response);
+            if (result) {
+               var timeSpan = DateTimeOffset.Now - response.StoredAt;
+               if (timeSpan < TimeSpan.FromSeconds(5)) {
+                  return response.Response;
+               }
+               else {
+                  _responseCache.TryRemove(uri.ToString(), out response);
+               }
             }
-
-            return await executeMethodAsync(method, query).ConfigureAwait(false);
          }
 
-         return string.Empty;
+         return await _rateLimiter.Perform(() => callUriAsync(uri, ct), ct).ConfigureAwait(false);
       }
 
-      private async Task<string> executeMethodAsync(string method, [NotNull] VkParameters query) {
-         var finalUri = buildFinalUri(method, query);
+      private async Task<string> callUriAsync(Uri uri, CancellationToken ct) {
          try {
-            LastExecuteTime = DateTimeOffset.Now;
-            var response = await _httpClient.GetAsync(finalUri).ConfigureAwait(false);
+            var response = await _httpClient.GetAsync(uri, ct).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
 
             var result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             checkForErrors(result);
-            _failedAttempts = 0;
+
+            _responseCache.TryAdd(uri.ToString(), new VkApiResponse(result, DateTimeOffset.Now));
+
+            _tooMuchRequestsOccurrences = 0;
             _timeoutRetry = 0;
+
             return result;
          }
          catch (WebException ex) {
@@ -104,15 +107,17 @@ namespace vk.Models.VkApi {
             }
          }
          catch (VkException ex) {
-            if (_failedAttempts > 3) {
+            if (_tooMuchRequestsOccurrences > 2) {
                throw;
             }
 
-            _failedAttempts++;
+            _tooMuchRequestsOccurrences++;
             //too much requests per second
             if (ex.ErrorCode == 6) {
-               await Task.Delay(TimeSpan.FromSeconds(1f));
-               return await ExecuteMethodAsync(method, query);
+               await Task.Delay(TimeSpan.FromSeconds(1f), ct).ConfigureAwait(false);
+               if (!ct.IsCancellationRequested) {
+                  return await callUriAsync(uri, ct);
+               }
             }
 
             throw;
@@ -128,7 +133,9 @@ namespace vk.Models.VkApi {
             }
 
             _timeoutRetry++;
-            return await ExecuteMethodAsync(method, query).ConfigureAwait(false);
+            if (!ct.IsCancellationRequested) {
+               return await callUriAsync(uri, ct).ConfigureAwait(false);
+            }
          }
          //catch (VkException ex) {
          //   //captcha needed

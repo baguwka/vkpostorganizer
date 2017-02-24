@@ -8,8 +8,8 @@
         xmlns:inf="clr-namespace:vk.Infrastructure"
         mvvm:ViewModelLocator.AutoWireViewModel="True"
         mc:Ignorable="d"
-        MinHeight="600" MinWidth="900"
-        Height="600" Width="900"
+        MinHeight="725" MinWidth="900"
+        Height="725" Width="900"
         Name="ShellWindow"
         Title="Vk.com postpone helper" WindowStartupLocation="CenterScreen"
         Icon="/Resources/32x32.ico"
@@ -32,8 +32,7 @@
         </Border>
         
         <!-- Main region -->
-        <ContentControl Grid.Row="1" mvvm:RegionManager.RegionName="{x:Static inf:RegionNames.MainRegion}" Visibility="{Binding IsWallSelected, 
-            UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityNegativeConverter}}"/>
+        <ContentControl Grid.Row="1" mvvm:RegionManager.RegionName="{x:Static inf:RegionNames.MainRegion}"/>
 
         <!-- Bottom region  -->
         <Border Grid.Row="2" Height="35" Style="{StaticResource VkBorder}" >

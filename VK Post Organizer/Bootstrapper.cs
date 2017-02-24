@@ -9,6 +9,7 @@ using vk.Models;
 using vk.Models.Logger;
 using vk.Models.UrlHelper;
 using vk.Models.VkApi;
+using vk.ViewModels;
 using vk.Views;
 
 namespace vk {
@@ -83,6 +84,8 @@ namespace vk {
          Container.RegisterType<VkPostponeSaveLoader>(Lifetime.Singleton);
 
          Container.RegisterType<IWallHolder, EmptyWallHolder>();
+         Container.RegisterType<SharedWallContext>(Lifetime.Singleton);
+         Container.RegisterType<WallContainerController>(Lifetime.Singleton);
 
          Container.RegisterType<IPublishLogger, JsonServerPublishLogger>();
 

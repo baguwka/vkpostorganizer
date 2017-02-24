@@ -136,6 +136,10 @@
       <HintPath>..\packages\Prism.Wpf.6.2.0\lib\net45\Prism.Wpf.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="RateLimiter, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RateLimiter.1.0.0\lib\net45\RateLimiter.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="SimpleInjector, Version=3.3.2.0, Culture=neutral, PublicKeyToken=984cb50dea722e99, processorArchitecture=MSIL">
       <HintPath>..\packages\SimpleInjector.3.3.2\lib\net45\SimpleInjector.dll</HintPath>
       <Private>True</Private>
@@ -237,6 +241,7 @@
     <Compile Include="Infrastructure\WebBrowserUtility.cs" />
     <Compile Include="Models\Content\WallContentFiller.cs" />
     <Compile Include="Models\VkUploaderFactory.cs" />
+    <Compile Include="Models\WallContainerController.cs" />
     <Compile Include="Models\WinInetHelper.cs" />
     <Compile Include="ProgramInfo.cs" />
     <Compile Include="Infrastructure\RegionNames.cs" />
@@ -250,6 +255,9 @@
     <Compile Include="Models\VkApi\Concrete\GroupsGetById.cs" />
     <Compile Include="Models\VkApi\Concrete\WallPost.cs" />
     <Compile Include="Models\AvailableWallsFiller.cs" />
+    <Compile Include="Models\SharedWallContext.cs" />
+    <Compile Include="ViewModels\Content\WallContentViewModel.cs" />
+    <Compile Include="Models\IPostType.cs" />
     <Compile Include="ViewModels\UploaderViewModel.cs" />
     <Compile Include="Views\MainComponents\UploaderView.xaml.cs">
       <DependentUpon>UploaderView.xaml</DependentUpon>
@@ -291,7 +299,7 @@
     <Compile Include="Models\WallList.cs" />
     <Compile Include="ViewModels\PostControl.cs" />
     <Compile Include="Models\PostType.cs" />
-    <Compile Include="Models\SmartCollection.cs" />
+    <Compile Include="Models\RangeObservableCollection.cs" />
     <Compile Include="Models\Schedule.cs" />
     <Compile Include="Models\VkApi\Concrete\AccessToken.cs" />
     <Compile Include="Models\VkApi\Entities\Attachment.cs" />

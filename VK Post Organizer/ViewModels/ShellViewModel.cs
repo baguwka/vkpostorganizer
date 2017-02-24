@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using Data_Persistence_Provider;
 using JetBrains.Annotations;
@@ -13,7 +12,6 @@ using vk.Infrastructure;
 using vk.Models;
 using vk.Models.VkApi.Entities;
 using vk.Views;
-using static System.Threading.Tasks.Task<string>;
 
 namespace vk.ViewModels {
    [UsedImplicitly]
@@ -124,6 +122,7 @@ namespace vk.ViewModels {
          //IsBusy = false;
 
          //_eventAggregator.GetEvent<FillWallListEvent>().Publish();
+         App.IsInitialized = true;
       }
 
       public void OnClosing() {

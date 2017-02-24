@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
@@ -12,10 +13,15 @@ namespace vk.Models.VkApi {
          this._api = api;
       }
 
-      public async Task<UploadServerInfo> GetAsync(int groupId) {
+      public async Task<UploadServerInfo> GetAsync(int groupId, CancellationToken ct) {
          groupId = Math.Abs(groupId);
-         var response = await _api.ExecuteMethodAsync("photos.getWallUploadServer", VkParameters.New().AddParameter("group_id", groupId)).ConfigureAwait(false);
+         var response = await _api.ExecuteMethodAsync("photos.getWallUploadServer", 
+            VkParameters.New().AddParameter("group_id", groupId), ct).ConfigureAwait(false);
          return JsonConvert.DeserializeObject<PhotosGetWallUploadServerResponse>(response)?.Response;
+      }
+
+      public async Task<UploadServerInfo> GetAsync(int groupId) {
+         return await GetAsync(groupId, CancellationToken.None).ConfigureAwait(false);
       }
    }
 

@@ -8,6 +8,7 @@ using vk.Models;
 namespace vk {
    public partial class App : Application {
       public static IUnityContainer Container { get; private set; }
+      public static bool IsInitialized { get; set; }
 
       protected override void OnStartup(StartupEventArgs e) {
          if (SingleInstance.IsOnlyInstance() == false) {
@@ -24,6 +25,7 @@ namespace vk {
          var bs = new Bootstrapper();
 
          ViewModelLocationProvider.SetDefaultViewModelFactory(type => bs.Container.Resolve(type));
+
          bs.Run();
          Container = bs.Container;
 

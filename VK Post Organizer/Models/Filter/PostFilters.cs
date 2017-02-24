@@ -8,32 +8,47 @@ namespace vk.Models.Filter {
          Instance = new NoPostFilter();
       }
 
-      public override bool Suitable(PostControl postControl) {
+      public override bool Suitable(IPostType postControl) {
          return true;
       }
    }
 
    public class MissingPostFilter : PostFilter {
-      public override bool Suitable(PostControl postControl) {
+      public override bool Suitable(IPostType postControl) {
          return postControl.PostType == PostType.Missing;
       }
    }
 
    public class PostsAndRepostsFilter : PostFilter {
-      public override bool Suitable(PostControl postControl) {
+      public override bool Suitable(IPostType postControl) {
          return postControl.PostType == PostType.Post || postControl.PostType == PostType.Repost;
       }
    }
 
    public class PostsOnlyFilter : PostFilter {
-      public override bool Suitable(PostControl postControl) {
+      public override bool Suitable(IPostType postControl) {
          return postControl.PostType == PostType.Post;
       }
    }
 
    public class RepostsOnlyFilter : PostFilter {
-      public override bool Suitable(PostControl postControl) {
+      public override bool Suitable(IPostType postControl) {
          return postControl.PostType == PostType.Repost;
+      }
+   }
+
+   public class CompositePostFilter : PostFilter {
+      public PostType CompositePostType { get; set; }
+
+      public CompositePostFilter() {
+      }
+
+      public CompositePostFilter(PostType postType) {
+         this.CompositePostType = postType;
+      }
+
+      public override bool Suitable(IPostType postControl) {
+         return CompositePostType.HasFlag(postControl.PostType);
       }
    }
 }

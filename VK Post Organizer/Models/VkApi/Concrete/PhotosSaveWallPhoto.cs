@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
@@ -15,9 +16,9 @@ namespace vk.Models.VkApi {
          this._api = api;
       }
 
-      public async Task<PhotosSaveWallPhotoResponse> SaveAsync(int groupID, string uploadResponse) {
+      public async Task<PhotosSaveWallPhotoResponse> SaveAsync(int groupID, string uploadResponse, CancellationToken ct) {
          var query = buildAQuery(groupID, uploadResponse);
-         var response = await _api.ExecuteMethodAsync("photos.saveWallPhoto", query).ConfigureAwait(false);
+         var response = await _api.ExecuteMethodAsync("photos.saveWallPhoto", query, ct).ConfigureAwait(false);
          return JsonConvert.DeserializeObject<PhotosSaveWallPhotoResponse>(response);
       }
 
@@ -39,6 +40,10 @@ namespace vk.Models.VkApi {
             .AddParameter("photo", jphoto)
             .AddParameter("hash", jhash);
          return query;
+      }
+
+      public Task<PhotosSaveWallPhotoResponse> SaveAsync(int groupID, string uploadResponse) {
+         return SaveAsync(groupID, uploadResponse, CancellationToken.None);
       }
    }
 

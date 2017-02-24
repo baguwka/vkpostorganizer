@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -10,15 +12,14 @@ using Prism.Regions;
 using vk.Infrastructure;
 using vk.Models;
 using vk.Models.VkApi;
-using vk.Models.VkApi.Entities;
 
 namespace vk.ViewModels {
    [UsedImplicitly]
-   public class WallContentLeftBlockViewModel : BindableBase, INavigationAware {
+   public class WallContentLeftBlockViewModel : BindableBase {
       private readonly IEventAggregator _eventAggregator;
       private readonly IRegionManager _regionManager;
-      private readonly VkUploader _uploader;
       private readonly VkApiProvider _vkApi;
+      private readonly WallContainerController _wallContainerController;
       private string _description;
       private string _profilePhoto;
       private string _name;
@@ -51,11 +52,14 @@ namespace vk.ViewModels {
       }
 
       public WallContentLeftBlockViewModel(IEventAggregator eventAggregator, IRegionManager regionManager,
-         VkUploader uploader, VkApiProvider vkApi) {
+         VkApiProvider vkApi, WallContainerController wallContainerController) {
+
          _eventAggregator = eventAggregator;
          _regionManager = regionManager;
-         _uploader = uploader;
          _vkApi = vkApi;
+         _wallContainerController = wallContainerController;
+         _wallContainerController.Container.WallHolderChanged += onWallContainerWallHolderChanged;
+         _wallContainerController.Container.PullCompleted += onWallContainerPullCompleted;
 
          ShowActualWallCommand = new DelegateCommand(() => {
             var parameters = new NavigationParameters {{"filter", "howdy"}};
@@ -63,48 +67,10 @@ namespace vk.ViewModels {
          });
 
          ShowPostponeWallCommand =
-            DelegateCommand.FromAsyncHandler(
-               async () => {
+            new DelegateCommand(
+               () => {
                   _regionManager.RequestNavigate(RegionNames.ContentMainRegion,
                      $"{ViewNames.WallPostponeContent}?filter=sayhello");
-                  try {
-                     var list = new List<string>();
-                     await _vkApi.GroupsGetById.GetAsync(-127092063);
-                     await _vkApi.WallGet.GetAsync(-127092063);
-                     await _vkApi.GroupsGetById.GetAsync(-127092063);
-                     await _vkApi.WallGet.GetAsync(-127092063);
-                     await _vkApi.UsersGet.GetAsync();
-                     await _vkApi.GroupsGetById.GetAsync(-127092063);
-                     await _vkApi.WallGet.GetAsync(-127092063);
-                     await _vkApi.GroupsGetById.GetAsync(-127092063);
-                     await _vkApi.UsersGet.GetAsync();
-                     await _vkApi.WallGet.GetAsync(-127092063);
-                     await _vkApi.GroupsGetById.GetAsync(-127092063);
-                     await _vkApi.WallGet.GetAsync(-127092063);
-                     await _vkApi.GroupsGetById.GetAsync(-127092063);
-                     await _vkApi.WallGet.GetAsync(-127092063);
-                     await _vkApi.UsersGet.GetAsync();
-                     await _vkApi.GroupsGetById.GetAsync(-127092063);
-                     await _vkApi.WallGet.GetAsync(-127092063);
-                     await _vkApi.GroupsGetById.GetAsync(-127092063);
-                     await _vkApi.UsersGet.GetAsync();
-                     await _vkApi.WallGet.GetAsync(-127092063);
-                     await _vkApi.GroupsGetById.GetAsync(-127092063);
-                     await _vkApi.WallGet.GetAsync(-127092063);
-                     await _vkApi.GroupsGetById.GetAsync(-127092063);
-                     await _vkApi.WallGet.GetAsync(-127092063);
-                     await _vkApi.UsersGet.GetAsync();
-                     await _vkApi.GroupsGetById.GetAsync(-127092063);
-                     await _vkApi.WallGet.GetAsync(-127092063);
-                     await _vkApi.GroupsGetById.GetAsync(-127092063);
-                     await _vkApi.UsersGet.GetAsync();
-                     await _vkApi.WallGet.GetAsync(-127092063);
-                     var another = list.ToList();
-                     MessageBox.Show(another.Count.ToString());
-                  }
-                  catch (VkException ex) {
-                     MessageBox.Show(ex.Message);
-                  }
                });
 
          ShowHistoryCommand =
@@ -115,14 +81,29 @@ namespace vk.ViewModels {
                });
       }
 
-      public void OnNavigatedTo(NavigationContext navigationContext) {
+      private async void onWallContainerWallHolderChanged(object sender, IWallHolder wallHolder) {
+         var response = await _vkApi.GroupsGetById.GetAsync(wallHolder.ID);
+         var thisGroup = response.Response.FirstOrDefault();
+         if (thisGroup == null) return;
+
+         Name = thisGroup.Name;
+         Description = thisGroup.Description;
+         ProfilePhoto = thisGroup.Photo200;
       }
 
-      public bool IsNavigationTarget(NavigationContext navigationContext) {
-         return true;
-      }
+      private void onWallContainerPullCompleted(object sender, ObservableCollection<PostControl> observableCollection) {
+         var wallContainer = sender as WallContainer;
+         if (wallContainer == null) return;
 
-      public void OnNavigatedFrom(NavigationContext navigationContext) {
+         var totalPostCount = wallContainer.GetRealPostCount();
+         var repostCount = wallContainer.GetRepostCount();
+         var postCount = wallContainer.GetPostOnlyCount();
+         var missingPosts = wallContainer.GetMissingPostCount();
+
+         InfoPanel = $"Всего: {totalPostCount} / {WallContainer.MAX_POSTPONED}" +
+                     $"\nПостов: {postCount}" +
+                     $"\nРепостов: {repostCount}" +
+                     $"\nСлоты для отложек: {missingPosts}";
       }
    }
 }

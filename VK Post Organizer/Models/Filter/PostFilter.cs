@@ -4,10 +4,10 @@ using vk.ViewModels;
 
 namespace vk.Models.Filter {
    public abstract class PostFilter {
-      public IEnumerable<PostControl> FilterPosts(IEnumerable<PostControl> postItems) {
+      public IEnumerable<IPostType> FilterPosts(IEnumerable<IPostType> postItems) {
          return postItems.Where(Suitable);
       }
 
-      public abstract bool Suitable(PostControl postControl);
+      public abstract bool Suitable(IPostType postTypeEntity);
    }
 }

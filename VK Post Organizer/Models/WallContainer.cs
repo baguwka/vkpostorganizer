@@ -20,13 +20,15 @@ namespace vk.Models {
       public const int MAX_POSTPONED = 150;
       public const int RESERVE = 100;
       public event EventHandler PullInvoked;
-      public event EventHandler PullCompleted;
+      public event EventHandler<ObservableCollection<PostControl>> PullCompleted;
+      public event EventHandler<IWallHolder> WallHolderChanged;
 
       private IWallHolder _wallHolder;
       private ObservableCollection<PostControl> _items;
 
       public WallContainer(WallGet wallGet) {
          _wallGet = wallGet;
+         WallHolder = new EmptyWallHolder();
 
          Items = new ObservableCollection<PostControl>();
          ExpandAllCommand = new DelegateCommand(expandAllCommandExecute);
@@ -37,7 +39,10 @@ namespace vk.Models {
 
       public IWallHolder WallHolder {
          get { return _wallHolder; }
-         set { SetProperty(ref _wallHolder, value); }
+         set {
+            SetProperty(ref _wallHolder, value);
+            OnWallHolderChanged(_wallHolder);
+         }
       }
 
       public ObservableCollection<PostControl> Items {
@@ -100,11 +105,11 @@ namespace vk.Models {
             await PullWithScheduleHightlightAsync(WallHolder, filter, schedule);
          }
          finally {
-            OnPulled();
+            OnPulled(Items);
          }
       }
 
-      public async Task PullWithScheduleHightlightAsync([NotNull] IWallHolder other, [NotNull] PostFilter filter, [NotNull] Schedule schedule) {
+      private async Task PullWithScheduleHightlightAsync([NotNull] IWallHolder other, [NotNull] PostFilter filter, [NotNull] Schedule schedule) {
          if (other == null) {
             throw new ArgumentNullException(nameof(other));
          }
@@ -184,7 +189,7 @@ namespace vk.Models {
             nextDate = nextDate.AddDays(1);
          }
 
-         tempList = filter.FilterPosts(tempList).ToList();
+         tempList = tempList.Where(filter.Suitable).ToList();
          SortListByDate(tempList);
 
          Items.AddRange(tempList);
@@ -252,12 +257,16 @@ namespace vk.Models {
          UploadRequested?.Invoke(this, e);
       }
 
-      protected virtual void OnPulled() {
-         PullCompleted?.Invoke(this, EventArgs.Empty);
+      protected virtual void OnPulled(ObservableCollection<PostControl> collection) {
+         PullCompleted?.Invoke(this, collection);
       }
 
       protected virtual void OnPullInvoked() {
          PullInvoked?.Invoke(this, EventArgs.Empty);
+      }
+
+      protected virtual void OnWallHolderChanged(IWallHolder e) {
+         WallHolderChanged?.Invoke(this, e);
       }
    }
 }

@@ -16,21 +16,20 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="35"/>
             <RowDefinition Height="200"/>
+            <RowDefinition Height="70"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <!--<StackPanel Grid.Row="0" Orientation="Vertical">
-            <Button Height="35" Margin="2" Style="{StaticResource VkBlue}" Content="Postponed" Command="{Binding ShowPostponeWallCommand}"></Button>
-            <Button Height="35" Margin="2" Style="{StaticResource VkBlue}" Content="Actual" Command="{Binding ShowActualWallCommand}"></Button>
-            <Button IsEnabled="False" Height="35" Margin="2" Style="{StaticResource VkBlue}" Content="History" Command="{Binding ShowHistoryCommand}"></Button>
-        </StackPanel>-->
         
-        <Label Grid.Row="0" Style="{StaticResource VkLabel}" Content="{Binding Name, UpdateSourceTrigger=PropertyChanged}" FontSize="16"/>
-        
-        <Image Grid.Row="1" ToolTip="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
-                           Source="{Binding ProfilePhoto, UpdateSourceTrigger=PropertyChanged}"/>
-        
-        <StackPanel Grid.Row="2" Orientation="Vertical" HorizontalAlignment="Center">
-            <Label Height="120" Style="{StaticResource VkLabel}" Content="{Binding InfoPanel, UpdateSourceTrigger=PropertyChanged}"/>
+        <Label Grid.Row="0" Style="{StaticResource VkLabel}" HorizontalAlignment="Center"
+               Content="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" FontSize="16"/>
+
+        <Image Grid.Row="1" ToolTip="{Binding Description, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                           Source="{Binding ProfilePhoto, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"/>
+
+        <Label Grid.Row="2" Style="{StaticResource VkLabel}" Content="{Binding Description, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" FontSize="12"/>
+
+        <StackPanel Grid.Row="3" Orientation="Vertical" HorizontalAlignment="Center">
+            <Label Height="120" Style="{StaticResource VkLabel}" Content="{Binding InfoPanel, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"/>
 
             <Separator Style="{StaticResource VkSeparator}"/>
 

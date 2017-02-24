@@ -13,7 +13,7 @@ using vk.Utils;
 
 namespace vk.ViewModels {
    [UsedImplicitly]
-   public class PostControl : BindableBase {
+   public class PostControl : BindableBase, IPostType {
       private bool _expanded;
       private PostMark _mark;
       private PostType _postType;

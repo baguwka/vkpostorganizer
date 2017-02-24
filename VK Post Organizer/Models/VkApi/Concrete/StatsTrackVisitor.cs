@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
@@ -12,9 +13,13 @@ namespace vk.Models.VkApi {
          this._api = api;
       }
 
-      public async Task<int> TrackAsync() {
-         var response = await _api.ExecuteMethodAsync("stats.trackVisitor", VkParameters.No()).ConfigureAwait(false);
+      public async Task<int> TrackAsync(CancellationToken ct) {
+         var response = await _api.ExecuteMethodAsync("stats.trackVisitor", VkParameters.No(), ct).ConfigureAwait(false);
          return JsonConvert.DeserializeObject<StatsTrackVisitorResponse>(response).Response;
+      }
+
+      public async Task<int> TrackAsync() {
+         return await TrackAsync(CancellationToken.None).ConfigureAwait(false);
       }
    }
 

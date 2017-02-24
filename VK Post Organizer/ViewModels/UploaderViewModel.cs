@@ -34,7 +34,7 @@ namespace vk.ViewModels {
       private readonly VkUploader _uploader;
       private readonly UploadSettings _uploadSettings;
       private readonly VkApiProvider _vkApi;
-      private readonly WallContainer _wallContainer;
+      private readonly WallContainerController _wallContainerController;
       private ObservableCollection<AttachmentItem> _attachments;
 
       private CancellationTokenSource _cts;
@@ -136,24 +136,18 @@ namespace vk.ViewModels {
       public ICommand MoveNextCommand { get; private set; }
 
 
-      public UploaderViewModel(IEventAggregator eventAggregator, VkUploader uploader, UploadSettings uploadSettings, VkApiProvider vkApi, WallContainer wallContainer) {
+      public UploaderViewModel(IEventAggregator eventAggregator, VkUploader uploader, UploadSettings uploadSettings, 
+         VkApiProvider vkApi, WallContainerController wallContainerController) {
+
          _eventAggregator = eventAggregator;
          _uploader = uploader;
          _uploadSettings = uploadSettings;
          _vkApi = vkApi;
-         _wallContainer = wallContainer;
+         _wallContainerController = wallContainerController;
 
-         _wallContainer.PullInvoked += (sender, args) => {
-            IsBusy = true;
-            ProgressString = "Pull...";
-         };
-
-         _wallContainer.PullCompleted += (sender, args) => {
-            var missing = _wallContainer.GetMissingPostCount();
-            InfoPanel = $"{WallContainer.MAX_POSTPONED - missing}/{WallContainer.MAX_POSTPONED}";
-            IsBusy = false;
-            ProgressString = "";
-         };
+         _wallContainerController.Container.PullInvoked += onContainerPullInvoked;
+         _wallContainerController.Container.PullCompleted += onContainerPullCompleted;
+         _wallContainerController.Container.WallHolderChanged += onContainerWallHolderChanged;
 
          _shrinkAfterPublish = _uploadSettings.CloseUploadWindowAfterPublish;
 
@@ -188,32 +182,49 @@ namespace vk.ViewModels {
          MovePreviousCommand = new DelegateCommand(moveToPreviousMissing);
          MoveNextCommand = new DelegateCommand(moveToNextMissing);
 
-         _eventAggregator.GetEvent<MainBottomEvents.Refresh>().Subscribe(async () => {
-            if (IsBusy || !IsEnabled) return;
-            IsBusy = true;
-            ProgressString = "Pull...";
-            try {
-               await _wallContainer.PullWithScheduleHightlightAsync(new MissingPostFilter(), new Schedule());
-            }
-            finally {
-               IsBusy = false;
-               ProgressString = "";
-            }
-         });
+         //_eventAggregator.GetEvent<MainBottomEvents.Refresh>().Subscribe(async () => {
+         //   if (IsBusy || !IsEnabled) return;
+         //   IsBusy = true;
+         //   ProgressString = "Pull...";
+         //   try {
+         //      await _wallContainer.PullWithScheduleHightlightAsync(new MissingPostFilter(), new Schedule());
+         //   }
+         //   finally {
+         //      IsBusy = false;
+         //      ProgressString = "";
+         //   }
+         //});
 
          _eventAggregator.GetEvent<UploaderEvents.SetVisibility>().Subscribe(onSetVisibility);
          _eventAggregator.GetEvent<UploaderEvents.Configure>().Subscribe(onConfigure);
+      }
+
+      private void onContainerPullInvoked(object sender, EventArgs args) {
+         IsBusy = true;
+         ProgressString = "Pull...";
+      }
+
+      private void onContainerPullCompleted(object sender, ObservableCollection<PostControl> args) {
+         var missing = _wallContainerController.Container.GetMissingPostCount();
+         InfoPanel = $"{WallContainer.MAX_POSTPONED - missing}/{WallContainer.MAX_POSTPONED}";
+         IsBusy = false;
+         ProgressString = "";
+      }
+
+      private async void onContainerWallHolderChanged(object sender, IWallHolder holder) {
+         var thisGroup = await _vkApi.GroupsGetById.GetAsync(holder.ID);
+         WallName = thisGroup.Response.FirstOrDefault()?.Name;
       }
 
       private void onSetVisibility(bool visibility) {
          IsShowing = visibility;
       }
 
-      private async void onConfigure(UploaderViewModelConfiguration config) {
+      private  void onConfigure(UploaderViewModelConfiguration config) {
          //todo: как то это не очень.
          if (IsBusy) {
             _cts.Cancel();
-            MessageBox.Show("Все задачи Uploader'а были отменены", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+            //MessageBox.Show("Все задачи Uploader'а были отменены", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
             return;
          }
 
@@ -223,14 +234,14 @@ namespace vk.ViewModels {
             return;
          }
 
-         _wallContainer.WallHolder = new WallHolder(config.WallId);
-         var thisGroup = await _vkApi.GroupsGetById.GetAsync(config.WallId);
-         WallName = thisGroup.Response.FirstOrDefault()?.Name;
+         //_wallContainer.WallHolder = new WallHolder(config.WallId);
+         //var thisGroup = await _vkApi.GroupsGetById.GetAsync(config.WallId);
+         //WallName = thisGroup.Response.FirstOrDefault()?.Name;
 
-         await _wallContainer.PullWithScheduleHightlightAsync(new MissingPostFilter(), new Schedule());
+         ////await _wallContainer.PullWithScheduleHightlightAsync(new MissingPostFilter(), new Schedule());
 
          if (config.DateOverride == -1) {
-            var firstMissed = _wallContainer.Items.FirstOrDefault();
+            var firstMissed = _wallContainerController.Container.Items.FirstOrDefault();
             if (firstMissed == null) {
                return;
             }
@@ -247,13 +258,13 @@ namespace vk.ViewModels {
       }
 
       public void moveToPreviousMissing() {
-         if (_wallContainer.Items.None() || DateUnix <= 0) {
+         if (_wallContainerController.Container.Items.None() || DateUnix <= 0) {
             return;
          }
 
-         var previousOne = _wallContainer.Items.LastOrDefault(p => p.Post.DateUnix < DateUnix);
+         var previousOne = _wallContainerController.Container.Items.LastOrDefault(p => p.Post.DateUnix < DateUnix);
          if (previousOne == null) {
-            previousOne = _wallContainer.Items.LastOrDefault();
+            previousOne = _wallContainerController.Container.Items.LastOrDefault();
             if (previousOne == null) {
                return;
             }
@@ -265,13 +276,13 @@ namespace vk.ViewModels {
       }
 
       public void moveToNextMissing() {
-         if (_wallContainer.Items.None() || DateUnix <= 0) {
+         if (_wallContainerController.Container.Items.None() || DateUnix <= 0) {
             return;
          }
 
-         var nextOne = _wallContainer.Items.FirstOrDefault(p => p.Post.DateUnix > DateUnix);
+         var nextOne = _wallContainerController.Container.Items.FirstOrDefault(p => p.Post.DateUnix > DateUnix);
          if (nextOne == null) {
-            nextOne = _wallContainer.Items.FirstOrDefault();
+            nextOne = _wallContainerController.Container.Items.FirstOrDefault();
             if (nextOne == null) {
                return;
             }
@@ -362,7 +373,7 @@ namespace vk.ViewModels {
       private async Task uploadFromBytes(byte[] photo, CancellationToken cancellationToken) {
          ProgressString = "Uploading...";
          UploadProgress = 100;
-         var result = await _uploader.TryUploadPhotoToWallAsync(photo, _wallContainer.WallHolder.ID, cancellationToken);
+         var result = await _uploader.TryUploadPhotoToWallAsync(photo, _wallContainerController.Container.WallHolder.ID, cancellationToken);
          if (result.Successful) {
             addPhotoToAttachments(result.Photo);
          }
@@ -404,7 +415,7 @@ namespace vk.ViewModels {
       private async Task publishExecute() {
          IsBusy = true;
          try {
-            await _vkApi.WallPost.PostAsync(-_wallContainer.WallHolder.ID, Message, false, true, DateUnix,
+            await _vkApi.WallPost.PostAsync(-_wallContainerController.Container.WallHolder.ID, Message, false, true, DateUnix,
                Attachments.Take(10).Select(item => item.Attachment));
          }
          catch (VkException ex) {
