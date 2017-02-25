@@ -28,6 +28,17 @@ namespace vk.Models.VkApi.Entities {
          get { return _document; }
          set { SetProperty(ref _document, value); }
       }
+
+      public override string ToString() {
+         switch (Type) {
+            case "photo":
+               return $"{Type}{Photo}";
+            case "doc":
+               return $"{Type}{Document}";
+         }
+
+         return base.ToString();
+      }
    }
 
    public static class AttachmentExtensions {

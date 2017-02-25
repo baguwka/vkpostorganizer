@@ -7,6 +7,7 @@ namespace vk.Models.VkApi.Entities {
    [UsedImplicitly]
    public class Document : BindableBase {
       private int _id;
+      private int _ownerId;
       private int _size;
       private string _ext;
       private string _url;
@@ -14,9 +15,15 @@ namespace vk.Models.VkApi.Entities {
       private int _type;
 
       [JsonProperty(PropertyName = "id")]
-      public int ID {
+      public int Id {
          get { return _id; }
          set { SetProperty(ref _id, value); }
+      }
+
+      [JsonProperty(PropertyName = "owner_id")]
+      public int OwnerId {
+         get { return _ownerId; }
+         set { SetProperty(ref _ownerId, value); }
       }
 
       [JsonProperty(PropertyName = "size")]
@@ -51,6 +58,10 @@ namespace vk.Models.VkApi.Entities {
 
       [JsonProperty(PropertyName = "preview")]
       public DocumentPreview Preview { get; set; }
+
+      public override string ToString() {
+         return $"{OwnerId}_{Id}";
+      }
    }
 
    [UsedImplicitly]

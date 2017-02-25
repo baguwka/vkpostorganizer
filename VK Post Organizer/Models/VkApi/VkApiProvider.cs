@@ -6,6 +6,7 @@ namespace vk.Models.VkApi {
       public AccessToken Token { get; private set; }
       public GroupsGet GroupsGet { get; private set; }
       public GroupsGetById GroupsGetById { get; private set; }
+      public PhotosGetById PhotosGetById { get; private set; }
       public PhotosGetWallUploadSever PhotosGetWallUploadSever { get; private set; }
       public PhotosSaveWallPhoto PhotosSaveWallPhoto { get; private set; }
       public StatsTrackVisitor StatsTrackVisitor { get; private set; }
@@ -17,6 +18,7 @@ namespace vk.Models.VkApi {
          Token = token;
          GroupsGet = new GroupsGet(api);
          GroupsGetById = new GroupsGetById(api);
+         PhotosGetById = new PhotosGetById(api);
          PhotosGetWallUploadSever = new PhotosGetWallUploadSever(api);
          PhotosSaveWallPhoto = new PhotosSaveWallPhoto(api);
          StatsTrackVisitor = new StatsTrackVisitor(api);

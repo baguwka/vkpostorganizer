@@ -88,5 +88,9 @@ namespace vk.Models.VkApi.Entities {
 
          return "";
       }
+
+      public override string ToString() {
+         return $"{OwnerId}_{Id}";
+      }
    }
 }

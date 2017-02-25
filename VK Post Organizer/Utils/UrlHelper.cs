@@ -4,6 +4,14 @@ using JetBrains.Annotations;
 
 namespace vk.Utils {
    public static class UrlHelper {
+      public static bool IsUriIsValid(Uri uri) {
+         if (uri != null) {
+            return uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps;
+
+         }
+         return false;
+      }
+
       public static bool IsUrlIsValid(string url) {
          if (!string.IsNullOrEmpty(url)) {
             Uri uriResult;

@@ -14,19 +14,15 @@ using RateLimiter;
 using vk.Models.VkApi.Entities;
 
 namespace vk.Models.VkApi {
-   public class VkApiResponse {
-      public VkApiResponse(string response, DateTimeOffset storedAt) {
+   public class VkApiResponseInfo {
+      public VkApiResponseInfo(string response, DateTimeOffset storedAt) {
          Response = response;
          StoredAt = storedAt;
       }
 
+      public Uri Uri { get; set; }
       public string Response { get; private set; }
       public DateTimeOffset StoredAt { get; private set; }
-   }
-
-   public class VkCall {
-      public Action<string> Callback { get; set; }
-      public Task<string> Task { get; set; }
    }
 
    [UsedImplicitly]
@@ -36,18 +32,19 @@ namespace vk.Models.VkApi {
       private readonly HttpClient _httpClient;
       private readonly HttpClientHandler _httpClientHandler;
       private readonly AccessToken _token;
-      private readonly ConcurrentDictionary<string, VkApiResponse> _responseCache;
+      private readonly ConcurrentDictionary<string, VkApiResponseInfo> _responseCache;
 
       private readonly TimeLimiter _rateLimiter;
       private int _tooMuchRequestsOccurrences;
       private int _timeoutRetry;
 
+      public event EventHandler<VkApiResponseInfo> CallPerformed;
 
       public VkApi(AccessToken token, HttpClientHandler httpClientHandler) {
          _token = token;
          _httpClientHandler = httpClientHandler;
          _httpClient = new HttpClient(httpClientHandler) {Timeout = TimeSpan.FromSeconds(4)};
-         _responseCache = new ConcurrentDictionary<string, VkApiResponse>();
+         _responseCache = new ConcurrentDictionary<string, VkApiResponseInfo>();
 
          _rateLimiter = TimeLimiter.GetFromMaxCountByInterval(6, TimeSpan.FromSeconds(1));
       }
@@ -68,25 +65,26 @@ namespace vk.Models.VkApi {
             throw new ArgumentNullException(nameof(query));
          }
 
-         var uri = buildFinalUri(method, query);
+         var uri = buildCompleteUri(method, query);
          if (_responseCache.ContainsKey(uri.ToString())) {
-            VkApiResponse response;
-            var result = _responseCache.TryGetValue(uri.ToString(), out response);
+            VkApiResponseInfo responseInfo;
+            var result = _responseCache.TryGetValue(uri.ToString(), out responseInfo);
             if (result) {
-               var timeSpan = DateTimeOffset.Now - response.StoredAt;
+               var timeSpan = DateTimeOffset.Now - responseInfo.StoredAt;
                if (timeSpan < TimeSpan.FromSeconds(5)) {
-                  return response.Response;
+                  return responseInfo.Response;
                }
                else {
-                  _responseCache.TryRemove(uri.ToString(), out response);
+                  _responseCache.TryRemove(uri.ToString(), out responseInfo);
                }
             }
          }
 
-         return await _rateLimiter.Perform(() => callUriAsync(uri, ct), ct).ConfigureAwait(false);
+         return await _rateLimiter.Perform(() => callAsync(uri, ct), ct).ConfigureAwait(false);
       }
 
-      private async Task<string> callUriAsync(Uri uri, CancellationToken ct) {
+
+      private async Task<string> callAsync(Uri uri, CancellationToken ct) {
          try {
             var response = await _httpClient.GetAsync(uri, ct).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
@@ -94,10 +92,11 @@ namespace vk.Models.VkApi {
             var result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             checkForErrors(result);
 
-            _responseCache.TryAdd(uri.ToString(), new VkApiResponse(result, DateTimeOffset.Now));
-
-            _tooMuchRequestsOccurrences = 0;
-            _timeoutRetry = 0;
+            var vkResponse = new VkApiResponseInfo(result, DateTimeOffset.Now) {
+               Uri = uri
+            };
+            
+            OnCallPerformed(vkResponse);
 
             return result;
          }
@@ -116,7 +115,7 @@ namespace vk.Models.VkApi {
             if (ex.ErrorCode == 6) {
                await Task.Delay(TimeSpan.FromSeconds(1f), ct).ConfigureAwait(false);
                if (!ct.IsCancellationRequested) {
-                  return await callUriAsync(uri, ct);
+                  return await callAsync(uri, ct);
                }
             }
 
@@ -134,7 +133,7 @@ namespace vk.Models.VkApi {
 
             _timeoutRetry++;
             if (!ct.IsCancellationRequested) {
-               return await callUriAsync(uri, ct).ConfigureAwait(false);
+               return await callAsync(uri, ct).ConfigureAwait(false);
             }
          }
          //catch (VkException ex) {
@@ -164,7 +163,7 @@ namespace vk.Models.VkApi {
          throw new VkException(!string.IsNullOrEmpty(message) ? message : innerException?.Message ?? ex.Message, ex);
       }
 
-      private Uri buildFinalUri(string method, VkParameters parameters) {
+      private Uri buildCompleteUri(string method, VkParameters parameters) {
          var uriBuilder = new UriBuilder($"https://api.vk.com/method/{method}");
 
          var uriParameters = new NameValueCollection();
@@ -184,6 +183,15 @@ namespace vk.Models.VkApi {
 
       protected Error deserializeError(string jsonString) {
          return JsonConvert.DeserializeObject<ErrorResponse>(jsonString).Error;
+      }
+
+      protected virtual void OnCallPerformed(VkApiResponseInfo e) {
+         CallPerformed?.Invoke(this, e);
+
+         _responseCache.TryAdd(e.Uri.ToString(), e);
+
+         _tooMuchRequestsOccurrences = 0;
+         _timeoutRetry = 0;
       }
    }
 

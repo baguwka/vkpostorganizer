@@ -132,7 +132,7 @@ namespace vk.Models {
          if (photo == null) throw new ArgumentNullException(nameof(photo));
 
          try {
-            var uploadServer = await _getWallUploadServer.GetAsync(wallId);
+            var uploadServer = await _getWallUploadServer.GetAsync(wallId, ct);
 
             var response = await _client.PostAsync(new Uri(uploadServer.UploadUrl), photo, ct);
 
@@ -145,7 +145,7 @@ namespace vk.Models {
 
             var uploadResponse = await response.Content.ReadAsStringAsync();
 
-            var savePhotoProperty = await _saveWallPhoto.SaveAsync(wallId, uploadResponse);
+            var savePhotoProperty = await _saveWallPhoto.SaveAsync(wallId, uploadResponse, ct);
             var savedPhoto = savePhotoProperty?.Response.FirstOrDefault();
 
             return new UploadPhotoInfo {

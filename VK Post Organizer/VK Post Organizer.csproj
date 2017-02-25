@@ -213,6 +213,8 @@
     <Compile Include="Models\Content\IContentPopulator.cs" />
     <Compile Include="Models\Content\PostponeContentPopulator.cs" />
     <Compile Include="Models\HttpClientHandlerFactory.cs" />
+    <Compile Include="Models\Logger\HistoryController.cs" />
+    <Compile Include="Models\VkApi\Entities\Attachments.cs" />
     <Compile Include="Models\VkApi\Interfaces\IPhotosGetWallUploadSever.cs" />
     <Compile Include="Models\VkApi\Interfaces\IPhotosSaveWallPhoto.cs" />
     <Compile Include="Models\VkApi\Interfaces\IGroupsGet.cs" />
@@ -227,9 +229,9 @@
     <Compile Include="Models\Files\ExtensionChecker.cs" />
     <Compile Include="Models\Files\FileFilter.cs" />
     <Compile Include="Models\Files\GifExtensionChecker.cs" />
-    <Compile Include="Models\Logger\IPublishLogger.cs" />
-    <Compile Include="Models\Logger\JsonServerPublishLogger.cs" />
-    <Compile Include="Models\Logger\NoPublishLogger.cs" />
+    <Compile Include="Models\Logger\IHistoryPublisher.cs" />
+    <Compile Include="Models\Logger\JsonServerHistoryPublisher.cs" />
+    <Compile Include="Models\Logger\NoHistoryPublisher.cs" />
     <Compile Include="Models\Logger\HistoryPost.cs" />
     <Compile Include="Models\ProxyProvider.cs" />
     <Compile Include="Models\Configuration\Settings.cs" />
@@ -241,6 +243,7 @@
     <Compile Include="Infrastructure\WebBrowserUtility.cs" />
     <Compile Include="Models\Content\WallContentFiller.cs" />
     <Compile Include="Models\VkUploaderFactory.cs" />
+    <Compile Include="Models\Waiter.cs" />
     <Compile Include="Models\WallContainerController.cs" />
     <Compile Include="Models\WinInetHelper.cs" />
     <Compile Include="ProgramInfo.cs" />

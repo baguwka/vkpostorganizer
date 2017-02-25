@@ -26,6 +26,9 @@ namespace vk {
          var loadedSettings = saveLoader.TryLoad<Settings>("Settings");
          settings.ApplySettings(loadedSettings.Successful ? loadedSettings.Result : new Settings());
 
+         var historyController = Container.Resolve<HistoryController>();
+         historyController.Observe();
+
          regionManager.RegisterViewWithRegion(RegionNames.MainRegion, typeof(StartPageView));
          regionManager.RegisterViewWithRegion(RegionNames.BottomRegion, typeof(MainBottomView));
          regionManager.RegisterViewWithRegion(RegionNames.AuthRegion, typeof(AuthBarView));
@@ -66,6 +69,7 @@ namespace vk {
 
          Container.RegisterType<GroupsGet>(new InjectionFactory(container => container.Resolve<VkApiProvider>().GroupsGet));
          Container.RegisterType<GroupsGetById>(new InjectionFactory(container => container.Resolve<VkApiProvider>().GroupsGetById));
+         Container.RegisterType<PhotosGetById>(new InjectionFactory(container => container.Resolve<VkApiProvider>().PhotosGetById));
          Container.RegisterType<PhotosGetWallUploadSever>(new InjectionFactory(container => container.Resolve<VkApiProvider>().PhotosGetWallUploadSever));
          Container.RegisterType<PhotosSaveWallPhoto>(new InjectionFactory(container => container.Resolve<VkApiProvider>().PhotosSaveWallPhoto));
          Container.RegisterType<StatsTrackVisitor>(new InjectionFactory(container => container.Resolve<VkApiProvider>().StatsTrackVisitor));
@@ -87,7 +91,8 @@ namespace vk {
          Container.RegisterType<SharedWallContext>(Lifetime.Singleton);
          Container.RegisterType<WallContainerController>(Lifetime.Singleton);
 
-         Container.RegisterType<IPublishLogger, JsonServerPublishLogger>();
+         Container.RegisterType<HistoryController>(Lifetime.Singleton);
+         Container.RegisterType<IHistoryPublisher, JsonServerHistoryPublisher>(Lifetime.Singleton);
 
          Container.RegisterType<PhotoUrlObtainer>(Lifetime.Singleton);
          Container.RegisterType<DocumentPreviewUrlObtainer>(Lifetime.Singleton);

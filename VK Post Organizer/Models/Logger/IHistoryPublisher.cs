@@ -1,8 +1,7 @@
 ﻿using System.Threading.Tasks;
 
 namespace vk.Models.Logger {
-   public interface IPublishLogger {
+   public interface IHistoryPublisher {
       Task LogAsync(HistoryPost data);
-      void Log(HistoryPost data);
    }
 }

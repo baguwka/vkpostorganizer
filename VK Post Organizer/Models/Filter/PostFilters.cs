@@ -14,6 +14,12 @@ namespace vk.Models.Filter {
    }
 
    public class MissingPostFilter : PostFilter {
+      public static PostFilter Instance { get; }
+
+      static MissingPostFilter() {
+         Instance = new MissingPostFilter();
+      }
+
       public override bool Suitable(IPostType postControl) {
          return postControl.PostType == PostType.Missing;
       }

@@ -73,7 +73,7 @@
                             <DataTemplate>
                                 <Button Style="{StaticResource VkMimic}" Command="{Binding OpenInBrowserCommand}" Height="75" Width="75" Margin="2">
                                     <Grid>
-                                        <Image Source="{Binding Photo.Photo75, UpdateSourceTrigger=PropertyChanged}" 
+                                        <Image Source="{Binding Preview, UpdateSourceTrigger=PropertyChanged}" 
                                                Height="75" Width="75"/>
                                         <Button Content="x" Width="20" Height="20" Style="{StaticResource VkCommon}" 
                                                 VerticalAlignment="Top" HorizontalAlignment="Right"

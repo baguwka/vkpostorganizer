@@ -5,12 +5,16 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using JetBrains.Annotations;
+using Microsoft.Practices.Unity;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
 using vk.Infrastructure;
 using vk.Models;
+using vk.Models.Logger;
 using vk.Models.VkApi;
 
 namespace vk.ViewModels {
@@ -74,7 +78,7 @@ namespace vk.ViewModels {
                });
 
          ShowHistoryCommand =
-            new DelegateCommand(
+             new DelegateCommand(
                () => {
                   _regionManager.RequestNavigate(RegionNames.ContentMainRegion,
                      $"{ViewNames.HistoryContent}?filter=sayhello");
