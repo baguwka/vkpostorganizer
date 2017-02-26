@@ -60,7 +60,10 @@ namespace vk.ViewModels {
 
       public bool IsBusy {
          get { return _isBusy; }
-         set { SetProperty(ref _isBusy, value); }
+         set {
+            SetProperty(ref _isBusy, value); 
+            _eventAggregator.GetEvent<UploaderEvents.BusyEvent>().Publish(_isBusy);
+         }
       }
 
       public string Message {
@@ -133,7 +136,7 @@ namespace vk.ViewModels {
          set { SetProperty(ref _isPublishing, value); }
       }
 
-      public List<PostControl> FilteredItems { get; }
+      public List<PostViewModel> FilteredItems { get; }
 
       public ICommand ShowHideCommand { get; private set; }
       public ICommand PublishCommand { get; private set; }
@@ -151,7 +154,7 @@ namespace vk.ViewModels {
          _uploadSettings = uploadSettings;
          _vkApi = vkApi;
          _wallContainerController = wallContainerController;
-         FilteredItems = new List<PostControl>();
+         FilteredItems = new List<PostViewModel>();
 
          _wallContainerController.Container.PullInvoked += onContainerPullInvoked;
          _wallContainerController.Container.PullCompleted += onContainerPullCompleted;
@@ -212,7 +215,7 @@ namespace vk.ViewModels {
          ProgressString = "Pull...";
       }
 
-      private async void onContainerPullCompleted(object sender, ObservableCollection<PostControl> args) {
+      private async void onContainerPullCompleted(object sender, ObservableCollection<PostViewModel> args) {
          var missing = _wallContainerController.Container.GetMissingPostCount();
          InfoPanel = $"{WallContainer.MAX_POSTPONED - missing}/{WallContainer.MAX_POSTPONED}";
          IsBusy = false;
@@ -220,7 +223,7 @@ namespace vk.ViewModels {
          await filterOutAsync(_wallContainerController.Container.Items);
       }
 
-      protected async Task filterOutAsync(IEnumerable<PostControl> items) {
+      protected async Task filterOutAsync(IEnumerable<PostViewModel> items) {
          IsBusy = true;
          try {
             await Task.Run(() => {
@@ -236,7 +239,7 @@ namespace vk.ViewModels {
 
       private async void onContainerWallHolderChanged(object sender, IWallHolder holder) {
          var thisGroup = await _vkApi.GroupsGetById.GetAsync(holder.ID);
-         WallName = thisGroup.Response.FirstOrDefault()?.Name;
+         WallName = thisGroup.Content.FirstOrDefault()?.Name;
       }
 
       private void onSetVisibility(bool visibility) {

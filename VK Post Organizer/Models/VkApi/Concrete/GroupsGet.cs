@@ -36,7 +36,7 @@ namespace vk.Models.VkApi {
    [UsedImplicitly]
    public class GroupsGetResponse {
       [JsonProperty(PropertyName = "response")]
-      public GroupGetCollection Collection { get; set; }
+      public GroupGetCollection Content { get; set; }
    }
 
    [UsedImplicitly]

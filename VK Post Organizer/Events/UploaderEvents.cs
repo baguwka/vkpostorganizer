@@ -7,5 +7,6 @@ namespace vk.Events {
    public class UploaderEvents {
       public class SetVisibility : PubSubEvent<bool> { }
       public class Configure : PubSubEvent<UploaderViewModelConfiguration> { }
+      public class BusyEvent : PubSubEvent<bool> { }
    }
 }

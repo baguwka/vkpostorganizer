@@ -15,22 +15,20 @@ namespace vk.Models.VkApi {
          this._api = api;
       }
 
-      public async Task<WallGetResponse> GetAsync(int id, int count = 100, int offset = 0) {
+      public async Task<WallGetResponse> GetAsync(int id, int count = 100, int offset = 0, bool ignoraCache = false) {
          var parameters = makeAQuery(id, count, offset);
-         return await GetAsync(parameters).ConfigureAwait(false);
+         return await GetAsync(parameters, ignoraCache).ConfigureAwait(false);
       }
 
-      public async Task<WallGetResponse> GetAsync(int id, VkParameters parameters, CancellationToken ct) {
-         parameters.AddParameter("owner_id", -Math.Abs(id));
-         return await GetAsync(parameters, ct);
+      public async Task<WallGetResponse> GetAsync(VkParameters parameters, bool ignoraCache = false) {
+         return await GetAsync(parameters, CancellationToken.None, ignoraCache);
       }
 
-      public async Task<WallGetResponse> GetAsync(VkParameters parameters) {
-         return await GetAsync(parameters, CancellationToken.None);
-      }
+      public async Task<WallGetResponse> GetAsync(VkParameters parameters, CancellationToken ct, bool ignoraCache = false) {
+         var response = ignoraCache 
+            ? await _api.ExecuteMethodIgnoreCacheAsync("wall.get", parameters, ct).ConfigureAwait(false)
+            : await _api.ExecuteMethodAsync("wall.get", parameters, ct).ConfigureAwait(false);
 
-      public async Task<WallGetResponse> GetAsync(VkParameters parameters, CancellationToken ct) {
-         var response = await _api.ExecuteMethodAsync("wall.get", parameters, ct).ConfigureAwait(false);
          return JsonConvert.DeserializeObject<WallGetResponse>(response);
       }
 
@@ -48,7 +46,7 @@ namespace vk.Models.VkApi {
    [UsedImplicitly]
    public class WallGetResponse {
       [JsonProperty(PropertyName = "response")]
-      public WallGetCollection Response { get; set; }
+      public WallGetCollection Content { get; set; }
    }
 
    [UsedImplicitly]

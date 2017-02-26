@@ -146,7 +146,7 @@ namespace vk.Models {
             var uploadResponse = await response.Content.ReadAsStringAsync();
 
             var savePhotoProperty = await _saveWallPhoto.SaveAsync(wallId, uploadResponse, ct);
-            var savedPhoto = savePhotoProperty?.Response.FirstOrDefault();
+            var savedPhoto = savePhotoProperty?.Content.FirstOrDefault();
 
             return new UploadPhotoInfo {
                Photo = savedPhoto,

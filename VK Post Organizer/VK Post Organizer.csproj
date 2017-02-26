@@ -202,6 +202,7 @@
     <Compile Include="Converter\PostTypeToBoolConverter.cs" />
     <Compile Include="Converter\MissingPostIsHiddenConverter.cs" />
     <Compile Include="Events\AuthBarEvents.cs" />
+    <Compile Include="Events\ContentEvents.cs" />
     <Compile Include="Events\MainBottomEvents.cs" />
     <Compile Include="Events\ShellEvents.cs" />
     <Compile Include="Events\UploaderEvents.cs" />
@@ -210,10 +211,11 @@
     <Compile Include="Infrastructure\AutoPopulateExportedViewsBehavior.cs" />
     <Compile Include="Infrastructure\IViewRegionRegistration.cs" />
     <Compile Include="Infrastructure\ViewExportAttribute.cs" />
+    <Compile Include="Models\BusyObserver.cs" />
     <Compile Include="Models\Content\IContentPopulator.cs" />
     <Compile Include="Models\Content\PostponeContentPopulator.cs" />
     <Compile Include="Models\HttpClientHandlerFactory.cs" />
-    <Compile Include="Models\Logger\HistoryController.cs" />
+    <Compile Include="Models\History\HistoryController.cs" />
     <Compile Include="Models\VkApi\Entities\Attachments.cs" />
     <Compile Include="Models\VkApi\Interfaces\IPhotosGetWallUploadSever.cs" />
     <Compile Include="Models\VkApi\Interfaces\IPhotosSaveWallPhoto.cs" />
@@ -229,10 +231,10 @@
     <Compile Include="Models\Files\ExtensionChecker.cs" />
     <Compile Include="Models\Files\FileFilter.cs" />
     <Compile Include="Models\Files\GifExtensionChecker.cs" />
-    <Compile Include="Models\Logger\IHistoryPublisher.cs" />
-    <Compile Include="Models\Logger\JsonServerHistoryPublisher.cs" />
-    <Compile Include="Models\Logger\NoHistoryPublisher.cs" />
-    <Compile Include="Models\Logger\HistoryPost.cs" />
+    <Compile Include="Models\History\IHistoryPublisher.cs" />
+    <Compile Include="Models\History\JsonServerHistoryPublisher.cs" />
+    <Compile Include="Models\History\NoHistoryPublisher.cs" />
+    <Compile Include="Models\History\HistoryPost.cs" />
     <Compile Include="Models\ProxyProvider.cs" />
     <Compile Include="Models\Configuration\Settings.cs" />
     <Compile Include="Models\VkUploader.cs" />
@@ -261,6 +263,7 @@
     <Compile Include="Models\SharedWallContext.cs" />
     <Compile Include="ViewModels\Content\WallContentViewModel.cs" />
     <Compile Include="Models\IPostType.cs" />
+    <Compile Include="ViewModels\HistoryPostViewModel.cs" />
     <Compile Include="ViewModels\UploaderViewModel.cs" />
     <Compile Include="Views\MainComponents\UploaderView.xaml.cs">
       <DependentUpon>UploaderView.xaml</DependentUpon>
@@ -300,7 +303,7 @@
     <Compile Include="Models\WallContainer.cs" />
     <Compile Include="Models\WallItem.cs" />
     <Compile Include="Models\WallList.cs" />
-    <Compile Include="ViewModels\PostControl.cs" />
+    <Compile Include="ViewModels\PostViewModel.cs" />
     <Compile Include="Models\PostType.cs" />
     <Compile Include="Models\RangeObservableCollection.cs" />
     <Compile Include="Models\Schedule.cs" />

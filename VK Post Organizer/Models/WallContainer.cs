@@ -16,26 +16,26 @@ using vk.ViewModels;
 namespace vk.Models {
    [UsedImplicitly]
    public class WallContainer : BindableBase {
-      private readonly WallGet _wallGet;
+      private readonly VkApiProvider _vkApi;
       public const int MAX_POSTPONED = 150;
       public const int RESERVE = 100;
       public event EventHandler PullInvoked;
-      public event EventHandler<ObservableCollection<PostControl>> PullCompleted;
+      public event EventHandler<ObservableCollection<PostViewModel>> PullCompleted;
       public event EventHandler<IWallHolder> WallHolderChanged;
 
       private IWallHolder _wallHolder;
-      private ObservableCollection<PostControl> _items;
+      private ObservableCollection<PostViewModel> _items;
 
-      public WallContainer(WallGet wallGet) {
-         _wallGet = wallGet;
+      public WallContainer(VkApiProvider vkApi) {
+         _vkApi = vkApi;
          WallHolder = new EmptyWallHolder();
 
-         Items = new ObservableCollection<PostControl>();
+         Items = new ObservableCollection<PostViewModel>();
          ExpandAllCommand = new DelegateCommand(expandAllCommandExecute);
          CollapseAllCommand = new DelegateCommand(collapseAllCommandExecute);
       }
 
-      public event EventHandler<PostControl> UploadRequested;
+      public event EventHandler<PostViewModel> UploadRequested;
 
       public IWallHolder WallHolder {
          get { return _wallHolder; }
@@ -45,7 +45,7 @@ namespace vk.Models {
          }
       }
 
-      public ObservableCollection<PostControl> Items {
+      public ObservableCollection<PostViewModel> Items {
          get { return _items; }
          set { SetProperty(ref _items, value); }
       }
@@ -53,28 +53,28 @@ namespace vk.Models {
       public ICommand ExpandAllCommand { get; private set; }
       public ICommand CollapseAllCommand { get; private set; }
 
-      private static async Task<IEnumerable<PostControl>> pullPostsWithAnOffset(WallGet wall, int wallHolderId, int count, int offset) {
-         var posts = await wall.GetAsync(wallHolderId, count, offset);
-         var tasks = posts.Response.Wall.Select(async p => {
-            var post = await PostControl.CreateAsync(p);
+      private async Task<IEnumerable<PostViewModel>> pullPostsWithAnOffset(int wallHolderId, int count, int offset) {
+         var response = await _vkApi.WallGet.GetAsync(wallHolderId, count, offset, true).ConfigureAwait(false);
+         var tasks = response.Content.Wall.Select(async p => {
+            var post = await PostViewModel.CreateAsync(p).ConfigureAwait(false);
             post.IsExisting = true;
             return post;
          }).ToList();
 
-         return await Task.WhenAll(tasks);
+         return await Task.WhenAll(tasks).ConfigureAwait(false);
       }
 
-      public async Task<IEnumerable<PostControl>> PullAsync(IWallHolder wallHolder) {
+      public async Task<IEnumerable<PostViewModel>> PullAsync(IWallHolder wallHolder) {
          if (wallHolder == null) {
             throw new ArgumentNullException(nameof(wallHolder));
          }
 
          try {
-            var postList = new List<PostControl>();
+            var postList = new List<PostViewModel>();
 
-            postList.AddRange(await pullPostsWithAnOffset(_wallGet, wallHolder.ID, 100, 0));
+            postList.AddRange(await pullPostsWithAnOffset(wallHolder.ID, 100, 0).ConfigureAwait(false));
             if (postList.Count == 100) {
-               postList.AddRange(await pullPostsWithAnOffset(_wallGet, wallHolder.ID, 50, 100));
+               postList.AddRange(await pullPostsWithAnOffset(wallHolder.ID, 50, 100).ConfigureAwait(false));
             }
 
             return postList;
@@ -86,7 +86,7 @@ namespace vk.Models {
       } 
 
       private void onPostUploadRequested(object sender, EventArgs eventArgs) {
-         OnUploadRequested((PostControl)sender);
+         OnUploadRequested((PostViewModel)sender);
       }
 
       public async Task PullWithScheduleHightlightAsync([NotNull] PostFilter filter, [NotNull] Schedule schedule) {
@@ -124,14 +124,14 @@ namespace vk.Models {
 
          Clear();
 
-         var tempList = new List<PostControl>();
+         var tempList = new List<PostViewModel>();
 
-         tempList.AddRange(await PullAsync(WallHolder));
+         tempList.AddRange(await PullAsync(WallHolder).ConfigureAwait(false));
 
-         await addMissingFakePosts(filter, schedule, tempList);
+         await addMissingFakePosts(filter, schedule, tempList).ConfigureAwait(false);
       }
 
-      private async Task addMissingFakePosts(PostFilter filter, Schedule schedule, List<PostControl> tempList) {
+      private async Task addMissingFakePosts(PostFilter filter, Schedule schedule, List<PostViewModel> tempList) {
          tempList.Where(i => IsDateMatchTheSchedule(i.Post.DateUnix, schedule)).ForEach(i => i.Mark = PostMark.Good);
 
          var firstDate = DateTime.Now;
@@ -161,11 +161,11 @@ namespace vk.Models {
                if (isTimeCorrectlyScheduled == false) {
                   totalCount++;
 
-                  var post = await PostControl.CreateAsync(new Post {
+                  var post = await PostViewModel.CreateAsync(new Post {
                      DateUnix = UnixTimeConverter.ToUnix(scheduledDate),
                      ID = 0,
                      Text = "Здесь должен быть пост."
-                  });
+                  }).ConfigureAwait(false);
                   
                   post.Mark = PostMark.Bad;
                   post.IsExisting = false;
@@ -229,13 +229,13 @@ namespace vk.Models {
          return new DateTime(yearMonthDay.Year, yearMonthDay.Month, yearMonthDay.Day, scheduleItem.Hour, scheduleItem.Minute, 0);
       }
 
-      public static void SortListByDate(List<PostControl> posts) {
+      public static void SortListByDate(List<PostViewModel> posts) {
          posts.Sort((a, b) => a.Post.DateUnix.CompareTo(b.Post.DateUnix));
       }
 
       public void Clear() {
          foreach (var postItem in Items) {
-            postItem.Clear();
+            postItem.ClearPreview();
             postItem.UploadRequested -= onPostUploadRequested;
          }
          Items.Clear();
@@ -253,11 +253,11 @@ namespace vk.Models {
          }
       }
 
-      protected virtual void OnUploadRequested(PostControl e) {
+      protected virtual void OnUploadRequested(PostViewModel e) {
          UploadRequested?.Invoke(this, e);
       }
 
-      protected virtual void OnPulled(ObservableCollection<PostControl> collection) {
+      protected virtual void OnPulled(ObservableCollection<PostViewModel> collection) {
          PullCompleted?.Invoke(this, collection);
       }
 

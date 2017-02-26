@@ -6,7 +6,7 @@ using JetBrains.Annotations;
 using Newtonsoft.Json;
 using RateLimiter;
 
-namespace vk.Models.Logger {
+namespace vk.Models.History {
    [UsedImplicitly]
    public class JsonServerHistoryPublisher : IHistoryPublisher {
       private readonly Settings _settings;

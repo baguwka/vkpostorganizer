@@ -12,23 +12,52 @@ using vk.Models.VkApi.Entities;
 using vk.Utils;
 
 namespace vk.ViewModels {
-   [UsedImplicitly]
-   public class PostControl : BindableBase, IPostType {
+   public class PostViewModelBase : BindableBase, IPostType {
       private bool _expanded;
-      private PostMark _mark;
       private PostType _postType;
-      public Post Post { get; private set; }
-      public event EventHandler UploadRequested;
-
-      public ObservableCollection<ImageItem> Images { get; private set; }
+      private ObservableCollection<ImageItem> _previewImages;
 
       public bool Expanded {
          get { return _expanded; }
-         set {
-            if (PostType == PostType.Missing) value = false;
-            SetProperty(ref _expanded, value);
-         }
+         set { SetProperty(ref _expanded, value); }
       }
+
+      public PostType PostType {
+         get { return _postType; }
+         set { SetProperty(ref _postType, value); }
+      }
+
+      public ObservableCollection<ImageItem> PreviewImages {
+         get { return _previewImages; }
+         set { SetProperty(ref _previewImages, value); }
+      }
+
+      public PostViewModelBase() {
+         PreviewImages = new ObservableCollection<ImageItem>();
+      }
+
+      protected virtual void expandToggle() {
+         Expanded = !Expanded;
+      }
+
+      public virtual void Expand() {
+         Expanded = true;
+      }
+
+      public virtual void Collapse() {
+         Expanded = false;
+      }
+
+      public virtual void ClearPreview() {
+         PreviewImages.Clear();
+      }
+   }
+
+   [UsedImplicitly]
+   public class PostViewModel : PostViewModelBase {
+      private PostMark _mark;
+      public Post Post { get; private set; }
+      public event EventHandler UploadRequested;
 
       public PostMark Mark {
          get { return _mark; }
@@ -38,57 +67,48 @@ namespace vk.ViewModels {
       public ICommand OpenPost { get; set; }
       public ICommand ExpandToggleCommand { get; set; }
       public ICommand UploadAtThisDateCommand { get; set; }
-      public ICommand RapidUploadModeCommand { get; set; }
 
       public bool IsExisting { get; set; }
 
-      public bool IsRapidUploadModeEnabled { get; set; }
-      public bool IsImageReady { get; set; }
-
-      public PostType PostType {
-         get { return _postType; }
-         set { SetProperty(ref _postType, value); }
-      }
-
       private void loadImages() {
-         Images.AddRange(from attachment in Post.Attachments
+         PreviewImages.AddRange(from attachment in Post.Attachments
                          where attachment.Type == "photo"
                          select attachment.ObtainPhotoUrl(ImageSize.Medium, new PhotoUrlObtainer()));
 
-         Images.AddRange(from attachment in Post.Attachments
+         PreviewImages.AddRange(from attachment in Post.Attachments
                          where attachment.Type == "doc" && (attachment.Document.Type == (int)DocType.Image || attachment.Document.Type == (int)DocType.Gif)
                          select attachment.ObtainDocumentPreview(ImageSize.Large, new DocumentPreviewUrlObtainer()));
       }
 
-      private PostControl() {
-         
-      }
-
-      public static async Task<PostControl> CreateAsync([NotNull] Post postReference) {
-         if (postReference == null) {
-            throw new ArgumentNullException(nameof(postReference));
-         }
-
-         var postControl = new PostControl();
-         return await postControl.InitializeAsync(postReference);
-      }
-
-      private async Task<PostControl> InitializeAsync([NotNull] Post postReference) {
-         if (postReference == null) {
-            throw new ArgumentNullException(nameof(postReference));
-         }
-
-         Images = new ObservableCollection<ImageItem>();
-
+      private PostViewModel() {
          ExpandToggleCommand = new DelegateCommand(expandToggle,
-            () => PostType != PostType.Missing).ObservesProperty(() => PostType);
+               () => PostType != PostType.Missing)
+            .ObservesProperty(() => PostType);
 
          OpenPost = new DelegateCommand(openPostCommand,
-            () => IsExisting == true && PostType != PostType.Missing).ObservesProperty(() => IsExisting);
+               () => IsExisting == true && PostType != PostType.Missing)
+            .ObservesProperty(() => IsExisting)
+            .ObservesProperty(() => PostType);
 
          UploadAtThisDateCommand = new DelegateCommand(uploadAtThisDateCommandExecute,
-            () => PostType == PostType.Missing).ObservesProperty(() => PostType);
+               () => PostType == PostType.Missing)
+            .ObservesProperty(() => PostType);
+      }
 
+      public static async Task<PostViewModel> CreateAsync([NotNull] Post postReference) {
+         if (postReference == null) {
+            throw new ArgumentNullException(nameof(postReference));
+         }
+
+         var postControl = new PostViewModel();
+         return await postControl.initializeAsync(postReference);
+      }
+
+      private async Task<PostViewModel> initializeAsync([NotNull] Post postReference) {
+         if (postReference == null) {
+            throw new ArgumentNullException(nameof(postReference));
+         }
+         
          Post = postReference;
 
          //if copy history is null it's not a repost
@@ -118,21 +138,24 @@ namespace vk.ViewModels {
          System.Diagnostics.Process.Start($"https://vk.com/wall{Post.OwnerId}_{Post.ID}");
       }
 
-      private void expandToggle() {
+      protected override void expandToggle() {
+         if (PostType == PostType.Missing) {
+            Expanded = false;
+            return;
+         }
+
          Expanded = !Expanded;
       }
 
-      public void Clear() {
-         Images.Clear();
-      }
+      public override void Expand() {
+         if (PostType == PostType.Missing) {
+            Expanded = false;
+            return;
+         }
 
-      public void Expand() {
          Expanded = true;
       }
 
-      public void Collapse() {
-         Expanded = false;
-      }
 
       protected virtual void OnUploadRequested() {
          UploadRequested?.Invoke(this, EventArgs.Empty);

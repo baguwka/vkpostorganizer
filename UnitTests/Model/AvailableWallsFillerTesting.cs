@@ -25,7 +25,7 @@ namespace UnitTests.Model {
          var usersGet = SubstituresForVkApi.UsersGet();
          var groupsGet = Substitute.For<IGroupsGet>();
          groupsGet.GetAsync(VkParameters.No()).ReturnsForAnyArgs(new GroupsGetResponse {
-            Collection = null
+            Content = null
          });
 
          var wallList = new WallList();

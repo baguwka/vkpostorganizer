@@ -91,7 +91,7 @@ namespace vk.Models.VkApi {
    [UsedImplicitly]
    public class WallPostResponse {
       [JsonProperty(PropertyName = "response")]
-      public WallPostInfo Response { get; set; }
+      public WallPostInfo Content { get; set; }
    }
 
    [UsedImplicitly]

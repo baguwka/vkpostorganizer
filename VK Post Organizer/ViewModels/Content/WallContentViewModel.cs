@@ -21,11 +21,13 @@ namespace vk.ViewModels {
       private bool _isBusy;
       private bool _filterPostsIsChecked;
       private bool _filterRepostsIsChecked;
-      private IList <PostControl> _filteredItems;
+      private IList <PostViewModel> _filteredItems;
 
       public bool IsBusy {
          get { return _isBusy; }
-         set { SetProperty(ref _isBusy, value); }
+         set { SetProperty(ref _isBusy, value);
+            _eventAggregator.GetEvent<ContentEvents.BusyEvent>().Publish(_isBusy);
+         }
       }
 
       public bool FilterPostsIsChecked {
@@ -38,7 +40,7 @@ namespace vk.ViewModels {
          set { SetProperty(ref _filterRepostsIsChecked, value); }
       }
 
-      public IList<PostControl> FilteredItems {
+      public IList<PostViewModel> FilteredItems {
          get { return _filteredItems; }
          private set { SetProperty(ref _filteredItems, value); }
       }
@@ -56,7 +58,7 @@ namespace vk.ViewModels {
          _wallContainerController = wallContainerController;
          _sharedWallContext = sharedWallContext;
          CurrentPostFilter = new CompositePostFilter();
-         FilteredItems = new RangeObservableCollection<PostControl>();
+         FilteredItems = new RangeObservableCollection<PostViewModel>();
 
          _wallContainerController.Container.PullInvoked += onWallContainerPullInvoked;
          _wallContainerController.Container.PullCompleted += onWallContainerPullCompleted;
@@ -90,10 +92,10 @@ namespace vk.ViewModels {
             .ObservesProperty(() => IsBusy);
       }
 
-      private void onWallContainerUploadRequest(object sender, PostControl postControl) {
+      private void onWallContainerUploadRequest(object sender, PostViewModel postViewModel) {
          _eventAggregator.GetEvent<UploaderEvents.Configure>().Publish(new UploaderViewModelConfiguration() {
             IsEnabled = true,
-            DateOverride = postControl.Post.DateUnix
+            DateOverride = postViewModel.Post.DateUnix
          });
          _eventAggregator.GetEvent<UploaderEvents.SetVisibility>().Publish(true);
       }
@@ -102,7 +104,7 @@ namespace vk.ViewModels {
          IsBusy = true;
       }
 
-      protected virtual async void onWallContainerPullCompleted(object sender, ObservableCollection<PostControl> items) {
+      protected virtual async void onWallContainerPullCompleted(object sender, ObservableCollection<PostViewModel> items) {
          IsBusy = true;
          try {
             await filterOutAsync(items);
@@ -124,12 +126,12 @@ namespace vk.ViewModels {
 
       }
 
-      protected async Task filterOutAsync(IEnumerable<PostControl> items) {
+      protected async Task filterOutAsync(IEnumerable<PostViewModel> items) {
          IsBusy = true;
          try {
             var currentFiltered = _filteredItems;
 
-            IEnumerable<PostControl> tempItems = new List<PostControl>();
+            IEnumerable<PostViewModel> tempItems = new List<PostViewModel>();
             await Task.Run(() => tempItems = items.Where(CurrentPostFilter.Suitable));
 
             this.FilteredItems = null;

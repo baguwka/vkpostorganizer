@@ -46,7 +46,7 @@ namespace vk.Models {
          Attachment.Document = doc;
 
          var previewObtainer = new DocumentPreviewUrlObtainer();
-         Preview = previewObtainer.Obtain(Attachment, ImageSize.Small).Url;
+         Preview = previewObtainer.Obtain(Attachment, ImageSize.Small).Preview;
       }
    }
 

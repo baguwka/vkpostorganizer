@@ -21,7 +21,7 @@ namespace vk.Utils {
          var groupsGetById = App.Container.Resolve<GroupsGetById>();
 
          var response = await groupsGetById.GetAsync(groupId);
-         var group = response.Response.FirstOrDefault();
+         var group = response.Content.FirstOrDefault();
 
          _groupNamesById.TryAdd(groupId, group?.Name);
          return group?.Name;

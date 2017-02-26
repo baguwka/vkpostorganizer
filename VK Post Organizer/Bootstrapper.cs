@@ -6,7 +6,7 @@ using Prism.Regions;
 using Prism.Unity;
 using vk.Infrastructure;
 using vk.Models;
-using vk.Models.Logger;
+using vk.Models.History;
 using vk.Models.UrlHelper;
 using vk.Models.VkApi;
 using vk.ViewModels;
@@ -89,6 +89,7 @@ namespace vk {
 
          Container.RegisterType<IWallHolder, EmptyWallHolder>();
          Container.RegisterType<SharedWallContext>(Lifetime.Singleton);
+         Container.RegisterType<BusyObserver>(Lifetime.Singleton);
          Container.RegisterType<WallContainerController>(Lifetime.Singleton);
 
          Container.RegisterType<HistoryController>(Lifetime.Singleton);

@@ -30,7 +30,7 @@ namespace UnitTests.Model {
 
          var info = await uploader.TryUploadPhotoToWallAsync(photo, -1, ct);
 
-         Assert.That(info.Photo?.Photo1280, Is.EqualTo(FakeResponsesForVkApi.ForPhotosSaveWallPhoto().Response[0]?.Photo1280));
+         Assert.That(info.Photo?.Photo1280, Is.EqualTo(FakeResponsesForVkApi.ForPhotosSaveWallPhoto().Content[0]?.Photo1280));
          Assert.That(info.Successful, Is.True);
       }
    }

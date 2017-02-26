@@ -19,7 +19,7 @@ namespace vk.Models {
             .AddParameter("filter", "editor")
             .AddParameter("fields", "description"));
 
-         if (groups.Collection == null) {
+         if (groups.Content == null) {
             return new AvailableWallsInfo {
                Succeed = false,
                ErrorMessage = "Groups not found"
@@ -53,7 +53,7 @@ namespace vk.Models {
          wallList.Clear();
          wallList.Add(item);
 
-         foreach (var group in groups.Collection.Groups) {
+         foreach (var group in groups.Content.Groups) {
             wallList.Add(new WallItem(group));
          }
 

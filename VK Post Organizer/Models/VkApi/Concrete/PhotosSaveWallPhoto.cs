@@ -50,7 +50,7 @@ namespace vk.Models.VkApi {
    [UsedImplicitly]
    public class PhotosSaveWallPhotoResponse {
       [JsonProperty(PropertyName = "response")]
-      public List<Photo> Response { get; set; }
+      public List<Photo> Content { get; set; }
    }
 
    [UsedImplicitly]

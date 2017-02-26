@@ -14,7 +14,7 @@ namespace UnitTests.Fakes {
 
       public static PhotosSaveWallPhotoResponse ForPhotosSaveWallPhoto() {
          return new PhotosSaveWallPhotoResponse {
-            Response = new List<Photo> {
+            Content = new List<Photo> {
                new Photo {
                   Id = 1,
                   OwnerId = 1,
@@ -42,7 +42,7 @@ namespace UnitTests.Fakes {
 
       public static GroupsGetResponse ForGroupsGet() {
          return new GroupsGetResponse { 
-            Collection = new GroupGetCollection {
+            Content = new GroupGetCollection {
                Count = 2,
                Groups = new List<Group> {
                   new Group {

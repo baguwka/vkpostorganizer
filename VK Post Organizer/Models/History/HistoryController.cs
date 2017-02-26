@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 using vk.Models.VkApi;
 using vk.Models.VkApi.Entities;
 
-namespace vk.Models.Logger {
+namespace vk.Models.History {
    [UsedImplicitly]
    public class HistoryController {
       private readonly IHistoryPublisher _historyPublisher;
@@ -38,6 +38,7 @@ namespace vk.Models.Logger {
                   WallId = info.WallId,
                   Message = info.Message,
                   PostponedToDate = info.Date,
+                  IsRepost = false,
                   PublishingDate = info.PublishingDate,
                   AttachmentUrls = info.Attachments.Exposed.Select(attachment => attachment.Photo.GetLargest()).ToList()
                };

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Net;
@@ -46,7 +45,7 @@ namespace vk.Models.VkApi {
          _httpClient = new HttpClient(httpClientHandler) {Timeout = TimeSpan.FromSeconds(4)};
          _responseCache = new ConcurrentDictionary<string, VkApiResponseInfo>();
 
-         _rateLimiter = TimeLimiter.GetFromMaxCountByInterval(6, TimeSpan.FromSeconds(1));
+         _rateLimiter = TimeLimiter.GetFromMaxCountByInterval(3, TimeSpan.FromSeconds(1.00f));
       }
 
       private void checkForErrors(string response) {
@@ -83,6 +82,14 @@ namespace vk.Models.VkApi {
          return await _rateLimiter.Perform(() => callAsync(uri, ct), ct).ConfigureAwait(false);
       }
 
+      public async Task<string> ExecuteMethodIgnoreCacheAsync(string method, [NotNull] VkParameters query, CancellationToken ct) {
+         if (query == null) {
+            throw new ArgumentNullException(nameof(query));
+         }
+
+         var uri = buildCompleteUri(method, query);
+         return await _rateLimiter.Perform(() => callAsync(uri, ct), ct).ConfigureAwait(false);
+      }
 
       private async Task<string> callAsync(Uri uri, CancellationToken ct) {
          try {
