@@ -13,7 +13,7 @@ namespace UnitTests.Fakes {
       public static IGroupsGet GroupsGet() {
          var groupsGet = Substitute.For<IGroupsGet>();
          var fakeGroupResponse = FakeResponsesForVkApi.ForGroupsGet();
-         groupsGet.GetAsync(VkParameters.No()).ReturnsForAnyArgs(fakeGroupResponse);
+         groupsGet.GetAsync(QueryParameters.No()).ReturnsForAnyArgs(fakeGroupResponse);
          return groupsGet;
       }
 

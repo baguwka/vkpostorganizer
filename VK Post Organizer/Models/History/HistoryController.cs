@@ -37,10 +37,10 @@ namespace vk.Models.History {
                   OwnerId = userid,
                   WallId = info.WallId,
                   Message = info.Message,
-                  PostponedToDate = info.Date,
+                  PostponedDateUnix = info.Date,
                   IsRepost = false,
-                  PublishingDate = info.PublishingDate,
-                  AttachmentUrls = info.Attachments.Exposed.Select(attachment => attachment.Photo.GetLargest()).ToList()
+                  PublishingDateUnix = info.PublishingDate,
+                  Attachments = info.Attachments.Exposed.Select(attachment => attachment.Photo.GetLargest()).ToList()
                };
                _historyPublisher.LogAsync(post);
             }

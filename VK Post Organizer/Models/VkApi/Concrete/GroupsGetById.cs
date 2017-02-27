@@ -24,9 +24,9 @@ namespace vk.Models.VkApi {
          return await GetAsync(id, CancellationToken.None).ConfigureAwait(false);
       }
 
-      private static VkParameters buildAQuery(int id) {
+      private static QueryParameters buildAQuery(int id) {
          id = Math.Abs(id);
-         var query = VkParameters.New()
+         var query = QueryParameters.New()
             .AddParameter("group_id", id);
             //.AddParameter("fields", fields);
          return query;

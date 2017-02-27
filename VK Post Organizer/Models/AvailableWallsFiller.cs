@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using vk.Models.VkApi;
@@ -15,7 +16,7 @@ namespace vk.Models {
       }
 
       public async Task<AvailableWallsInfo> FillAsync(WallList wallList) {
-         var groups = await _groupsGet.GetAsync(VkParameters.New()
+         var groups = await _groupsGet.GetAsync(QueryParameters.New()
             .AddParameter("filter", "editor")
             .AddParameter("fields", "description"));
 
@@ -45,6 +46,7 @@ namespace vk.Models {
          //todo: get rid of workaround
          var item = new WallItem(new EmptyWallHolder {
             Name = user.Name,
+            ID = Math.Abs(user.ID),
             Description = user.Description,
             Photo200 = user.Photo200,
             Photo50 = user.Photo50
@@ -54,6 +56,7 @@ namespace vk.Models {
          wallList.Add(item);
 
          foreach (var group in groups.Content.Groups) {
+            group.ID = -group.ID;
             wallList.Add(new WallItem(group));
          }
 

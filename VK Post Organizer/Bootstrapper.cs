@@ -7,6 +7,8 @@ using Prism.Unity;
 using vk.Infrastructure;
 using vk.Models;
 using vk.Models.History;
+using vk.Models.JsonServerApi;
+using vk.Models.Pullers;
 using vk.Models.UrlHelper;
 using vk.Models.VkApi;
 using vk.ViewModels;
@@ -55,6 +57,7 @@ namespace vk {
          Container.RegisterType<Settings>(Lifetime.Singleton);
          Container.RegisterType<ProxySettings>(new InjectionFactory(container => container.Resolve<Settings>().Proxy));
          Container.RegisterType<UploadSettings>(new InjectionFactory(container => container.Resolve<Settings>().Upload));
+         Container.RegisterType<HistorySettings>(new InjectionFactory(container => container.Resolve<Settings>().History));
 
          Container.RegisterType<HttpClientHandlerFactory>(Lifetime.Singleton);
          Container.RegisterType<HttpMessageHandler>(new InjectionFactory(container =>
@@ -63,6 +66,11 @@ namespace vk {
             container.Resolve<HttpClientHandlerFactory>().BuildHttpClientHandlerWithProxyIfEnabled()));
 
          Container.RegisterType<AccessToken>(Lifetime.Singleton);
+
+         Container.RegisterType<JsApi>(Lifetime.Singleton);
+         Container.RegisterType<JsApiProvider>(Lifetime.Singleton);
+
+         Container.RegisterType<GetPosts>(new InjectionFactory(container => container.Resolve<JsApiProvider>().GetPosts));
 
          Container.RegisterType<VkApi>(Lifetime.Singleton);
          Container.RegisterType<VkApiProvider>(Lifetime.Singleton);
@@ -90,7 +98,7 @@ namespace vk {
          Container.RegisterType<IWallHolder, EmptyWallHolder>();
          Container.RegisterType<SharedWallContext>(Lifetime.Singleton);
          Container.RegisterType<BusyObserver>(Lifetime.Singleton);
-         Container.RegisterType<WallContainerController>(Lifetime.Singleton);
+         Container.RegisterType<PullersController>(Lifetime.Singleton);
 
          Container.RegisterType<HistoryController>(Lifetime.Singleton);
          Container.RegisterType<IHistoryPublisher, JsonServerHistoryPublisher>(Lifetime.Singleton);

@@ -18,6 +18,7 @@ using vk.Events;
 using vk.Models;
 using vk.Models.Files;
 using vk.Models.Filter;
+using vk.Models.Pullers;
 using vk.Models.VkApi;
 using vk.Models.VkApi.Entities;
 using vk.Utils;
@@ -35,7 +36,7 @@ namespace vk.ViewModels {
       private readonly VkUploader _uploader;
       private readonly UploadSettings _uploadSettings;
       private readonly VkApiProvider _vkApi;
-      private readonly WallContainerController _wallContainerController;
+      private readonly PullersController _pullersController;
       private ObservableCollection<AttachmentItem> _attachments;
 
       private CancellationTokenSource _cts;
@@ -147,18 +148,18 @@ namespace vk.ViewModels {
       public ICommand MoveNextCommand { get; private set; }
 
       public UploaderViewModel(IEventAggregator eventAggregator, VkUploader uploader, UploadSettings uploadSettings, 
-         VkApiProvider vkApi, WallContainerController wallContainerController) {
+         VkApiProvider vkApi, PullersController pullersController) {
 
          _eventAggregator = eventAggregator;
          _uploader = uploader;
          _uploadSettings = uploadSettings;
          _vkApi = vkApi;
-         _wallContainerController = wallContainerController;
+         _pullersController = pullersController;
          FilteredItems = new List<PostViewModel>();
 
-         _wallContainerController.Container.PullInvoked += onContainerPullInvoked;
-         _wallContainerController.Container.PullCompleted += onContainerPullCompleted;
-         _wallContainerController.Container.WallHolderChanged += onContainerWallHolderChanged;
+         _pullersController.Vk.PullInvoked += onContainerPullInvoked;
+         _pullersController.Vk.PullCompleted += onContainerPullCompleted;
+         _pullersController.Vk.WallHolderChanged += onContainerWallHolderChanged;
 
          _shrinkAfterPublish = _uploadSettings.CloseUploadWindowAfterPublish;
 
@@ -215,12 +216,12 @@ namespace vk.ViewModels {
          ProgressString = "Pull...";
       }
 
-      private async void onContainerPullCompleted(object sender, ObservableCollection<PostViewModel> args) {
-         var missing = _wallContainerController.Container.GetMissingPostCount();
-         InfoPanel = $"{WallContainer.MAX_POSTPONED - missing}/{WallContainer.MAX_POSTPONED}";
+      private async void onContainerPullCompleted(object sender, IList<PostViewModel> args) {
+         var missing = _pullersController.Vk.GetMissingPostCount();
+         InfoPanel = $"{VkWallPuller.MAX_POSTPONED - missing}/{VkWallPuller.MAX_POSTPONED}";
          IsBusy = false;
          ProgressString = "";
-         await filterOutAsync(_wallContainerController.Container.Items);
+         await filterOutAsync(_pullersController.Vk.Items);
       }
 
       protected async Task filterOutAsync(IEnumerable<PostViewModel> items) {
@@ -269,14 +270,14 @@ namespace vk.ViewModels {
                return;
             }
 
-            if (await Waiter.WaitUntilConditionSetsTrue(() => _wallContainerController.Container.Items.Any(), 5,
+            if (await Waiter.WaitUntilConditionSetsTrue(() => _pullersController.Vk.Items.Any(), 5,
                TimeSpan.FromSeconds(1f)) == false) {
                return;
             }
 
             if (config.DateOverride == -1) {
                var firstMissed =
-                  _wallContainerController.Container.Items.FirstOrDefault(MissingPostFilter.Instance.Suitable);
+                  _pullersController.Vk.Items.FirstOrDefault(MissingPostFilter.Instance.Suitable);
                if (firstMissed == null) {
                   return;
                }
@@ -412,7 +413,7 @@ namespace vk.ViewModels {
       private async Task uploadFromBytes(byte[] photo, CancellationToken cancellationToken) {
          ProgressString = "Uploading...";
          UploadProgress = 100;
-         var result = await _uploader.TryUploadPhotoToWallAsync(photo, _wallContainerController.Container.WallHolder.ID, cancellationToken);
+         var result = await _uploader.TryUploadPhotoToWallAsync(photo, _pullersController.Vk.WallHolder.ID, cancellationToken);
          if (result.Successful) {
             addPhotoToAttachments(result.Photo);
          }
@@ -459,7 +460,7 @@ namespace vk.ViewModels {
          IsPublishing = true;
          bool successful = true;
          try {
-            await _vkApi.WallPost.PostAsync(-_wallContainerController.Container.WallHolder.ID, Message, 
+            await _vkApi.WallPost.PostAsync(_pullersController.Vk.WallHolder.ID, Message, 
                DateUnix, Attachments.Take(10).ToAttachments());
          }
          catch (VkException ex) {

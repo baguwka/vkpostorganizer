@@ -7,10 +7,10 @@ using vk.Models.VkApi;
 
 namespace UnitTests.VkApi {
    [TestFixture]
-   public class VkParametersTesting {
+   public class QueryParametersTesting {
       [Test]
       public void Fill_parameters_and_check_them() {
-         var parameters = VkParameters.New()
+         var parameters = QueryParameters.New()
             .AddParameter("param1", "value1")
             .AddParameter("param2", "value2")
             .AddParameter("param3", "value3")
@@ -24,11 +24,11 @@ namespace UnitTests.VkApi {
 
       [Test]
       public void Add_parameters_to_parameters_and_check_them() {
-         var parameters = VkParameters.New()
+         var parameters = QueryParameters.New()
             .AddParameter("param1", "value1")
             .AddParameter("param2", "value2");
 
-         var externalParameters = VkParameters.New()
+         var externalParameters = QueryParameters.New()
             .AddParameter("externalParam1", "externalValue1")
             .AddParameter("externalParam2", "externalValue2");
 
@@ -42,7 +42,7 @@ namespace UnitTests.VkApi {
 
       [Test]
       public void Build_a_uri_from_parameters() {
-         var parameters = VkParameters.New()
+         var parameters = QueryParameters.New()
             .AddParameter("param1", "value1")
             .AddParameter("param2", "value2");
 

@@ -59,7 +59,7 @@ namespace vk.Models.VkApi {
          }
       }
 
-      public async Task<string> ExecuteMethodAsync(string method, [NotNull] VkParameters query, CancellationToken ct) {
+      public async Task<string> ExecuteMethodAsync(string method, [NotNull] QueryParameters query, CancellationToken ct) {
          if (query == null) {
             throw new ArgumentNullException(nameof(query));
          }
@@ -82,7 +82,7 @@ namespace vk.Models.VkApi {
          return await _rateLimiter.Perform(() => callAsync(uri, ct), ct).ConfigureAwait(false);
       }
 
-      public async Task<string> ExecuteMethodIgnoreCacheAsync(string method, [NotNull] VkParameters query, CancellationToken ct) {
+      public async Task<string> ExecuteMethodIgnoreCacheAsync(string method, [NotNull] QueryParameters query, CancellationToken ct) {
          if (query == null) {
             throw new ArgumentNullException(nameof(query));
          }
@@ -170,7 +170,7 @@ namespace vk.Models.VkApi {
          throw new VkException(!string.IsNullOrEmpty(message) ? message : innerException?.Message ?? ex.Message, ex);
       }
 
-      private Uri buildCompleteUri(string method, VkParameters parameters) {
+      private Uri buildCompleteUri(string method, QueryParameters parameters) {
          var uriBuilder = new UriBuilder($"https://api.vk.com/method/{method}");
 
          var uriParameters = new NameValueCollection();

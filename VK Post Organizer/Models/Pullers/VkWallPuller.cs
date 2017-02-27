@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Input;
 using JetBrains.Annotations;
-using Prism.Commands;
 using Prism.Mvvm;
 using vk.Models.Filter;
 using vk.Models.VkApi;
@@ -13,26 +11,24 @@ using vk.Models.VkApi.Entities;
 using vk.Utils;
 using vk.ViewModels;
 
-namespace vk.Models {
+namespace vk.Models.Pullers {
    [UsedImplicitly]
-   public class WallContainer : BindableBase {
+   public class VkWallPuller : BindableBase {
       private readonly VkApiProvider _vkApi;
       public const int MAX_POSTPONED = 150;
       public const int RESERVE = 100;
       public event EventHandler PullInvoked;
-      public event EventHandler<ObservableCollection<PostViewModel>> PullCompleted;
+      public event EventHandler<IList<PostViewModel>> PullCompleted;
       public event EventHandler<IWallHolder> WallHolderChanged;
 
       private IWallHolder _wallHolder;
       private ObservableCollection<PostViewModel> _items;
 
-      public WallContainer(VkApiProvider vkApi) {
+      public VkWallPuller(VkApiProvider vkApi) {
          _vkApi = vkApi;
          WallHolder = new EmptyWallHolder();
 
          Items = new ObservableCollection<PostViewModel>();
-         ExpandAllCommand = new DelegateCommand(expandAllCommandExecute);
-         CollapseAllCommand = new DelegateCommand(collapseAllCommandExecute);
       }
 
       public event EventHandler<PostViewModel> UploadRequested;
@@ -49,9 +45,6 @@ namespace vk.Models {
          get { return _items; }
          set { SetProperty(ref _items, value); }
       }
-
-      public ICommand ExpandAllCommand { get; private set; }
-      public ICommand CollapseAllCommand { get; private set; }
 
       private async Task<IEnumerable<PostViewModel>> pullPostsWithAnOffset(int wallHolderId, int count, int offset) {
          var response = await _vkApi.WallGet.GetAsync(wallHolderId, count, offset, true).ConfigureAwait(false);
@@ -241,13 +234,13 @@ namespace vk.Models {
          Items.Clear();
       }
 
-      private void expandAllCommandExecute() {
+      public void ExpandAll() {
          foreach (var postItem in Items) {
             postItem.Expand();
          }
       }
 
-      private void collapseAllCommandExecute() {
+      public void CollapseAll() {
          foreach (var postItem in Items) {
             postItem.Collapse();
          }
@@ -257,7 +250,7 @@ namespace vk.Models {
          UploadRequested?.Invoke(this, e);
       }
 
-      protected virtual void OnPulled(ObservableCollection<PostViewModel> collection) {
+      protected virtual void OnPulled(IList<PostViewModel> collection) {
          PullCompleted?.Invoke(this, collection);
       }
 

@@ -5,23 +5,24 @@ using System.Threading.Tasks;
 using System.Windows;
 using JetBrains.Annotations;
 using vk.Models;
+using vk.Models.Pullers;
 using vk.ViewModels;
 
 namespace vk.Views {
    public class UploadInfo {
       [NotNull]
-      public WallContainer Wall { get; private set; }
+      public VkWallPuller VkWallPuller { get; private set; }
       public int DateOverride { get; private set; }
 
       [NotNull]
       public IEnumerable<string> Files { get; private set; }
 
-      public UploadInfo([NotNull] WallContainer wall, [CanBeNull] IEnumerable<string> files, int dateOverride = -1) {
-         if (wall == null) {
-            throw new ArgumentNullException(nameof(wall));
+      public UploadInfo([NotNull] VkWallPuller vkWallPuller, [CanBeNull] IEnumerable<string> files, int dateOverride = -1) {
+         if (vkWallPuller == null) {
+            throw new ArgumentNullException(nameof(vkWallPuller));
          }
 
-         Wall = wall;
+         VkWallPuller = vkWallPuller;
          DateOverride = dateOverride;
          Files = files ?? new List<string>();
       }

@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Prism;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
@@ -11,17 +12,19 @@ using Prism.Regions;
 using vk.Events;
 using vk.Models;
 using vk.Models.Filter;
+using vk.Models.Pullers;
+using vk.Utils;
 
 namespace vk.ViewModels {
-   public abstract class WallContentViewModel : BindableBase, INavigationAware {
+   public abstract class WallContentViewModel : BindableBase, INavigationAware, IActiveAware {
       protected readonly IEventAggregator _eventAggregator;
-      protected readonly WallContainerController _wallContainerController;
+      protected readonly PullersController _pullersController;
       protected readonly SharedWallContext _sharedWallContext;
 
       private bool _isBusy;
       private bool _filterPostsIsChecked;
       private bool _filterRepostsIsChecked;
-      private IList <PostViewModel> _filteredItems;
+      private IList <PostViewModelBase> _filteredItems;
 
       public bool IsBusy {
          get { return _isBusy; }
@@ -40,78 +43,42 @@ namespace vk.ViewModels {
          set { SetProperty(ref _filterRepostsIsChecked, value); }
       }
 
-      public IList<PostViewModel> FilteredItems {
+      public IList<PostViewModelBase> FilteredItems {
          get { return _filteredItems; }
          private set { SetProperty(ref _filteredItems, value); }
       }
 
       public CompositePostFilter CurrentPostFilter { get; }
 
-      public ICommand PostFilterCheckedCommand { get; private set; }
-      public ICommand PostFilterUncheckedCommand { get; private set; }
+      public ICommand PostFilterCheckedCommand { get; protected set; }
+      public ICommand PostFilterUncheckedCommand { get; protected set; }
 
-      public ICommand RepostFilterCheckedCommand { get; private set; }
-      public ICommand RepostFilterUncheckedCommand { get; private set; }
+      public ICommand RepostFilterCheckedCommand { get; protected set; }
+      public ICommand RepostFilterUncheckedCommand { get; protected set; }
 
-      public WallContentViewModel(IEventAggregator eventAggregator, WallContainerController wallContainerController, SharedWallContext sharedWallContext) {
+      public WallContentViewModel(IEventAggregator eventAggregator, PullersController pullersController, SharedWallContext sharedWallContext) {
          _eventAggregator = eventAggregator;
-         _wallContainerController = wallContainerController;
+         _pullersController = pullersController;
          _sharedWallContext = sharedWallContext;
          CurrentPostFilter = new CompositePostFilter();
-         FilteredItems = new RangeObservableCollection<PostViewModel>();
-
-         _wallContainerController.Container.PullInvoked += onWallContainerPullInvoked;
-         _wallContainerController.Container.PullCompleted += onWallContainerPullCompleted;
-         _wallContainerController.Container.UploadRequested += onWallContainerUploadRequest;
+         FilteredItems = new RangeObservableCollection<PostViewModelBase>();
 
          FilterPostsIsChecked = true;
          FilterRepostsIsChecked = true;
 
-         PostFilterCheckedCommand = DelegateCommand.FromAsyncHandler(async () => {
-               updateFilter();
-               await filterOutAsync(_wallContainerController.Container.Items).ConfigureAwait(false);
-            }, () => !IsBusy)
-            .ObservesProperty(() => IsBusy);
 
-         PostFilterUncheckedCommand = DelegateCommand.FromAsyncHandler(async () => {
-               updateFilter();
-               await filterOutAsync(_wallContainerController.Container.Items).ConfigureAwait(false);
-            }, () => !IsBusy)
-            .ObservesProperty(() => IsBusy);
-
-         RepostFilterCheckedCommand = DelegateCommand.FromAsyncHandler(async () => {
-            updateFilter();
-            await filterOutAsync(_wallContainerController.Container.Items).ConfigureAwait(false);
-         }, () => !IsBusy)
-            .ObservesProperty(() => IsBusy);
-
-         RepostFilterUncheckedCommand = DelegateCommand.FromAsyncHandler(async () => {
-            updateFilter();
-            await filterOutAsync(_wallContainerController.Container.Items).ConfigureAwait(false);
-         }, () => !IsBusy)
-            .ObservesProperty(() => IsBusy);
+         _eventAggregator.GetEvent<ContentEvents.LeftBlockExpandAllRequest>().Subscribe(expandAllItems);
+         _eventAggregator.GetEvent<ContentEvents.LeftBlockCollapseAllRequest>().Subscribe(collapseAllItems);
       }
 
-      private void onWallContainerUploadRequest(object sender, PostViewModel postViewModel) {
-         _eventAggregator.GetEvent<UploaderEvents.Configure>().Publish(new UploaderViewModelConfiguration() {
-            IsEnabled = true,
-            DateOverride = postViewModel.Post.DateUnix
-         });
-         _eventAggregator.GetEvent<UploaderEvents.SetVisibility>().Publish(true);
+      protected virtual void expandAllItems() {
+         if (!IsActive) return;
+         FilteredItems.ForEach(i => i.Expand());
       }
 
-      private void onWallContainerPullInvoked(object sender, EventArgs eventArgs) {
-         IsBusy = true;
-      }
-
-      protected virtual async void onWallContainerPullCompleted(object sender, ObservableCollection<PostViewModel> items) {
-         IsBusy = true;
-         try {
-            await filterOutAsync(items);
-         }
-         finally {
-            IsBusy = false;
-         }
+      protected virtual void collapseAllItems() {
+         if (!IsActive) return;
+         FilteredItems.ForEach(i => i.Collapse());
       }
 
       public virtual void OnNavigatedTo(NavigationContext navigationContext) {
@@ -126,12 +93,12 @@ namespace vk.ViewModels {
 
       }
 
-      protected async Task filterOutAsync(IEnumerable<PostViewModel> items) {
+      protected async Task filterOutAsync(IEnumerable<PostViewModelBase> items) {
          IsBusy = true;
          try {
             var currentFiltered = _filteredItems;
 
-            IEnumerable<PostViewModel> tempItems = new List<PostViewModel>();
+            IEnumerable<PostViewModelBase> tempItems = new List<PostViewModelBase>();
             await Task.Run(() => tempItems = items.Where(CurrentPostFilter.Suitable));
 
             this.FilteredItems = null;
@@ -164,5 +131,8 @@ namespace vk.ViewModels {
             CurrentPostFilter.CompositePostType &= ~PostType.Repost;
          }
       }
+
+      public bool IsActive { get; set; }
+      public event EventHandler IsActiveChanged;
    }
 }

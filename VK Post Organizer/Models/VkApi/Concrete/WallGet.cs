@@ -20,11 +20,11 @@ namespace vk.Models.VkApi {
          return await GetAsync(parameters, ignoraCache).ConfigureAwait(false);
       }
 
-      public async Task<WallGetResponse> GetAsync(VkParameters parameters, bool ignoraCache = false) {
+      public async Task<WallGetResponse> GetAsync(QueryParameters parameters, bool ignoraCache = false) {
          return await GetAsync(parameters, CancellationToken.None, ignoraCache);
       }
 
-      public async Task<WallGetResponse> GetAsync(VkParameters parameters, CancellationToken ct, bool ignoraCache = false) {
+      public async Task<WallGetResponse> GetAsync(QueryParameters parameters, CancellationToken ct, bool ignoraCache = false) {
          var response = ignoraCache 
             ? await _api.ExecuteMethodIgnoreCacheAsync("wall.get", parameters, ct).ConfigureAwait(false)
             : await _api.ExecuteMethodAsync("wall.get", parameters, ct).ConfigureAwait(false);
@@ -32,9 +32,9 @@ namespace vk.Models.VkApi {
          return JsonConvert.DeserializeObject<WallGetResponse>(response);
       }
 
-      private static VkParameters makeAQuery(int id, int count, int offset) {
+      private static QueryParameters makeAQuery(int id, int count, int offset) {
          id = -Math.Abs(id);
-         var parameters = VkParameters.New()
+         var parameters = QueryParameters.New()
             .AddParameter("owner_id", id)
             .AddParameter("filter", "postponed")
             .AddParameter("offset", offset)

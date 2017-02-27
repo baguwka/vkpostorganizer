@@ -22,7 +22,7 @@ namespace vk.Models.VkApi {
          return JsonConvert.DeserializeObject<PhotosSaveWallPhotoResponse>(response);
       }
 
-      private static VkParameters buildAQuery(int groupID, string uploadResponse) {
+      private static QueryParameters buildAQuery(int groupID, string uploadResponse) {
          groupID = Math.Abs(groupID);
 
          var jsonedResponse = JsonConvert.DeserializeObject(uploadResponse) as JObject;
@@ -34,7 +34,7 @@ namespace vk.Models.VkApi {
          var jserver = jsonedResponse["server"];
          var jphoto = jsonedResponse["photo"];
          var jhash = jsonedResponse["hash"];
-         var query = VkParameters.New()
+         var query = QueryParameters.New()
             .AddParameter("group_id", groupID)
             .AddParameter("server", jserver)
             .AddParameter("photo", jphoto)

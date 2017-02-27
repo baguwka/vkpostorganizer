@@ -92,7 +92,7 @@
     <Compile Include="VkApi\PhotosSaveWallPhotoTesting.cs" />
     <Compile Include="VkApi\UsersGetTesting.cs" />
     <Compile Include="VkApi\VkAuthorizationTesting.cs" />
-    <Compile Include="VkApi\VkParametersTesting.cs" />
+    <Compile Include="VkApi\QueryParametersTesting.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

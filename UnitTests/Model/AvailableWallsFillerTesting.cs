@@ -24,7 +24,7 @@ namespace UnitTests.Model {
       public async Task Fill_empty_wall_list_with_corrupted_groups_data() {
          var usersGet = SubstituresForVkApi.UsersGet();
          var groupsGet = Substitute.For<IGroupsGet>();
-         groupsGet.GetAsync(VkParameters.No()).ReturnsForAnyArgs(new GroupsGetResponse {
+         groupsGet.GetAsync(QueryParameters.No()).ReturnsForAnyArgs(new GroupsGetResponse {
             Content = null
          });
 

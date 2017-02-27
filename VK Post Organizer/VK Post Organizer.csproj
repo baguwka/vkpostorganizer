@@ -216,11 +216,16 @@
     <Compile Include="Models\Content\PostponeContentPopulator.cs" />
     <Compile Include="Models\HttpClientHandlerFactory.cs" />
     <Compile Include="Models\History\HistoryController.cs" />
+    <Compile Include="Models\JsonServerApi\GetPosts.cs" />
+    <Compile Include="Models\JsonServerApi\JsApi.cs" />
+    <Compile Include="Models\Pullers\HistoryPuller.cs" />
     <Compile Include="Models\VkApi\Entities\Attachments.cs" />
+    <Compile Include="Models\JsonServerApi\JsonServerException.cs" />
     <Compile Include="Models\VkApi\Interfaces\IPhotosGetWallUploadSever.cs" />
     <Compile Include="Models\VkApi\Interfaces\IPhotosSaveWallPhoto.cs" />
     <Compile Include="Models\VkApi\Interfaces\IGroupsGet.cs" />
     <Compile Include="Models\VkApi\Interfaces\IUsersGet.cs" />
+    <Compile Include="Models\JsonServerApi\JsApiProvider.cs" />
     <Compile Include="Models\VkApi\VkApiProvider.cs" />
     <Compile Include="Models\VkApi\VkAuthorization.cs" />
     <Compile Include="Models\AppDataFolderProvider.cs" />
@@ -241,12 +246,12 @@
     <Compile Include="Models\VkApi\Concrete\PhotosGetWallUploadSever.cs" />
     <Compile Include="Models\VkApi\Concrete\PhotosSaveWallPhoto.cs" />
     <Compile Include="Models\VkApi\Concrete\StatsTrackVisitor.cs" />
-    <Compile Include="Models\VkApi\VkParameters.cs" />
+    <Compile Include="Models\VkApi\QueryParameters.cs" />
     <Compile Include="Infrastructure\WebBrowserUtility.cs" />
     <Compile Include="Models\Content\WallContentFiller.cs" />
     <Compile Include="Models\VkUploaderFactory.cs" />
     <Compile Include="Models\Waiter.cs" />
-    <Compile Include="Models\WallContainerController.cs" />
+    <Compile Include="Models\Pullers\PullersController.cs" />
     <Compile Include="Models\WinInetHelper.cs" />
     <Compile Include="ProgramInfo.cs" />
     <Compile Include="Infrastructure\RegionNames.cs" />
@@ -263,7 +268,8 @@
     <Compile Include="Models\SharedWallContext.cs" />
     <Compile Include="ViewModels\Content\WallContentViewModel.cs" />
     <Compile Include="Models\IPostType.cs" />
-    <Compile Include="ViewModels\HistoryPostViewModel.cs" />
+    <Compile Include="ViewModels\Post\HistoryPostViewModel.cs" />
+    <Compile Include="ViewModels\Post\PostViewModelBase.cs" />
     <Compile Include="ViewModels\UploaderViewModel.cs" />
     <Compile Include="Views\MainComponents\UploaderView.xaml.cs">
       <DependentUpon>UploaderView.xaml</DependentUpon>
@@ -300,10 +306,10 @@
     <Compile Include="ViewModels\UploadViewModel.cs" />
     <Compile Include="ViewModels\Content\Components\WallContentLeftBlockViewModel.cs" />
     <Compile Include="ViewModels\Content\WallPostponeContentViewModel.cs" />
-    <Compile Include="Models\WallContainer.cs" />
+    <Compile Include="Models\Pullers\VkWallPuller.cs" />
     <Compile Include="Models\WallItem.cs" />
     <Compile Include="Models\WallList.cs" />
-    <Compile Include="ViewModels\PostViewModel.cs" />
+    <Compile Include="ViewModels\Post\PostViewModel.cs" />
     <Compile Include="Models\PostType.cs" />
     <Compile Include="Models\RangeObservableCollection.cs" />
     <Compile Include="Models\Schedule.cs" />

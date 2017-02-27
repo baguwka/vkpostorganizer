@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace vk.Models.VkApi {
    public interface IGroupsGet {
-      Task<GroupsGetResponse> GetAsync(VkParameters parameters);
-      Task<GroupsGetResponse> GetAsync(VkParameters parameters, CancellationToken ct);
+      Task<GroupsGetResponse> GetAsync(QueryParameters parameters);
+      Task<GroupsGetResponse> GetAsync(QueryParameters parameters, CancellationToken ct);
    }
 }

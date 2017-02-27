@@ -3,35 +3,35 @@ using System.Collections.Specialized;
 using JetBrains.Annotations;
 
 namespace vk.Models.VkApi {
-   public class VkParameters {
+   public class QueryParameters {
       public NameValueCollection Query { get; }
 
-      public static VkParameters No() {
-         return new VkParameters();
+      public static QueryParameters No() {
+         return new QueryParameters();
       }
 
-      public static VkParameters New() {
-         return new VkParameters();
+      public static QueryParameters New() {
+         return new QueryParameters();
       }
 
       public string this[string key] => Query[key];
 
-      public VkParameters() {
+      public QueryParameters() {
          Query = new NameValueCollection();
       }
 
-      public VkParameters AddParameter(string paramName, string paramValue) {
+      public QueryParameters AddParameter(string paramName, string paramValue) {
          if (!string.IsNullOrEmpty(paramValue)) {
             Query[paramName] = paramValue;
          }
          return this;
       }
 
-      public VkParameters AddParameter(string paramName, object paramValue) {
+      public QueryParameters AddParameter(string paramName, object paramValue) {
          return AddParameter(paramName, paramValue.ToString());
       }
 
-      public VkParameters AppendParameters([NotNull] VkParameters parameters) {
+      public QueryParameters AppendParameters([NotNull] QueryParameters parameters) {
          if (parameters == null) {
             throw new ArgumentNullException(nameof(parameters));
          }

@@ -14,7 +14,7 @@ namespace vk.Models.VkApi {
       }
 
       public async Task<int> TrackAsync(CancellationToken ct) {
-         var response = await _api.ExecuteMethodAsync("stats.trackVisitor", VkParameters.No(), ct).ConfigureAwait(false);
+         var response = await _api.ExecuteMethodAsync("stats.trackVisitor", QueryParameters.No(), ct).ConfigureAwait(false);
          return JsonConvert.DeserializeObject<StatsTrackVisitorResponse>(response).Response;
       }
 

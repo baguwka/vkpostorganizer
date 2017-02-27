@@ -5,54 +5,12 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using JetBrains.Annotations;
 using Prism.Commands;
-using Prism.Mvvm;
 using vk.Models;
 using vk.Models.UrlHelper;
 using vk.Models.VkApi.Entities;
 using vk.Utils;
 
 namespace vk.ViewModels {
-   public class PostViewModelBase : BindableBase, IPostType {
-      private bool _expanded;
-      private PostType _postType;
-      private ObservableCollection<ImageItem> _previewImages;
-
-      public bool Expanded {
-         get { return _expanded; }
-         set { SetProperty(ref _expanded, value); }
-      }
-
-      public PostType PostType {
-         get { return _postType; }
-         set { SetProperty(ref _postType, value); }
-      }
-
-      public ObservableCollection<ImageItem> PreviewImages {
-         get { return _previewImages; }
-         set { SetProperty(ref _previewImages, value); }
-      }
-
-      public PostViewModelBase() {
-         PreviewImages = new ObservableCollection<ImageItem>();
-      }
-
-      protected virtual void expandToggle() {
-         Expanded = !Expanded;
-      }
-
-      public virtual void Expand() {
-         Expanded = true;
-      }
-
-      public virtual void Collapse() {
-         Expanded = false;
-      }
-
-      public virtual void ClearPreview() {
-         PreviewImages.Clear();
-      }
-   }
-
    [UsedImplicitly]
    public class PostViewModel : PostViewModelBase {
       private PostMark _mark;
@@ -65,12 +23,11 @@ namespace vk.ViewModels {
       }
 
       public ICommand OpenPost { get; set; }
-      public ICommand ExpandToggleCommand { get; set; }
       public ICommand UploadAtThisDateCommand { get; set; }
 
       public bool IsExisting { get; set; }
 
-      private void loadImages() {
+      protected override void loadPreviews() {
          PreviewImages.AddRange(from attachment in Post.Attachments
                          where attachment.Type == "photo"
                          select attachment.ObtainPhotoUrl(ImageSize.Medium, new PhotoUrlObtainer()));
@@ -81,10 +38,6 @@ namespace vk.ViewModels {
       }
 
       private PostViewModel() {
-         ExpandToggleCommand = new DelegateCommand(expandToggle,
-               () => PostType != PostType.Missing)
-            .ObservesProperty(() => PostType);
-
          OpenPost = new DelegateCommand(openPostCommand,
                () => IsExisting == true && PostType != PostType.Missing)
             .ObservesProperty(() => IsExisting)
@@ -114,7 +67,7 @@ namespace vk.ViewModels {
          //if copy history is null it's not a repost
          var prev = Post.CopyHistory?.FirstOrDefault();
          if (prev == null) {
-            loadImages();
+            loadPreviews();
             PostType = PostType.Post;
          }
          else {
@@ -125,7 +78,7 @@ namespace vk.ViewModels {
             Post.Text = $"{groupName.Substring(0, groupName.Length > 10 ? 10 : groupName.Length)}... {prev.Text}";
             Post.Attachments = prev.Attachments;
 
-            loadImages();
+            loadPreviews();
          }
          return this;
       }

@@ -26,8 +26,8 @@ namespace vk.Models.VkApi {
          return await GetAsync(CancellationToken.None);
       }
 
-      private static VkParameters buildAQuery() {
-         var query = VkParameters.New()
+      private static QueryParameters buildAQuery() {
+         var query = QueryParameters.New()
             .AddParameter("fields", "first_name,last_name,photo_50");
          return query;
       }

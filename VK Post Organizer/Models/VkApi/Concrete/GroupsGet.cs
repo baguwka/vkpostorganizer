@@ -15,7 +15,7 @@ namespace vk.Models.VkApi {
          _api = api;
       }
 
-      public async Task<GroupsGetResponse> GetAsync(VkParameters parameters, CancellationToken ct) {
+      public async Task<GroupsGetResponse> GetAsync(QueryParameters parameters, CancellationToken ct) {
          var query = buildAQuery();
          query.AppendParameters(parameters);
 
@@ -23,12 +23,12 @@ namespace vk.Models.VkApi {
          return JsonConvert.DeserializeObject<GroupsGetResponse>(response);
       }
 
-      public async Task<GroupsGetResponse> GetAsync(VkParameters parameters) {
+      public async Task<GroupsGetResponse> GetAsync(QueryParameters parameters) {
          return await GetAsync(parameters, CancellationToken.None).ConfigureAwait(false);
       }
 
-      private static VkParameters buildAQuery() {
-         return VkParameters.New()
+      private static QueryParameters buildAQuery() {
+         return QueryParameters.New()
             .AddParameter("extended", 1);
       }
    }
