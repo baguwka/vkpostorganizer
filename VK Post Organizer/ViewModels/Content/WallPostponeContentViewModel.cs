@@ -24,7 +24,10 @@ namespace vk.ViewModels {
 
       public bool FilterMissingIsChecked {
          get { return _filterMissingIsChecked; }
-         set { SetProperty(ref _filterMissingIsChecked, value); }
+         set {
+            if (IsBusy) return;
+            SetProperty(ref _filterMissingIsChecked, value);
+         }
       }
 
       public ICommand MissingFilterCheckedCommand { get; private set; }
@@ -41,49 +44,53 @@ namespace vk.ViewModels {
          _pullersController.Postponed.PullCompleted += onPostponedPullCompleted;
          //_pullersController.Postponed.UploadRequested += onVkPullerUploadRequest;
 
-         PostFilterCheckedCommand = DelegateCommand.FromAsyncHandler(async () => {
+         PostFilterCheckedCommand = new DelegateCommand(() => {
                updateFilter();
-               await syncAsync(_pullersController.Postponed.Items);
+               filterOut(UnfilteredItems);
             }, () => !IsBusy)
             .ObservesProperty(() => IsBusy);
 
-         PostFilterUncheckedCommand = DelegateCommand.FromAsyncHandler(async () => {
+         PostFilterUncheckedCommand = new DelegateCommand(() => {
                updateFilter();
-               await syncAsync(_pullersController.Postponed.Items);
+               filterOut(UnfilteredItems);
             }, () => !IsBusy)
             .ObservesProperty(() => IsBusy);
 
-         RepostFilterCheckedCommand = DelegateCommand.FromAsyncHandler(async () => {
+         RepostFilterCheckedCommand = new DelegateCommand(() => {
                updateFilter();
-               await syncAsync(_pullersController.Postponed.Items);
+               filterOut(UnfilteredItems);
             }, () => !IsBusy)
             .ObservesProperty(() => IsBusy);
 
-         RepostFilterUncheckedCommand = DelegateCommand.FromAsyncHandler(async () => {
+         RepostFilterUncheckedCommand = new DelegateCommand(() => {
                updateFilter();
-               await syncAsync(_pullersController.Postponed.Items);
+               filterOut(UnfilteredItems);
             }, () => !IsBusy)
             .ObservesProperty(() => IsBusy);
 
-         MissingFilterCheckedCommand = DelegateCommand.FromAsyncHandler(async () => {
+         MissingFilterCheckedCommand = new DelegateCommand(() => {
                updateFilter();
-               await syncAsync(_pullersController.Postponed.Items);
+               filterOut(UnfilteredItems);
             }, () => !IsBusy)
             .ObservesProperty(() => IsBusy);
 
-         MissingFilterUncheckedCommand = DelegateCommand.FromAsyncHandler(async () => {
+         MissingFilterUncheckedCommand = new DelegateCommand(() => {
                updateFilter();
-               await syncAsync(_pullersController.Postponed.Items);
+               filterOut(UnfilteredItems);
             }, () => !IsBusy)
             .ObservesProperty(() => IsBusy);
       }
 
       protected async Task buildViewModelPosts(IEnumerable<IPost> posts) {
+         clear(UnfilteredItems);
+         clear(FilteredItems);
+
+         var rawPosts = posts as IList<IPost> ?? posts.ToList();
          var schedule = new Schedule();
 
          var vms = new List<VkPostViewModel>();
-         var rawPosts = await _postBuilder.BuildAsync(posts);
-         vms.AddRange(rawPosts.Cast<VkPostViewModel>());
+         var freshViewModels = await _postBuilder.BuildAsync(rawPosts);
+         vms.AddRange(freshViewModels.Cast<VkPostViewModel>());
          vms.Where(post => {
             var vmPost = post;
             if (vmPost == null) return false;
@@ -96,35 +103,40 @@ namespace vk.ViewModels {
          });
 
          var missingFiller = new MissingFiller();
-         var missingDates = await missingFiller.GetMissingDates(posts, schedule);
-         var missingPosts = missingFiller.BuildMissingViewModels(missingDates);
+         var missingDates = await missingFiller.GetMissingDates(rawPosts, schedule);
+         var missingPosts = missingFiller.BuildMissingViewModels(missingDates).ToList();
+
+         missingPosts.ForEach(p => p.UploadRequested += onMissingPostRequestedUpload);
 
          vms.AddRange(missingPosts);
          vms.Sort((a, b) => a.Post.Date.CompareTo(b.Post.Date));
 
+         UnfilteredItems.Clear();
+         UnfilteredItems.AddRange(vms);
          filterOut(vms);
+      }
+
+      protected override void clearPost(PostViewModelBase post) {
+         base.clearPost(post);
+         var vkPost = post as VkPostViewModel;
+         if (vkPost == null) return;
+         vkPost.UploadRequested -= onMissingPostRequestedUpload;
+      }
+
+      private void onMissingPostRequestedUpload(object sender, EventArgs eventArgs) {
+         var post = sender as VkPostViewModel;
+         if (post == null) return;
+
+         _eventAggregator.GetEvent<UploaderEvents.Configure>().Publish(new UploaderViewModelConfiguration() {
+            IsEnabled = true,
+            DateOverride = post.Post.Date
+         });
+         _eventAggregator.GetEvent<UploaderEvents.SetVisibility>().Publish(true);
       }
 
       public bool IsDateMatchTheSchedule(int unixTime, Schedule schedule) {
          var dateTime = UnixTimeConverter.ToDateTime(unixTime);
          return schedule.Items.Any(i => i.Hour == dateTime.Hour && i.Minute == dateTime.Minute);
-      }
-
-      protected override async void onIsActiveChanged(object sender, EventArgs eventArgs) {
-         base.onIsActiveChanged(sender, eventArgs);
-
-         //if (!IsActive) return;
-
-         //if (LastTimeSynced < _pullersController.Vk.LastTimePulled) {
-         //   LastTimeSynced = _pullersController.Vk.LastTimePulled;
-         //   IsBusy = true;
-         //   try {
-         //      await filterOutAsync(_pullersController.Vk.Items);
-         //   }
-         //   finally {
-         //      IsBusy = false;
-         //   }
-         //}
       }
 
       protected async void onPostponedPullCompleted(object sender, ContentPullerEventArgs e) {
@@ -138,22 +150,17 @@ namespace vk.ViewModels {
       private async Task syncAsync(IEnumerable<IPost> items) {
          if (IsBusy) return;
 
+         var sw = Stopwatch.StartNew();
          IsBusy = true;
          try {
             LastTimeSynced = DateTimeOffset.Now;
             await buildViewModelPosts(items);
          }
          finally {
+            sw.Stop();
+            Debug.WriteLine(sw.ElapsedMilliseconds);
             IsBusy = false;
          }
-      }
-
-      private void onVkPullerUploadRequest(object sender, VkPostViewModel vkPostViewModel) {
-         _eventAggregator.GetEvent<UploaderEvents.Configure>().Publish(new UploaderViewModelConfiguration() {
-            IsEnabled = true,
-            DateOverride = vkPostViewModel.Post.Date
-         });
-         _eventAggregator.GetEvent<UploaderEvents.SetVisibility>().Publish(true);
       }
 
       private void onPostponedPullInvoked(object sender, EventArgs eventArgs) {
@@ -179,10 +186,8 @@ namespace vk.ViewModels {
             Debug.WriteLine("Postpone NavigatedTo callback");
             IsBusy = true;
             try {
-               buildViewModelPosts(_pullersController.Postponed.Items);
                LastTimeSynced = DateTimeOffset.Now;
-               //_pullersController.SharedWallHolder = _sharedWallContext.SelectedWallHolder;
-               //await _pullersController.Vk.PullWithScheduleHightlightAsync(new NoPostFilter(), new Schedule());
+               await buildViewModelPosts(_pullersController.Postponed.Items);
             }
             finally {
                IsBusy = false;

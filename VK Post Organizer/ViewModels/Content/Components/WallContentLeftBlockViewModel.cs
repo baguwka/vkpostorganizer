@@ -142,13 +142,13 @@ namespace vk.ViewModels {
       }
 
       private async void onPostponedWallHolderChanged(object sender, IWallHolder wallHolder) {
-         var response = await _vkApi.GroupsGetById.GetAsync(wallHolder.ID);
-         var thisGroup = response.Content.FirstOrDefault();
-         if (thisGroup == null) return;
+         //var response = await _vkApi.GroupsGetById.GetAsync(wallHolder.ID);
+         //var thisGroup = response.Content.FirstOrDefault();
+         //if (thisGroup == null) return;
 
-         Name = thisGroup.Name;
-         Description = thisGroup.Description;
-         SetProfilePhoto(thisGroup.Photo200);
+         Name = wallHolder.Name;
+         Description = wallHolder.Description;
+         SetProfilePhoto(wallHolder.Photo200);
       }
 
       private void onPostponedPullCompleted(object sender, ContentPullerEventArgs e) {
@@ -157,10 +157,10 @@ namespace vk.ViewModels {
 
          //todo infopanel info dude
 
-         var totalPostCount = puller.Items.Count;//.GetRealPostCount();
+         var totalPostCount = puller.Items.Count;
          //var repostCount = puller.GetRepostCount();
          //var postCount = puller.GetPostOnlyCount();
-         var missingPosts = MissingFiller.MAX_POSTPONED - puller.Items.Count;//.GetMissingPostCount();
+         var missingPosts = MissingFiller.MAX_POSTPONED - puller.Items.Count;
 
          InfoPanel = $"Всего: {totalPostCount} / {MissingFiller.MAX_POSTPONED}" +
                      //$"\nПостов: {postCount}" +

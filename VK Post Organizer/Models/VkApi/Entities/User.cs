@@ -11,6 +11,7 @@ namespace vk.Models.VkApi.Entities {
       private string _firstName;
       private string _lastName;
       private string _description;
+      private string _nickname;
 
       [JsonProperty(PropertyName = "id")]
       public int ID {
@@ -24,13 +25,19 @@ namespace vk.Models.VkApi.Entities {
          set { SetProperty(ref _firstName, value); }
       }
 
+      [JsonProperty(PropertyName = "nickname")]
+      public string Nickname {
+         get { return _nickname; }
+         set { SetProperty(ref _nickname, value); }
+      }
+
       [JsonProperty(PropertyName = "last_name")]
       public string LastName {
          get { return _lastName; }
          set { SetProperty(ref _lastName, value); }
       }
 
-      [JsonProperty(PropertyName = "description")]
+      [JsonProperty(PropertyName = "status")]
       public string Description {
          get { return _description; }
          set { SetProperty(ref _description, value); }
@@ -48,6 +55,15 @@ namespace vk.Models.VkApi.Entities {
          set { SetProperty(ref _photo200, value); }
       }
 
-      public string Name => $"{FirstName} {LastName}";
+      public string Name {
+         get {
+            if (!string.IsNullOrEmpty(Nickname)) {
+               return $"{FirstName} ~{Nickname}~ {LastName}";
+            }
+            else {
+               return $"{FirstName} {LastName}";
+            }
+         }
+      }
    }
 }

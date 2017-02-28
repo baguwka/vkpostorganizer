@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Prism.Commands;
 using Prism.Events;
@@ -23,29 +23,28 @@ namespace vk.ViewModels {
 
          PostFilterCheckedCommand = new DelegateCommand(() => {
             updateFilter();
-            buildViewModelPosts(_pullersController.History.Items);
+            filterOut(UnfilteredItems);
          }, () => !IsBusy)
             .ObservesProperty(() => IsBusy);
 
          PostFilterUncheckedCommand = new DelegateCommand(() => {
             updateFilter();
-            buildViewModelPosts(_pullersController.History.Items);
+            filterOut(UnfilteredItems);
          }, () => !IsBusy)
             .ObservesProperty(() => IsBusy);
 
          RepostFilterCheckedCommand = new DelegateCommand(() => {
             updateFilter();
-            buildViewModelPosts(_pullersController.History.Items);
+            filterOut(UnfilteredItems);
          }, () => !IsBusy)
             .ObservesProperty(() => IsBusy);
 
          RepostFilterUncheckedCommand = new DelegateCommand(() => {
             updateFilter();
-            buildViewModelPosts(_pullersController.History.Items);
+            filterOut(UnfilteredItems);
          }, () => !IsBusy)
             .ObservesProperty(() => IsBusy);
          Debug.WriteLine($"GOOD THREAD IS {Thread.CurrentThread.ManagedThreadId}");
-         //todo: refactor HistoryPuller with VkPuller
       }
 
       protected override async void onIsActiveChanged(object sender, EventArgs eventArgs) {
@@ -66,9 +65,14 @@ namespace vk.ViewModels {
       }
 
       protected void buildViewModelPosts(IEnumerable<IPost> posts) {
+         clear(UnfilteredItems);
+         clear(FilteredItems);
+
          Debug.WriteLine($"--- HISTORY BUILD POSTS. THREAD {Thread.CurrentThread.ManagedThreadId}");
          var builder = new HistoryPostViewModelBuilder();
-         var vms = builder.Build(posts);
+         var vms = builder.Build(posts).ToList();
+         UnfilteredItems.Clear();
+         UnfilteredItems.AddRange(vms);
          filterOut(vms);
       }
 
@@ -96,7 +100,7 @@ namespace vk.ViewModels {
 
          _eventAggregator.GetEvent<FlagsChangedEvent>().Publish(CurrentPostFilter.CompositePostType);
       }
-      public override async void OnNavigatedTo(NavigationContext navigationContext) {
+      public override void OnNavigatedTo(NavigationContext navigationContext) {
          base.OnNavigatedTo(navigationContext);
 
          if (LastTimeSynced < _pullersController.History.LastTimePulled) {

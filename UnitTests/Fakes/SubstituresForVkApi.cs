@@ -6,7 +6,7 @@ namespace UnitTests.Fakes {
       public static IUsersGet UsersGet() {
          var usersGet = Substitute.For<IUsersGet>();
          var fakeUserResponse = FakeResponsesForVkApi.ForUsersGet();
-         usersGet.GetAsync().Returns(fakeUserResponse);
+         usersGet.GetAsync(QueryParameters.No()).Returns(fakeUserResponse);
          return usersGet;
       }
 

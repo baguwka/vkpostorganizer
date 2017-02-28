@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using Prism;
 using Prism.Events;
@@ -11,7 +10,6 @@ using vk.Events;
 using vk.Models;
 using vk.Models.Filter;
 using vk.Models.Pullers;
-using vk.Models.VkApi.Entities;
 using vk.Utils;
 
 namespace vk.ViewModels {
@@ -23,24 +21,38 @@ namespace vk.ViewModels {
       private bool _isBusy;
       private bool _filterPostsIsChecked;
       private bool _filterRepostsIsChecked;
+      private List<PostViewModelBase> _unfilteredItems;
       private IList <PostViewModelBase> _filteredItems;
       private bool _isActive;
 
       public bool IsBusy {
          get { return _isBusy; }
-         set { SetProperty(ref _isBusy, value);
-            _eventAggregator.GetEvent<ContentEvents.BusyEvent>().Publish(_isBusy);
+         set {
+            if (SetProperty(ref _isBusy, value)) {
+               _eventAggregator.GetEvent<ContentEvents.BusyEvent>().Publish(_isBusy);
+            }
          }
       }
 
       public bool FilterPostsIsChecked {
          get { return _filterPostsIsChecked; }
-         set { SetProperty(ref _filterPostsIsChecked, value); }
+         set {
+            if (IsBusy) return;
+            SetProperty(ref _filterPostsIsChecked, value);
+         }
       }
 
       public bool FilterRepostsIsChecked {
          get { return _filterRepostsIsChecked; }
-         set { SetProperty(ref _filterRepostsIsChecked, value); }
+         set {
+            if (IsBusy) return;
+            SetProperty(ref _filterRepostsIsChecked, value);
+         }
+      }
+
+      public List<PostViewModelBase> UnfilteredItems {
+         get { return _unfilteredItems; }
+         private set { SetProperty(ref _unfilteredItems, value); }
       }
 
       public IList<PostViewModelBase> FilteredItems {
@@ -63,6 +75,7 @@ namespace vk.ViewModels {
          _pullersController = pullersController;
          _sharedWallContext = sharedWallContext;
          CurrentPostFilter = new CompositePostFilter();
+         UnfilteredItems = new List<PostViewModelBase>();
          FilteredItems = new RangeObservableCollection<PostViewModelBase>();
 
          FilterPostsIsChecked = true;
@@ -98,6 +111,16 @@ namespace vk.ViewModels {
 
       public virtual void OnNavigatedFrom(NavigationContext navigationContext) {
 
+      }
+
+      protected virtual void clear(IEnumerable<PostViewModelBase> posts) {
+         foreach (var postViewModelBase in posts) {
+            clearPost(postViewModelBase);
+         }
+      }
+
+      protected virtual void clearPost(PostViewModelBase post) {
+         post.ClearPreview();
       }
 
       protected void filterOut(IEnumerable<PostViewModelBase> items) {

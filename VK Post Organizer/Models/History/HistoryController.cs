@@ -27,7 +27,7 @@ namespace vk.Models.History {
          Task.Run(() => {
             try {
                var userid = 0;
-               var users = _api.UsersGet.GetAsync();
+               var users = _api.UsersGet.GetAsync(QueryParameters.No());
                var user = users.Result?.Content?.FirstOrDefault();
                if (user != null) {
                   userid = user.ID;

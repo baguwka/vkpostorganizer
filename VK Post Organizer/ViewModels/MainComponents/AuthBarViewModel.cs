@@ -118,7 +118,8 @@ namespace vk.ViewModels {
 
          IsBusy = true;
          try {
-            var users = await _vkApi.UsersGet.GetAsync();
+            var users = await _vkApi.UsersGet.GetAsync(QueryParameters.New()
+               .Add("fields", "first_name,last_name,nickname,photo_50"));
 
             var user = users.Content.FirstOrDefault();
             if (user == null) {
@@ -129,7 +130,7 @@ namespace vk.ViewModels {
                return;
             }
 
-            UserName = $"You logged in as\n{user.FirstName} {user.LastName}";
+            UserName = $"Вы вошли как\n{user.Name}";
             SetUpAvatar(user.Photo50);
 
             IsAuthorized = true;

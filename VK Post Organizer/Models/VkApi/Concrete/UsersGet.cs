@@ -15,15 +15,6 @@ namespace vk.Models.VkApi {
          this._api = api;
       }
 
-      public async Task<UsersGetResponse> GetAsync() {
-         return await GetAsync(CancellationToken.None);
-      }
-
-      public Task<UsersGetResponse> GetAsync(CancellationToken ct) {
-         var query = buildAQuery();
-         return GetAsync(query, ct);
-      }
-
       public Task<UsersGetResponse> GetAsync(QueryParameters query) {
          return GetAsync(query, CancellationToken.None);
       }
@@ -33,11 +24,11 @@ namespace vk.Models.VkApi {
          return JsonConvert.DeserializeObject<UsersGetResponse>(response);
       }
 
-      private static QueryParameters buildAQuery() {
-         var query = QueryParameters.New()
-            .Add("fields", "first_name,last_name,photo_50");
-         return query;
-      }
+      //private static QueryParameters buildAQuery() {
+      //   var query = QueryParameters.New()
+      //      .Add("fields", "first_name,last_name,photo_50");
+      //   return query;
+      //}
    }
 
    [UsedImplicitly]

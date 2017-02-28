@@ -1,14 +1,12 @@
 using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
+using System.Windows.Threading;
 using JetBrains.Annotations;
 using Prism.Events;
 using vk.Events;
-using vk.Utils;
-using vk.ViewModels;
 using Timer = System.Timers.Timer;
 
 namespace vk.Models.Pullers {
@@ -28,15 +26,16 @@ namespace vk.Models.Pullers {
             _sharedWallHolder = value;
             Actual.WallHolder = _sharedWallHolder;
             Postponed.WallHolder = _sharedWallHolder;
-            if (_settings.History.Use) {
-               History.WallHolder = _sharedWallHolder;
-            }
+            History.WallHolder = _sharedWallHolder;
          }
       }
+
+      private readonly Dispatcher _currentDispatcher;
 
       public PullersController(IEventAggregator eventAggregator, PullerStrategies strategies, Settings settings) {
          _eventAggregator = eventAggregator;
          _settings = settings;
+         _currentDispatcher = Dispatcher.CurrentDispatcher;
 
          Actual = new ContentPuller(strategies.ActualPullerStrategyStrategy);
          Postponed = new ContentPuller(strategies.PostponePullerStrategyStrategy);
@@ -50,17 +49,17 @@ namespace vk.Models.Pullers {
          });
 
          _eventAggregator.GetEvent<WallSelectorEvents.WallSelected>().Subscribe(item => {
-            //Debug.WriteLine($"HISTORY TIMER START IN {Thread.CurrentThread.ManagedThreadId} THREAD");
+            Debug.WriteLine($"HISTORY TIMER START IN {Thread.CurrentThread.ManagedThreadId} THREAD");
 
-            //if (_historyPullTimer != null) {
-            //   _historyPullTimer.Stop();
-            //   _historyPullTimer.Elapsed -= onTimerElapsed;
-            //   _historyPullTimer.Dispose();
-            //}
+            if (_historyPullTimer != null) {
+               _historyPullTimer.Stop();
+               _historyPullTimer.Elapsed -= onTimerElapsed;
+               _historyPullTimer.Dispose();
+            }
 
-            //_historyPullTimer = new Timer(TimeSpan.FromSeconds(5).TotalMilliseconds);
-            //_historyPullTimer.Start();
-            //_historyPullTimer.Elapsed += onTimerElapsed;
+            _historyPullTimer = new Timer(TimeSpan.FromMinutes(5).TotalMilliseconds);
+            _historyPullTimer.Start();
+            _historyPullTimer.Elapsed += onTimerElapsed;
          });
 
          _eventAggregator.GetEvent<MainBottomEvents.Back>().Subscribe(() => {
@@ -74,28 +73,33 @@ namespace vk.Models.Pullers {
          if (!e.Successful) return;
       }
 
-      private async void onTimerElapsed(object sender, ElapsedEventArgs elapsedEventArgs) {
-         Debug.WriteLine($"HISTORY TIMER TICK IN {Thread.CurrentThread.ManagedThreadId} THREAD");
-         if (!_settings.History.Use) {
-            return;
-         }
+      private void onTimerElapsed(object sender, ElapsedEventArgs elapsedEventArgs) {
+         _currentDispatcher.Invoke(async () => {
+            Debug.WriteLine($"HISTORY TIMER TICK IN {Thread.CurrentThread.ManagedThreadId} THREAD");
+            if (!_settings.History.Use) {
+               return;
+            }
 
-         try {
-            await History.PullAsync();
-         }
-         catch (Exception ex) {
-            Debug.WriteLine(ex.ToString());
-            Debug.WriteLine(ex.Message);
-            Debug.WriteLine(ex.StackTrace);
-            //ignore
-         }
+            try {
+               await History.PullAsync();
+            }
+            catch (Exception ex) {
+               Debug.WriteLine(ex.ToString());
+               Debug.WriteLine(ex.Message);
+               Debug.WriteLine(ex.StackTrace);
+               //ignore
+            }
+         });
       }
 
       public async Task SharedPull() {
          await Postponed.PullAsync();
 
          if (_settings.History.Use) {
+            //fire and forget
+#pragma warning disable 4014
             History.PullAsync();
+#pragma warning restore 4014
          }
       }
    }

@@ -16,7 +16,6 @@ using Prism.Mvvm;
 using vk.Events;
 using vk.Models;
 using vk.Models.Files;
-using vk.Models.Filter;
 using vk.Models.Pullers;
 using vk.Models.VkApi;
 using vk.Models.VkApi.Entities;
@@ -217,7 +216,7 @@ namespace vk.ViewModels {
 
       private async void onPostponedPullCompleted(object sender, ContentPullerEventArgs e) {
          await fillMissing(e.Items);
-         InfoPanel = $"{MissingFiller.MAX_POSTPONED - MissingDates.Count}/{MissingFiller.MAX_POSTPONED}";
+         InfoPanel = $"{MissingFiller.MAX_POSTPONED - (MissingDates.Count - MissingFiller.RESERVE)}/{MissingFiller.MAX_POSTPONED}";
          IsBusy = false;
          ProgressString = "";
       }

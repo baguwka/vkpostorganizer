@@ -27,7 +27,8 @@ namespace vk.Models {
             };
          }
 
-         var users = await _usersGet.GetAsync();
+         var users = await _usersGet.GetAsync(QueryParameters.New()
+               .Add("fields", "first_name,last_name,photo_50,photo_200"));
          if (users.Content == null) {
             return new AvailableWallsInfo {
                Succeed = false,

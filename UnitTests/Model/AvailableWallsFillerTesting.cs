@@ -40,7 +40,7 @@ namespace UnitTests.Model {
       [Test]
       public async Task Fill_empty_wall_list_with_corrupted_users_data() {
          var usersGet = Substitute.For<IUsersGet>();
-         usersGet.GetAsync().Returns(new UsersGetResponse {
+         usersGet.GetAsync(QueryParameters.No()).Returns(new UsersGetResponse {
             Content = null
          });
 
