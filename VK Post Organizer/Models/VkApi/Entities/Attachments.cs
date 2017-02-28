@@ -27,7 +27,7 @@ namespace vk.Models.VkApi.Entities {
       public QueryParameters GetAsParameters() {
          var parameters = QueryParameters.New();
          if (Any()) {
-            parameters.AddParameter("attachments", ToString());
+            parameters.Add("attachments", ToString());
          }
          return parameters;
       }

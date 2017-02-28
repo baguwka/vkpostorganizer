@@ -35,10 +35,10 @@ namespace vk.Models.VkApi {
          var jphoto = jsonedResponse["photo"];
          var jhash = jsonedResponse["hash"];
          var query = QueryParameters.New()
-            .AddParameter("group_id", groupID)
-            .AddParameter("server", jserver)
-            .AddParameter("photo", jphoto)
-            .AddParameter("hash", jhash);
+            .Add("group_id", groupID)
+            .Add("server", jserver)
+            .Add("photo", jphoto)
+            .Add("hash", jhash);
          return query;
       }
 

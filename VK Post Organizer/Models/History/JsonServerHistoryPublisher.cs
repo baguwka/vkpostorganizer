@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -37,6 +38,7 @@ namespace vk.Models.History {
 
          try {
             var result = await _rateLimiter.Perform(() => _httpClient.PostAsync(uri, content));
+            Debug.WriteLine($"--- HISTORY PUBLISHED AT {DateTimeOffset.Now.Ticks}");
             if (result.IsSuccessStatusCode) {
                var contentResult = result.Content.ReadAsStringAsync();
             }

@@ -20,18 +20,18 @@ namespace vk.Models.VkApi {
          Query = new NameValueCollection();
       }
 
-      public QueryParameters AddParameter(string paramName, string paramValue) {
+      public QueryParameters Add(string paramName, string paramValue) {
          if (!string.IsNullOrEmpty(paramValue)) {
             Query[paramName] = paramValue;
          }
          return this;
       }
 
-      public QueryParameters AddParameter(string paramName, object paramValue) {
-         return AddParameter(paramName, paramValue.ToString());
+      public QueryParameters Add(string paramName, object paramValue) {
+         return Add(paramName, paramValue.ToString());
       }
 
-      public QueryParameters AppendParameters([NotNull] QueryParameters parameters) {
+      public QueryParameters Append([NotNull] QueryParameters parameters) {
          if (parameters == null) {
             throw new ArgumentNullException(nameof(parameters));
          }

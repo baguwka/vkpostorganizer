@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -137,7 +136,7 @@ namespace vk.ViewModels {
          set { SetProperty(ref _isPublishing, value); }
       }
 
-      public List<PostViewModel> FilteredItems { get; }
+      public List<int> MissingDates { get; }
 
       public ICommand ShowHideCommand { get; private set; }
       public ICommand PublishCommand { get; private set; }
@@ -155,11 +154,11 @@ namespace vk.ViewModels {
          _uploadSettings = uploadSettings;
          _vkApi = vkApi;
          _pullersController = pullersController;
-         FilteredItems = new List<PostViewModel>();
+         MissingDates = new List<int>();
 
-         _pullersController.Vk.PullInvoked += onContainerPullInvoked;
-         _pullersController.Vk.PullCompleted += onContainerPullCompleted;
-         _pullersController.Vk.WallHolderChanged += onContainerWallHolderChanged;
+         _pullersController.Postponed.PullInvoked += onPostponedPullInvoked;
+         _pullersController.Postponed.PullCompleted += onPostponedPullCompleted;
+         _pullersController.Postponed.WallHolderChanged += onPostponedWallHolderChanged;
 
          _shrinkAfterPublish = _uploadSettings.CloseUploadWindowAfterPublish;
 
@@ -211,34 +210,26 @@ namespace vk.ViewModels {
          _eventAggregator.GetEvent<UploaderEvents.Configure>().Subscribe(onConfigure);
       }
 
-      private void onContainerPullInvoked(object sender, EventArgs args) {
+      private void onPostponedPullInvoked(object sender, EventArgs args) {
          IsBusy = true;
          ProgressString = "Pull...";
       }
 
-      private async void onContainerPullCompleted(object sender, IList<PostViewModel> args) {
-         var missing = _pullersController.Vk.GetMissingPostCount();
-         InfoPanel = $"{VkWallPuller.MAX_POSTPONED - missing}/{VkWallPuller.MAX_POSTPONED}";
+      private async void onPostponedPullCompleted(object sender, ContentPullerEventArgs e) {
+         await fillMissing(e.Items);
+         InfoPanel = $"{MissingFiller.MAX_POSTPONED - MissingDates.Count}/{MissingFiller.MAX_POSTPONED}";
          IsBusy = false;
          ProgressString = "";
-         await filterOutAsync(_pullersController.Vk.Items);
       }
 
-      protected async Task filterOutAsync(IEnumerable<PostViewModel> items) {
-         IsBusy = true;
-         try {
-            await Task.Run(() => {
-               var tempItems = items.Where(MissingPostFilter.Instance.Suitable);
-               FilteredItems.Clear();
-               FilteredItems.AddRange(tempItems);
-            });
-         }
-         finally {
-            IsBusy = false;
-         }
+      private async Task fillMissing(IEnumerable<IPost> posts) {
+         var filler = new MissingFiller();
+         var schedule = new Schedule();
+         MissingDates.Clear();
+         MissingDates.AddRange(await filler.GetMissingDates(posts, schedule));
       }
 
-      private async void onContainerWallHolderChanged(object sender, IWallHolder holder) {
+      private async void onPostponedWallHolderChanged(object sender, IWallHolder holder) {
          var thisGroup = await _vkApi.GroupsGetById.GetAsync(holder.ID);
          WallName = thisGroup.Content.FirstOrDefault()?.Name;
       }
@@ -270,18 +261,18 @@ namespace vk.ViewModels {
                return;
             }
 
-            if (await Waiter.WaitUntilConditionSetsTrue(() => _pullersController.Vk.Items.Any(), 5,
+            if (await Waiter.WaitUntilConditionSetsTrue(() => _pullersController.Postponed.Items.Any(), 5,
                TimeSpan.FromSeconds(1f)) == false) {
                return;
             }
 
             if (config.DateOverride == -1) {
-               var firstMissed =
-                  _pullersController.Vk.Items.FirstOrDefault(MissingPostFilter.Instance.Suitable);
-               if (firstMissed == null) {
+               await fillMissing(_pullersController.Postponed.Items);
+               var firstMissed = MissingDates.FirstOrDefault();
+               if (firstMissed == default(int)) {
                   return;
                }
-               DateUnix = firstMissed.Post.DateUnix;
+               DateUnix = firstMissed;
             }
             else {
                DateUnix = config.DateOverride;
@@ -298,38 +289,38 @@ namespace vk.ViewModels {
       }
 
       public void moveToPreviousMissing() {
-         if (FilteredItems.None() || DateUnix <= 0) {
+         if (MissingDates.None() || DateUnix <= 0) {
             return;
          }
 
-         var previousOne = FilteredItems.LastOrDefault(p => p.Post.DateUnix < DateUnix);
-         if (previousOne == null) {
-            previousOne = FilteredItems.LastOrDefault();
-            if (previousOne == null) {
+         var previousOne = MissingDates.LastOrDefault(p => p < DateUnix);
+         if (previousOne == default(int)) {
+            previousOne = MissingDates.LastOrDefault();
+            if (previousOne == default(int)) {
                return;
             }
-            DateUnix = previousOne.Post.DateUnix;
+            DateUnix = previousOne;
          }
          else {
-            DateUnix = previousOne.Post.DateUnix;
+            DateUnix = previousOne;
          }
       }
 
       public void moveToNextMissing() {
-         if (FilteredItems.None() || DateUnix <= 0) {
+         if (MissingDates.None() || DateUnix <= 0) {
             return;
          }
 
-         var nextOne = FilteredItems.FirstOrDefault(p => p.Post.DateUnix > DateUnix);
-         if (nextOne == null) {
-            nextOne = FilteredItems.FirstOrDefault();
-            if (nextOne == null) {
+         var nextOne = MissingDates.FirstOrDefault(p => p > DateUnix);
+         if (nextOne == default(int)) {
+            nextOne = MissingDates.FirstOrDefault();
+            if (nextOne == default(int)) {
                return;
             }
-            DateUnix = nextOne.Post.DateUnix;
+            DateUnix = nextOne;
          }
          else {
-            DateUnix = nextOne.Post.DateUnix;
+            DateUnix = nextOne;
          }
       }
 
@@ -413,7 +404,7 @@ namespace vk.ViewModels {
       private async Task uploadFromBytes(byte[] photo, CancellationToken cancellationToken) {
          ProgressString = "Uploading...";
          UploadProgress = 100;
-         var result = await _uploader.TryUploadPhotoToWallAsync(photo, _pullersController.Vk.WallHolder.ID, cancellationToken);
+         var result = await _uploader.TryUploadPhotoToWallAsync(photo, _pullersController.Postponed.WallHolder.ID, cancellationToken);
          if (result.Successful) {
             addPhotoToAttachments(result.Photo);
          }
@@ -460,7 +451,7 @@ namespace vk.ViewModels {
          IsPublishing = true;
          bool successful = true;
          try {
-            await _vkApi.WallPost.PostAsync(_pullersController.Vk.WallHolder.ID, Message, 
+            await _vkApi.WallPost.PostAsync(_pullersController.Postponed.WallHolder.ID, Message, 
                DateUnix, Attachments.Take(10).ToAttachments());
          }
          catch (VkException ex) {

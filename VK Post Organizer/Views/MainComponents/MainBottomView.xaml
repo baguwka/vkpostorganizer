@@ -4,8 +4,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:vk.Views"
+             xmlns:vm="clr-namespace:vk.ViewModels"
              xmlns:prism="http://prismlibrary.com/"
              prism:ViewModelLocator.AutoWireViewModel="True"
+             d:DataContext="{d:DesignInstance d:Type=vm:MainBottomViewModel, IsDesignTimeCreatable=False}"
              mc:Ignorable="d" >
     <Grid Height="25">
         <Grid.ColumnDefinitions>
@@ -15,14 +17,14 @@
             <ColumnDefinition Width="175"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <Button Margin="5,0,5,0" Height="25" Content="Back" Style="{StaticResource VkCommon}" Command="{Binding BackCommand}"
+        <Button Margin="5,0,5,0" Height="25" Content="Назад" Style="{StaticResource VkCommon}" Command="{Binding BackCommand}"
                     Visibility="{Binding IsWallSelected, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
-        <Button Margin="5,0,5,0" Height="25" Grid.Column="1" Content="Refresh" Style="{StaticResource VkCommon}" Command="{Binding RefreshCommand}"/>
+        <Button Margin="5,0,5,0" Height="25" Grid.Column="1" Content="Обновить" Style="{StaticResource VkCommon}" Command="{Binding RefreshCommand}"/>
 
-        <Button Margin="5,0,5,0" Height="25"  Content="Settings" Style="{StaticResource VkCommon}" Command="{Binding SettingsCommand}"
+        <Button Margin="5,0,5,0" Height="25"  Content="Настройки" Style="{StaticResource VkCommon}" Command="{Binding SettingsCommand}"
                 Grid.Column="3"/>
         
-        <Label Grid.Column="4" Content="0.99" HorizontalAlignment="Right" Foreground="DarkGray" Margin="0,0,5,0"></Label>
+        <Label Grid.Column="4" Content="{Binding Version, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" HorizontalAlignment="Right" Foreground="DarkGray" Margin="0,0,5,0"></Label>
     </Grid>
 </UserControl>

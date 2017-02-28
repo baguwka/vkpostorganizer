@@ -16,7 +16,7 @@ namespace vk.Models.VkApi {
       public async Task<UploadServerInfo> GetAsync(int groupId, CancellationToken ct) {
          groupId = Math.Abs(groupId);
          var response = await _api.ExecuteMethodAsync("photos.getWallUploadServer", 
-            QueryParameters.New().AddParameter("group_id", groupId), ct).ConfigureAwait(false);
+            QueryParameters.New().Add("group_id", groupId), ct).ConfigureAwait(false);
          return JsonConvert.DeserializeObject<PhotosGetWallUploadServerResponse>(response)?.Content;
       }
 

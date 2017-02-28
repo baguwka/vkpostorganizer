@@ -11,7 +11,6 @@ using vk.Models.JsonServerApi;
 using vk.Models.Pullers;
 using vk.Models.UrlHelper;
 using vk.Models.VkApi;
-using vk.ViewModels;
 using vk.Views;
 
 namespace vk {

@@ -18,6 +18,7 @@ namespace vk.ViewModels {
       private bool _contentIsBusy;
       private bool _uploaderisBusy;
       private bool _isWallSelected;
+      private string _version;
 
       public bool IsBusy {
          get { return _isBusy; }
@@ -39,6 +40,11 @@ namespace vk.ViewModels {
          private set { SetProperty(ref _uploaderisBusy, value); }
       }
 
+      public string Version {
+         get { return _version; }
+         set { SetProperty(ref _version, value); }
+      }
+
       public MainBottomViewModel(IEventAggregator eventAggregator, BusyObserver busyObserver) {
          var aggregator = eventAggregator;
          _busyObserver = busyObserver;
@@ -49,7 +55,6 @@ namespace vk.ViewModels {
             UploaderIsBusy = _busyObserver.UploaderIsBusy;
          };
 
-         aggregator.GetEvent<ShellEvents.BusyEvent>().Subscribe(onShellIsBusyChanged);
          aggregator.GetEvent<ShellEvents.WallSelectedEvent>().Subscribe(onShellWallSelectedChanged);
 
          BackCommand = new DelegateCommand(() => {
@@ -70,14 +75,12 @@ namespace vk.ViewModels {
          SettingsCommand = new DelegateCommand(() => {
             aggregator.GetEvent<MainBottomEvents.Settings>().Publish();
          });
+
+         Version = App.Version.ToString();
       }
 
       private void onShellWallSelectedChanged(bool wallSelected) {
          IsWallSelected = wallSelected;
-      }
-
-      private void onShellIsBusyChanged(bool busy) {
-         IsBusy = busy;
       }
    }
 }

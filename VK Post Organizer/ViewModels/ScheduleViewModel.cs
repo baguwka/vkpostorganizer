@@ -8,7 +8,7 @@ using Prism.Mvvm;
 using vk.Models;
 
 namespace vk.ViewModels {
-   public class ScheduleViewModel : BindableBase, IViewModel {
+   public class ScheduleViewModel : BindableBase {
       private bool _isAnyItemSelected;
       private ScheduleItem _selectedItem;
       private ScheduleItem _editableItem;

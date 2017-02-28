@@ -3,7 +3,8 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using JetBrains.Annotations;
-using vk.Models.History;
+using vk.Models;
+using vk.Models.VkApi.Entities;
 
 namespace vk.ViewModels {
    public class HistoryPostViewModel : PostViewModelBase {
@@ -23,7 +24,7 @@ namespace vk.ViewModels {
          set { SetProperty(ref _date, value); }
       }
 
-      public static HistoryPostViewModel Create([NotNull] HistoryPost postReference) {
+      public static HistoryPostViewModel Create([NotNull] IPost postReference) {
          if (postReference == null) {
             throw new ArgumentNullException(nameof(postReference));
          }
@@ -32,24 +33,32 @@ namespace vk.ViewModels {
          return viewModel.initialize(postReference);
       }
 
-      private HistoryPostViewModel initialize([NotNull] HistoryPost postReference) {
+      private HistoryPostViewModel initialize([NotNull] IPost postReference) {
          if (postReference == null) {
             throw new ArgumentNullException(nameof(postReference));
          }
 
-         Post = postReference;
+         var historyPost = postReference as HistoryPost;
+         if (historyPost == null) {
+            throw new InvalidCastException();
+         }
+
+         Post = historyPost;
          Post.PropertyChanged += onPostPropertyChanged;
          loadPreviews();
-         Date = $"{Post?.PublishingDateString} -> {Post?.PostponedDateString}";
+         Date = $"{Post?.DateString} -> {Post?.PostponedDateString}";
+         PostType = historyPost.IsRepost ? PostType.Repost : PostType.Post;
          return this;
       }
 
       protected override void loadPreviews() {
          PreviewImages.AddRange(Post.Attachments.Select(url => new ImageItem(url, url)));
+         CanExpand = PreviewImages.Any();
+         Expand();
       }
 
       private void onPostPropertyChanged(object sender, PropertyChangedEventArgs propertyChangedEventArgs) {
-         Date = $"{Post?.PublishingDateString} -> {Post?.PostponedDateString}";
+         Date = $"{Post?.DateString}   ->   {Post?.PostponedDateString}";
       }
    }
 }

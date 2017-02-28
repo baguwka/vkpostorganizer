@@ -9,6 +9,7 @@ namespace vk.Models {
       private bool _shellIsBusy;
       private bool _contentIsBusy;
       private bool _uploaderIsBusy;
+      private bool _authBarIsBusy;
 
       public bool ShellIsBusy {
          get { return _shellIsBusy; }
@@ -25,6 +26,11 @@ namespace vk.Models {
          set { SetProperty(ref _uploaderIsBusy, value); }
       }
 
+      public bool AuthBarIsBusy {
+         get { return _authBarIsBusy; }
+         set { SetProperty(ref _authBarIsBusy, value); }
+      }
+
       public BusyObserver(IEventAggregator eventAggregator) {
          eventAggregator.GetEvent<ShellEvents.BusyEvent>().Subscribe(busy => {
             ShellIsBusy = busy;
@@ -36,6 +42,10 @@ namespace vk.Models {
 
          eventAggregator.GetEvent<UploaderEvents.BusyEvent>().Subscribe(busy => {
             UploaderIsBusy = busy;
+         });
+
+         eventAggregator.GetEvent<AuthBarEvents.BusyEvent>().Subscribe(busy => {
+            AuthBarIsBusy = busy;
          });
       }
    }

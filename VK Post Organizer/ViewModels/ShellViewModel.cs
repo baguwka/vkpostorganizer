@@ -1,6 +1,4 @@
 ﻿using System;
-using System.IO;
-using System.Threading;
 using System.Windows;
 using Data_Persistence_Provider;
 using JetBrains.Annotations;
@@ -20,6 +18,7 @@ namespace vk.ViewModels {
       private readonly IEventAggregator _eventAggregator;
       private readonly VkPostponeSaveLoader _saveLoader;
       private readonly Settings _settings;
+
 
       public ShellViewModel(IRegionManager regionManager, IEventAggregator eventAggregator, VkPostponeSaveLoader saveLoader, Settings settings) {
          _regionManager = regionManager;

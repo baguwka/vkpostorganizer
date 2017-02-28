@@ -28,9 +28,9 @@
                                 Margin="0,0,0,5" Background="Transparent" BorderThickness="0" HorizontalContentAlignment="Left">
                             <Border Style="{StaticResource VkBorder}">
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="5">
-                                    <Image Source="{Binding WallHolder.Photo50, UpdateSourceTrigger=PropertyChanged}"
+                                    <Image Source="{Binding Photo, UpdateSourceTrigger=PropertyChanged}"
                                        Width="50" Height="50" HorizontalAlignment="Left"></Image>
-                                    <TextBlock  Text="{Binding WallHolder.Name, UpdateSourceTrigger=PropertyChanged}" Margin="5,1,1,1" 
+                                    <TextBlock  Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Margin="5,1,1,1" 
                                             FontFamily="Roboto" Foreground="#2A5885" FontWeight="Bold" FontSize="12"
                                             Width="250" Height="50" HorizontalAlignment="Left" VerticalAlignment="Top" TextWrapping="WrapWithOverflow"></TextBlock>
                                 </StackPanel>

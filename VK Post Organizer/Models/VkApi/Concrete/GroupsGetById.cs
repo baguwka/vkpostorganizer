@@ -27,7 +27,7 @@ namespace vk.Models.VkApi {
       private static QueryParameters buildAQuery(int id) {
          id = Math.Abs(id);
          var query = QueryParameters.New()
-            .AddParameter("group_id", id);
+            .Add("group_id", id);
             //.AddParameter("fields", fields);
          return query;
       }

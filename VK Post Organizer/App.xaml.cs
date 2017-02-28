@@ -3,12 +3,13 @@ using System.Windows;
 using System.Windows.Threading;
 using Microsoft.Practices.Unity;
 using Prism.Mvvm;
-using vk.Models;
 
 namespace vk {
    public partial class App : Application {
       public static IUnityContainer Container { get; private set; }
       public static bool IsInitialized { get; set; }
+
+      public static Version Version { get; private set; }
 
       protected override void OnStartup(StartupEventArgs e) {
          if (SingleInstance.IsOnlyInstance() == false) {
@@ -16,6 +17,8 @@ namespace vk {
             Current.Shutdown();
             return;
          }
+
+         Version = new Version(1, 0, 2);
 
          base.OnStartup(e);
 

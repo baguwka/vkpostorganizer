@@ -33,23 +33,39 @@
 
             <Separator Style="{StaticResource VkSeparator}"/>
 
-            <Button Margin="2" Content="Актуальная стена" Style="{StaticResource VkCommon}" 
+            <!--<Button Margin="2" Content="Актуальная стена" Style="{StaticResource VkCommon}" 
                                 Command="{Binding ShowActualWallCommand}"
-                                Height="25" Width="150" IsEnabled="True"></Button>
+                                Height="25" Width="150" IsEnabled="True"></Button>-->
             <Button Margin="2" Content="Отложенные посты" Style="{StaticResource VkCommon}" 
                                 Command="{Binding ShowPostponeWallCommand}"
                                 Height="25" Width="150" IsEnabled="True"></Button>
-            <Button Margin="2" Content="История" Style="{StaticResource VkCommon}" 
+            <Grid>
+                <Button Margin="2" Content="История" Style="{StaticResource VkCommon}" 
                                 Command="{Binding ShowHistoryCommand}"
                                 Height="25" Width="150" IsEnabled="True"></Button>
+                <Border CornerRadius="999" Padding="4" Height="25" Width="25" IsHitTestVisible="False"
+                        HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-5,30,0"
+                        Visibility="{Binding HistoryUnreadBadgeVisible, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <Border.Background>
+                        <LinearGradientBrush EndPoint="0.5,0.9" StartPoint="0.5,0">
+                            <GradientStop Color="#f44242" Offset="0.9"/>
+                            <GradientStop Color="#f46141"/>
+                        </LinearGradientBrush>
+                    </Border.Background>
+                    
+                    <TextBlock Foreground="White" FontWeight="Bold" FontSize="10"
+                               HorizontalAlignment="Center" VerticalAlignment="Center"
+                               Text="{Binding HistoryUnreadPostCount, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"/>
+                </Border>
+            </Grid>
 
             <Separator Style="{StaticResource VkSeparator}"/>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button Width="50" Height="25" Margin="5" Content="Expand" Style="{StaticResource VkCommon}"
+                <Button Width="75" Height="25" Margin="5" Content="Развернуть" Style="{StaticResource VkCommon}"
                                 Command="{Binding ExpandAllCommand}"/>
 
-                <Button Width="50" Height="25" Margin="5" Content="Collapse" Style="{StaticResource VkCommon}"
+                <Button Width="75" Height="25" Margin="5" Content="Свернуть" Style="{StaticResource VkCommon}"
                                 Command="{Binding CollapseAllCommand}"/>
             </StackPanel>
         </StackPanel>

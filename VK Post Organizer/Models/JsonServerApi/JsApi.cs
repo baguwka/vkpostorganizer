@@ -13,13 +13,13 @@ namespace vk.Models.JsonServerApi {
    [UsedImplicitly]
    public class JsApi {
       private readonly HttpClient _httpClient;
-      private readonly HttpClientHandler _httpClientHandler;
+      private readonly HttpMessageHandler _httpClientHandler;
       private readonly HistorySettings _historySettings;
       private readonly TimeLimiter _rateLimiter;
 
       private int _timeoutRetry;
 
-      public JsApi(HttpClientHandler httpClientHandler, HistorySettings historySettings) {
+      public JsApi(HttpMessageHandler httpClientHandler, HistorySettings historySettings) {
          _httpClientHandler = httpClientHandler;
          _historySettings = historySettings;
          _httpClient = new HttpClient(httpClientHandler) { Timeout = TimeSpan.FromSeconds(4) };
@@ -45,10 +45,10 @@ namespace vk.Models.JsonServerApi {
          catch (TaskCanceledException ex) {
             if (_timeoutRetry > 2) {
                var error = "";
-               if (_httpClientHandler.UseProxy) {
-                  error = "Проверьте настройки прокси сервера и перезапустите приложение.";
-               }
-               throw new JsonServerException($"Соеденение не удалось.\n{error}", ex);
+               //if (_httpClientHandler.UseProxy) {
+               //   error = "Проверьте настройки прокси сервера и перезапустите приложение.";
+               //}
+               throw new JsonServerException($"Соеденение не удалось.\nПроверьте настройки прокси сервера и перезапустите приложение.\n{error}", ex);
             }
 
             _timeoutRetry++;

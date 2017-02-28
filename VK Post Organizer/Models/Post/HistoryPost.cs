@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using System.Globalization;
 using Newtonsoft.Json;
 using Prism.Mvvm;
+using vk.Models.VkApi.Entities;
 using vk.Utils;
-using vk.ViewModels;
 
-namespace vk.Models.History {
+namespace vk.Models {
    [Serializable]
-   public class HistoryPost : BindableBase {
+   public class HistoryPost : BindableBase, IPost {
       private string _postponedDateString;
-      private string _publishingDateString;
+      private string _dateString;
 
       private int _ownerId;
       private int _wallId;
       private bool _isRepost;
-      private int _publishingDateUnix;
+      private int _date;
       private int _postponedDateUnix;
       private string _message;
       private IEnumerable<string> _attachments;
@@ -39,10 +39,10 @@ namespace vk.Models.History {
       }
 
       [JsonProperty(PropertyName = "publishing_date")]
-      public int PublishingDateUnix {
-         get { return _publishingDateUnix; }
-         set { SetProperty(ref _publishingDateUnix, value);
-            PublishingDateString = UnixTimeConverter.ToDateTime(_publishingDateUnix).ToString("dd.MM.yy HH:mm", CultureInfo.CurrentCulture);
+      public int Date {
+         get { return _date; }
+         set { SetProperty(ref _date, value);
+            DateString = UnixTimeConverter.ToDateTime(_date).ToString("dd.MM.yy HH:mm", CultureInfo.CurrentCulture);
          }
       }
 
@@ -69,21 +69,25 @@ namespace vk.Models.History {
       /// <summary>
       /// Дата, когда пост был опубликован из приложения
       /// </summary>
-      public DateTime PublishingDate => UnixTimeConverter.ToDateTime(_publishingDateUnix);
+      [JsonIgnore]
+      public DateTime DateTime => UnixTimeConverter.ToDateTime(_date);
 
       /// <summary>
       /// Дата, на которую был отложен пост
       /// </summary>
+      [JsonIgnore]
       public DateTime PostponedDate => UnixTimeConverter.ToDateTime(_postponedDateUnix);
 
+      [JsonIgnore]
       public string PostponedDateString {
          get { return _postponedDateString; }
          private set { SetProperty(ref _postponedDateString, value); }
       }
 
-      public string PublishingDateString {
-         get { return _publishingDateString; }
-         private set { SetProperty(ref _publishingDateString, value); }
+      [JsonIgnore]
+      public string DateString {
+         get { return _dateString; }
+         private set { SetProperty(ref _dateString, value); }
       }
    }
 }

@@ -21,7 +21,7 @@
         </Grid.RowDefinitions>
         <Border Grid.Row="0" Height="35" Style="{StaticResource VkBorder}" Margin="5,0,5,0">
             <StackPanel Orientation="Horizontal" Height="25" Margin="5,0,0,0" HorizontalAlignment="Center">
-                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Posts" 
+                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Посты" 
                               IsChecked="{Binding FilterPostsIsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="Checked">
@@ -33,7 +33,7 @@
                     </i:Interaction.Triggers>
                 </ToggleButton>
 
-                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Reposts" 
+                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Репосты" 
                               IsChecked="{Binding FilterRepostsIsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="Checked">
@@ -62,18 +62,19 @@
 
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border Background="#ffffff" Margin="5" MinWidth="400" MaxWidth="750">
+                            <Border Style="{StaticResource VkBorder}" Margin="5" MinWidth="400" MaxWidth="750">
                                 <StackPanel Orientation="Vertical">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="200"/>
+                                            <ColumnDefinition Width="220"/>
                                             <ColumnDefinition/>
-                                            <ColumnDefinition Width="100"/>
+                                            <ColumnDefinition Width="25"/>
                                         </Grid.ColumnDefinitions>
                                         <Label Grid.Column="0" Height="25" Style="{StaticResource VkLabel}" Content="{Binding Date}"></Label>
                                         <Label Grid.Column="1" Height="25" Style="{StaticResource VkLabel}" Content="{Binding Post.Message}"></Label>
 
                                         <Button Grid.Column="2" HorizontalAlignment="Right" Height="25" Width="25" Content="+" Style="{StaticResource VkCommon}"
+                                                Visibility="{Binding CanExpand, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}"
                                                 Command="{Binding ExpandToggleCommand}"/>
                                     </Grid>
                                     <ItemsControl Margin="10" HorizontalAlignment="Center" ItemsSource="{Binding PreviewImages, UpdateSourceTrigger=PropertyChanged}" 
@@ -82,7 +83,7 @@
                                             <DataTemplate>
                                                 <Button Style="{StaticResource VkMimic}"  Margin="0,5,0,5" HorizontalAlignment="Left" MinWidth="400" MaxWidth="604" 
                                                          Command="{Binding ClickCommand}" Background="White" BorderThickness="0">
-                                                    <Image  Source="{Binding Preview, IsAsync=True}"/>
+                                                    <Image Source="{Binding Preview, IsAsync=True}"/>
                                                 </Button>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>

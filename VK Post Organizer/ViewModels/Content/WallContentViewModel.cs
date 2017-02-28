@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Prism;
-using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
@@ -13,6 +11,7 @@ using vk.Events;
 using vk.Models;
 using vk.Models.Filter;
 using vk.Models.Pullers;
+using vk.Models.VkApi.Entities;
 using vk.Utils;
 
 namespace vk.ViewModels {
@@ -25,6 +24,7 @@ namespace vk.ViewModels {
       private bool _filterPostsIsChecked;
       private bool _filterRepostsIsChecked;
       private IList <PostViewModelBase> _filteredItems;
+      private bool _isActive;
 
       public bool IsBusy {
          get { return _isBusy; }
@@ -48,6 +48,8 @@ namespace vk.ViewModels {
          private set { SetProperty(ref _filteredItems, value); }
       }
 
+      public DateTimeOffset LastTimeSynced { get; protected set; }
+
       public CompositePostFilter CurrentPostFilter { get; }
 
       public ICommand PostFilterCheckedCommand { get; protected set; }
@@ -66,9 +68,14 @@ namespace vk.ViewModels {
          FilterPostsIsChecked = true;
          FilterRepostsIsChecked = true;
 
-
          _eventAggregator.GetEvent<ContentEvents.LeftBlockExpandAllRequest>().Subscribe(expandAllItems);
          _eventAggregator.GetEvent<ContentEvents.LeftBlockCollapseAllRequest>().Subscribe(collapseAllItems);
+
+         IsActiveChanged += onIsActiveChanged;
+      }
+
+      protected virtual void onIsActiveChanged(object sender, EventArgs eventArgs) {
+
       }
 
       protected virtual void expandAllItems() {
@@ -93,27 +100,19 @@ namespace vk.ViewModels {
 
       }
 
-      protected async Task filterOutAsync(IEnumerable<PostViewModelBase> items) {
-         IsBusy = true;
-         try {
-            var currentFiltered = _filteredItems;
+      protected void filterOut(IEnumerable<PostViewModelBase> items) {
+         var currentFiltered = _filteredItems;
+         var tempItems = items.Where(CurrentPostFilter.Suitable);
 
-            IEnumerable<PostViewModelBase> tempItems = new List<PostViewModelBase>();
-            await Task.Run(() => tempItems = items.Where(CurrentPostFilter.Suitable));
+         this.FilteredItems = null;
 
-            this.FilteredItems = null;
+         currentFiltered.Clear();
 
-            currentFiltered.Clear();
-
-            foreach (var postControl in tempItems) {
-               currentFiltered.Add(postControl);
-            }
-
-            FilteredItems = currentFiltered;
+         foreach (var postControl in tempItems) {
+            currentFiltered.Add(postControl);
          }
-         finally {
-            IsBusy = false;
-         }
+
+         FilteredItems = currentFiltered;
       }
 
       protected virtual void updateFilter() {
@@ -132,7 +131,18 @@ namespace vk.ViewModels {
          }
       }
 
-      public bool IsActive { get; set; }
+      public bool IsActive {
+         get { return _isActive; }
+         set {
+            _isActive = value;
+            OnIsActiveChanged();
+         }
+      }
+
       public event EventHandler IsActiveChanged;
+
+      protected virtual void OnIsActiveChanged() {
+         IsActiveChanged?.Invoke(this, EventArgs.Empty);
+      }
    }
 }

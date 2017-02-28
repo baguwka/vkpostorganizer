@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,7 +16,7 @@ namespace vk.Models.VkApi {
 
       public async Task<GroupsGetResponse> GetAsync(QueryParameters parameters, CancellationToken ct) {
          var query = buildAQuery();
-         query.AppendParameters(parameters);
+         query.Append(parameters);
 
          var response = await _api.ExecuteMethodAsync("groups.get", query, ct).ConfigureAwait(false);
          return JsonConvert.DeserializeObject<GroupsGetResponse>(response);
@@ -29,7 +28,7 @@ namespace vk.Models.VkApi {
 
       private static QueryParameters buildAQuery() {
          return QueryParameters.New()
-            .AddParameter("extended", 1);
+            .Add("extended", 1);
       }
    }
 

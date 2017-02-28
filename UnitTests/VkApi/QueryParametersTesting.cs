@@ -11,10 +11,10 @@ namespace UnitTests.VkApi {
       [Test]
       public void Fill_parameters_and_check_them() {
          var parameters = QueryParameters.New()
-            .AddParameter("param1", "value1")
-            .AddParameter("param2", "value2")
-            .AddParameter("param3", "value3")
-            .AddParameter("param4", "value4");
+            .Add("param1", "value1")
+            .Add("param2", "value2")
+            .Add("param3", "value3")
+            .Add("param4", "value4");
 
          Assert.That(parameters["param1"], Is.EqualTo("value1"));
          Assert.That(parameters["param2"], Is.EqualTo("value2"));
@@ -25,14 +25,14 @@ namespace UnitTests.VkApi {
       [Test]
       public void Add_parameters_to_parameters_and_check_them() {
          var parameters = QueryParameters.New()
-            .AddParameter("param1", "value1")
-            .AddParameter("param2", "value2");
+            .Add("param1", "value1")
+            .Add("param2", "value2");
 
          var externalParameters = QueryParameters.New()
-            .AddParameter("externalParam1", "externalValue1")
-            .AddParameter("externalParam2", "externalValue2");
+            .Add("externalParam1", "externalValue1")
+            .Add("externalParam2", "externalValue2");
 
-         parameters.AppendParameters(externalParameters);
+         parameters.Append(externalParameters);
 
          Assert.That(parameters["param1"], Is.EqualTo("value1"));
          Assert.That(parameters["param2"], Is.EqualTo("value2"));
@@ -43,8 +43,8 @@ namespace UnitTests.VkApi {
       [Test]
       public void Build_a_uri_from_parameters() {
          var parameters = QueryParameters.New()
-            .AddParameter("param1", "value1")
-            .AddParameter("param2", "value2");
+            .Add("param1", "value1")
+            .Add("param2", "value2");
 
          var uriBuilder = new UriBuilder($"https://api.vk.com/method/nomethod");
          var uriParameters = new NameValueCollection();

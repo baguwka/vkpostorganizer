@@ -17,8 +17,8 @@ namespace vk.Models {
 
       public async Task<AvailableWallsInfo> FillAsync(WallList wallList) {
          var groups = await _groupsGet.GetAsync(QueryParameters.New()
-            .AddParameter("filter", "editor")
-            .AddParameter("fields", "description"));
+            .Add("filter", "editor")
+            .Add("fields", "description"));
 
          if (groups.Content == null) {
             return new AvailableWallsInfo {
@@ -28,14 +28,14 @@ namespace vk.Models {
          }
 
          var users = await _usersGet.GetAsync();
-         if (users.Users == null) {
+         if (users.Content == null) {
             return new AvailableWallsInfo {
                Succeed = false,
                ErrorMessage = "No users found at all"
             };
          }
 
-         var user = users.Users.FirstOrDefault();
+         var user = users.Content.FirstOrDefault();
          if (user == null) {
             return new AvailableWallsInfo {
                Succeed = false,

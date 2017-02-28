@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -9,14 +8,13 @@ using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
 using vk.Events;
-using vk.Models;
 using vk.Models.VkApi;
 using vk.Models.VkApi.Entities;
 using vk.Views;
 
 namespace vk.ViewModels {
    public class AuthBarViewModel : BindableBase {
-      private const string DEFAULT_AVATAR =
+      public const string DEFAULT_AVATAR =
          "pack://application:,,,/VKPostOrganizer;component/Resources/default_avatar.png";
 
       private readonly IEventAggregator _eventAggregator;
@@ -29,7 +27,10 @@ namespace vk.ViewModels {
 
       public bool IsBusy {
          get { return _isBusy; }
-         set { SetProperty(ref _isBusy, value); }
+         set {
+            SetProperty(ref _isBusy, value); 
+            _eventAggregator.GetEvent<AuthBarEvents.BusyEvent>().Publish(_isBusy);
+         }
       }
 
       public bool IsAuthorized {
@@ -58,13 +59,8 @@ namespace vk.ViewModels {
          AuthorizeCommand = new DelegateCommand(authorizeCommandExecute, () => !IsBusy).ObservesProperty(() => IsBusy);
          LogOutCommand = new DelegateCommand(logOutCommandExecute, () => !IsBusy).ObservesProperty(() => IsBusy);
 
-         _eventAggregator.GetEvent<ShellEvents.BusyEvent>().Subscribe(onShellIsBusyChanged);
          _eventAggregator.GetEvent<AuthBarEvents.AuthorizeIfAlreadyLoggined>().Subscribe(authorizeIfAlreadyLoggined);
          _eventAggregator.GetEvent<VkAuthorizationEvents.AcquiredTheToken>().Subscribe(onTokenAcquired);
-      }
-
-      private void onShellIsBusyChanged(bool busy) {
-         IsBusy = busy;
       }
 
       public void SetUpAvatar(string url) {
@@ -120,12 +116,14 @@ namespace vk.ViewModels {
 
          _vkApi.Token.Set(accessToken);
 
+         IsBusy = true;
          try {
             var users = await _vkApi.UsersGet.GetAsync();
 
-            var user = users.Users.FirstOrDefault();
+            var user = users.Content.FirstOrDefault();
             if (user == null) {
-               MessageBox.Show("Cant find user", "Error while authoriazation occured", MessageBoxButton.OK, MessageBoxImage.Error);
+               MessageBox.Show("Cant find user", "Error while authoriazation occured", MessageBoxButton.OK,
+                  MessageBoxImage.Error);
                IsAuthorized = false;
                _eventAggregator.GetEvent<AuthBarEvents.AuthorizationCompleted>().Publish(false);
                return;
@@ -141,8 +139,12 @@ namespace vk.ViewModels {
             await _vkApi.StatsTrackVisitor.TrackAsync();
          }
          catch (VkException ex) {
-            MessageBox.Show(ex.Message, $"Error while authoriazation occured\n{ex.Message}", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(ex.Message, $"Error while authoriazation occured\n{ex.Message}", MessageBoxButton.OK,
+               MessageBoxImage.Error);
             IsAuthorized = false;
+         }
+         finally {
+            IsBusy = false;
          }
       }
 

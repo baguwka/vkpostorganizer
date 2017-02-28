@@ -8,6 +8,8 @@ namespace vk.Models {
       }
 
       public int ID { get; set; }
+      public string Photo50 { get; }
+      public string Name { get; }
    }
 
    [UsedImplicitly]

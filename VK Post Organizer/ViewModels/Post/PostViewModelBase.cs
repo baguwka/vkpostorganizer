@@ -9,10 +9,16 @@ namespace vk.ViewModels {
       private bool _expanded;
       private PostType _postType;
       private ObservableCollection<ImageItem> _previewImages;
+      private bool _canExpand;
 
       public bool Expanded {
          get { return _expanded; }
          set { SetProperty(ref _expanded, value); }
+      }
+
+      public bool CanExpand {
+         get { return _canExpand; }
+         set { SetProperty(ref _canExpand, value); }
       }
 
       public PostType PostType {
@@ -39,14 +45,29 @@ namespace vk.ViewModels {
       }
 
       protected virtual void expandToggle() {
+         if (!CanExpand) {
+            Expanded = false;
+            return;
+         }
+
          Expanded = !Expanded;
       }
 
       public virtual void Expand() {
+         if (!CanExpand) {
+            Expanded = false;
+            return;
+         }
+
          Expanded = true;
       }
 
       public virtual void Collapse() {
+         if (!CanExpand) {
+            Expanded = false;
+            return;
+         }
+
          Expanded = false;
       }
 

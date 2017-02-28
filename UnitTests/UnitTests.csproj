@@ -89,6 +89,7 @@
     <Compile Include="Model\WaiterTesting.cs" />
     <Compile Include="PostFilterTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Puller\ContentPullerTesting.cs" />
     <Compile Include="VkApi\PhotosSaveWallPhotoTesting.cs" />
     <Compile Include="VkApi\UsersGetTesting.cs" />
     <Compile Include="VkApi\VkAuthorizationTesting.cs" />

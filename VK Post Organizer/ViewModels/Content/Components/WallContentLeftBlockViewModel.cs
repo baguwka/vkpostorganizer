@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System;
 using System.Linq;
-using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using JetBrains.Annotations;
 using Prism.Commands;
 using Prism.Events;
@@ -11,7 +11,6 @@ using Prism.Regions;
 using vk.Events;
 using vk.Infrastructure;
 using vk.Models;
-using vk.Models.JsonServerApi;
 using vk.Models.Pullers;
 using vk.Models.VkApi;
 
@@ -24,9 +23,13 @@ namespace vk.ViewModels {
       private readonly PullersController _pullersController;
       private readonly BusyObserver _busyObserver;
       private string _description;
-      private string _profilePhoto;
+      private ImageSource _profilePhoto;
+      private bool _contentIsBusy;
       private string _name;
       private string _infoPanel;
+
+      private bool _historyUnreadBadgeVisible;
+      private int _historyUnreadPostCount;
 
       public ICommand ShowActualWallCommand { get; private set; }
       public ICommand ShowPostponeWallCommand { get; private set; }
@@ -39,7 +42,7 @@ namespace vk.ViewModels {
          set { SetProperty(ref _description, value); }
       }
 
-      public string ProfilePhoto {
+      public ImageSource ProfilePhoto {
          get { return _profilePhoto; }
          set { SetProperty(ref _profilePhoto, value); }
       }
@@ -54,16 +57,34 @@ namespace vk.ViewModels {
          set { SetProperty(ref _infoPanel, value); }
       }
 
-      private bool _contentIsBusy;
-
       public bool ContentIsBusy {
          get { return _contentIsBusy; }
          private set { SetProperty(ref _contentIsBusy, value); }
       }
 
-      public WallContentLeftBlockViewModel(IEventAggregator eventAggregator, IRegionManager regionManager,
-         VkApiProvider vkApi, PullersController pullersController, BusyObserver busyObserver, JsApiProvider jsApi) {
+      public bool HistoryUnreadBadgeVisible {
+         get { return _historyUnreadBadgeVisible; }
+         set { SetProperty(ref _historyUnreadBadgeVisible, value); }
+      }
 
+      public int HistoryUnreadPostCount {
+         get { return _historyUnreadPostCount; }
+         set { SetProperty(ref _historyUnreadPostCount, value); }
+      }
+
+      public void SetProfilePhoto(string url) {
+         var bitmap = new BitmapImage();
+         bitmap.BeginInit();
+         bitmap.UriSource = new Uri(url, UriKind.Absolute);
+         bitmap.EndInit();
+
+         ProfilePhoto = bitmap;
+      }
+
+      public WallContentLeftBlockViewModel(IEventAggregator eventAggregator, IRegionManager regionManager,
+         VkApiProvider vkApi, PullersController pullersController, BusyObserver busyObserver) {
+
+         SetProfilePhoto(AuthBarViewModel.DEFAULT_AVATAR);
          _eventAggregator = eventAggregator;
          _regionManager = regionManager;
          _vkApi = vkApi;
@@ -73,8 +94,9 @@ namespace vk.ViewModels {
             ContentIsBusy = _busyObserver.ContentIsBusy;
          };
 
-         _pullersController.Vk.WallHolderChanged += onWallContainerWallHolderChanged;
-         _pullersController.Vk.PullCompleted += onWallContainerPullCompleted;
+         _pullersController.Postponed.WallHolderChanged += onPostponedWallHolderChanged;
+         _pullersController.Postponed.PullCompleted += onPostponedPullCompleted;
+         _pullersController.History.PullCompleted += onHistoryPullCompleted;
 
          ShowActualWallCommand =
             new DelegateCommand(
@@ -110,28 +132,39 @@ namespace vk.ViewModels {
          });
       }
 
-      private async void onWallContainerWallHolderChanged(object sender, IWallHolder wallHolder) {
+      private void onHistoryPullCompleted(object sender, ContentPullerEventArgs e) {
+         if (!e.Successful) {
+            return;
+         }
+
+         HistoryUnreadBadgeVisible = e.Items.Any();
+         HistoryUnreadPostCount = e.Items.Count;
+      }
+
+      private async void onPostponedWallHolderChanged(object sender, IWallHolder wallHolder) {
          var response = await _vkApi.GroupsGetById.GetAsync(wallHolder.ID);
          var thisGroup = response.Content.FirstOrDefault();
          if (thisGroup == null) return;
 
          Name = thisGroup.Name;
          Description = thisGroup.Description;
-         ProfilePhoto = thisGroup.Photo200;
+         SetProfilePhoto(thisGroup.Photo200);
       }
 
-      private void onWallContainerPullCompleted(object sender, IList<PostViewModel> observableCollection) {
-         var wallContainer = sender as VkWallPuller;
-         if (wallContainer == null) return;
+      private void onPostponedPullCompleted(object sender, ContentPullerEventArgs e) {
+         var puller = sender as ContentPuller;
+         if (puller == null) return;
 
-         var totalPostCount = wallContainer.GetRealPostCount();
-         var repostCount = wallContainer.GetRepostCount();
-         var postCount = wallContainer.GetPostOnlyCount();
-         var missingPosts = wallContainer.GetMissingPostCount();
+         //todo infopanel info dude
 
-         InfoPanel = $"Всего: {totalPostCount} / {VkWallPuller.MAX_POSTPONED}" +
-                     $"\nПостов: {postCount}" +
-                     $"\nРепостов: {repostCount}" +
+         var totalPostCount = puller.Items.Count;//.GetRealPostCount();
+         //var repostCount = puller.GetRepostCount();
+         //var postCount = puller.GetPostOnlyCount();
+         var missingPosts = MissingFiller.MAX_POSTPONED - puller.Items.Count;//.GetMissingPostCount();
+
+         InfoPanel = $"Всего: {totalPostCount} / {MissingFiller.MAX_POSTPONED}" +
+                     //$"\nПостов: {postCount}" +
+                     //$"\nРепостов: {repostCount}" +
                      $"\nСлоты для отложек: {missingPosts}";
       }
    }

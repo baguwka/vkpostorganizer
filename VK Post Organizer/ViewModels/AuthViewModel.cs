@@ -3,7 +3,6 @@ using JetBrains.Annotations;
 using Prism.Events;
 using Prism.Mvvm;
 using vk.Events;
-using vk.Models;
 using vk.Models.VkApi;
 
 namespace vk.ViewModels {

@@ -28,7 +28,7 @@ namespace UnitTests.Fakes {
 
       public static UsersGetResponse ForUsersGet() {
          return new UsersGetResponse {
-            Users = new List<User> {
+            Content = new List<User> {
                new User {
                   ID = 1,
                   FirstName = "Mark",

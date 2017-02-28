@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
@@ -16,19 +15,27 @@ namespace vk.Models.VkApi {
          this._api = api;
       }
 
-      public async Task<UsersGetResponse> GetAsync(CancellationToken ct) {
-         var query = buildAQuery();
-         var response = await _api.ExecuteMethodAsync("users.get", query, ct).ConfigureAwait(false);
-         return JsonConvert.DeserializeObject<UsersGetResponse>(response);
-      }
-
       public async Task<UsersGetResponse> GetAsync() {
          return await GetAsync(CancellationToken.None);
       }
 
+      public Task<UsersGetResponse> GetAsync(CancellationToken ct) {
+         var query = buildAQuery();
+         return GetAsync(query, ct);
+      }
+
+      public Task<UsersGetResponse> GetAsync(QueryParameters query) {
+         return GetAsync(query, CancellationToken.None);
+      }
+
+      public async Task<UsersGetResponse> GetAsync(QueryParameters query, CancellationToken ct) {
+         var response = await _api.ExecuteMethodAsync("users.get", query, ct).ConfigureAwait(false);
+         return JsonConvert.DeserializeObject<UsersGetResponse>(response);
+      }
+
       private static QueryParameters buildAQuery() {
          var query = QueryParameters.New()
-            .AddParameter("fields", "first_name,last_name,photo_50");
+            .Add("fields", "first_name,last_name,photo_50");
          return query;
       }
    }
@@ -36,6 +43,6 @@ namespace vk.Models.VkApi {
    [UsedImplicitly]
    public class UsersGetResponse {
       [JsonProperty(PropertyName = "response")]
-      public List<User> Users { get; set; }
+      public List<User> Content { get; set; }
    }
 }

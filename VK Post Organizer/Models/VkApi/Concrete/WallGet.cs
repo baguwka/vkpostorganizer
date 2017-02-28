@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
@@ -15,10 +14,10 @@ namespace vk.Models.VkApi {
          this._api = api;
       }
 
-      public async Task<WallGetResponse> GetAsync(int id, int count = 100, int offset = 0, bool ignoraCache = false) {
-         var parameters = makeAQuery(id, count, offset);
-         return await GetAsync(parameters, ignoraCache).ConfigureAwait(false);
-      }
+      //public async Task<WallGetResponse> GetAsync(int id, int count = 100, int offset = 0, bool ignoraCache = false) {
+      //   var parameters = makeAQuery(id, count, offset);
+      //   return await GetAsync(parameters, ignoraCache).ConfigureAwait(false);
+      //}
 
       public async Task<WallGetResponse> GetAsync(QueryParameters parameters, bool ignoraCache = false) {
          return await GetAsync(parameters, CancellationToken.None, ignoraCache);
@@ -32,15 +31,15 @@ namespace vk.Models.VkApi {
          return JsonConvert.DeserializeObject<WallGetResponse>(response);
       }
 
-      private static QueryParameters makeAQuery(int id, int count, int offset) {
-         id = -Math.Abs(id);
-         var parameters = QueryParameters.New()
-            .AddParameter("owner_id", id)
-            .AddParameter("filter", "postponed")
-            .AddParameter("offset", offset)
-            .AddParameter("count", count);
-         return parameters;
-      }
+      //private static QueryParameters makeAQuery(int id, int count, int offset) {
+      //   id = -Math.Abs(id);
+      //   var parameters = QueryParameters.New()
+      //      .Add("owner_id", id)
+      //      .Add("filter", "postponed")
+      //      .Add("offset", offset)
+      //      .Add("count", count);
+      //   return parameters;
+      //}
    }
 
    [UsedImplicitly]

@@ -291,7 +291,7 @@
                             </Trigger>
 
                             <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Background" Value="#DCE0E3"></Setter>
+                                <!--<Setter Property="Background" Value="#DCE0E3"></Setter>-->
                                 <Setter Property="Foreground" Value="#868E96"></Setter>
                             </Trigger>
                         </ControlTemplate.Triggers>

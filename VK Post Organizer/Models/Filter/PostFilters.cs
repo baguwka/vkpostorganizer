@@ -1,5 +1,3 @@
-using vk.ViewModels;
-
 namespace vk.Models.Filter {
    public class NoPostFilter : PostFilter {
       public static PostFilter Instance { get; }

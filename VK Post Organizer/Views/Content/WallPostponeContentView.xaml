@@ -23,7 +23,7 @@
         <!-- filter -->
         <Border Grid.Row="0" Height="35" Style="{StaticResource VkBorder}" Margin="5,0,5,0">
             <StackPanel Orientation="Horizontal" Height="25" Margin="5,0,0,0" HorizontalAlignment="Center">
-                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Posts" 
+                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Посты" 
                               IsChecked="{Binding FilterPostsIsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="Checked">
@@ -34,8 +34,8 @@
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </ToggleButton>
-                
-                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Reposts" 
+
+                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Репосты" 
                               IsChecked="{Binding FilterRepostsIsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="Checked">
@@ -47,7 +47,7 @@
                     </i:Interaction.Triggers>
                 </ToggleButton>
                 
-                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Missing" 
+                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Слоты" 
                               IsChecked="{Binding FilterMissingIsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="Checked">
@@ -75,7 +75,8 @@
 
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border Background="{Binding Mark, Converter={StaticResource PostMarkToColorConverter}}" Style="{StaticResource VkBorder}" Margin="5" MinWidth="400" MaxWidth="750">
+                            <Border Style="{StaticResource VkBorder}"
+                                Background="{Binding Mark, Converter={StaticResource PostMarkToColorConverter}}" Margin="5" MinWidth="400" MaxWidth="750">
                                 <StackPanel Orientation="Vertical">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
@@ -88,7 +89,7 @@
                                             <Label Height="25" Content="{Binding Post.DateString}"></Label>
                                         </Button>
 
-                                        <Label Grid.Column="1" Height="25" Content="{Binding Post.Text}"
+                                        <Label Grid.Column="1" Height="25" Content="{Binding Post.Message}"
                                                Visibility="{Binding PostType, Converter={StaticResource MissingPostIsHiddenConverter}, UpdateSourceTrigger=PropertyChanged}"></Label>
 
                                         <Label Grid.Column="1" HorizontalAlignment="Stretch" Height="25" Content="Здесь может быть пост"
@@ -99,7 +100,7 @@
                                                 Command="{Binding UploadAtThisDateCommand}"/>
 
                                         <Button Grid.Column="2" HorizontalAlignment="Right" Height="25" Width="25" Content="+" Style="{StaticResource VkCommon}"
-                                                Visibility="{Binding PostType, Converter={StaticResource MissingPostIsHiddenConverter}, UpdateSourceTrigger=PropertyChanged}"
+                                                Visibility="{Binding CanExpand, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}"
                                                 Command="{Binding ExpandToggleCommand}"/>
                                     </Grid>
                                     <ItemsControl Margin="10" HorizontalAlignment="Center" ItemsSource="{Binding PreviewImages, UpdateSourceTrigger=PropertyChanged}" 

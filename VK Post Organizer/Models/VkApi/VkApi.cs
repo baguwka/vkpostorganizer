@@ -29,7 +29,7 @@ namespace vk.Models.VkApi {
       public const string VERSION = "5.62";
 
       private readonly HttpClient _httpClient;
-      private readonly HttpClientHandler _httpClientHandler;
+      private readonly HttpMessageHandler _httpClientHandler;
       private readonly AccessToken _token;
       private readonly ConcurrentDictionary<string, VkApiResponseInfo> _responseCache;
 
@@ -39,7 +39,7 @@ namespace vk.Models.VkApi {
 
       public event EventHandler<VkApiResponseInfo> CallPerformed;
 
-      public VkApi(AccessToken token, HttpClientHandler httpClientHandler) {
+      public VkApi(AccessToken token, HttpMessageHandler httpClientHandler) {
          _token = token;
          _httpClientHandler = httpClientHandler;
          _httpClient = new HttpClient(httpClientHandler) {Timeout = TimeSpan.FromSeconds(4)};
@@ -120,7 +120,7 @@ namespace vk.Models.VkApi {
             _tooMuchRequestsOccurrences++;
             //too much requests per second
             if (ex.ErrorCode == 6) {
-               await Task.Delay(TimeSpan.FromSeconds(1f), ct).ConfigureAwait(false);
+               await Task.Delay(TimeSpan.FromSeconds(1f), ct);
                if (!ct.IsCancellationRequested) {
                   return await callAsync(uri, ct);
                }
@@ -132,10 +132,10 @@ namespace vk.Models.VkApi {
          catch (TaskCanceledException ex) {
             if (_timeoutRetry > 2) {
                var error = "";
-               if (_httpClientHandler.UseProxy) {
-                  error = "Проверьте настройки прокси сервера и перезапустите приложение.";
-               }
-               throw new VkException($"Соеденение не удалось.\n{error}", ex);
+               //if (_httpClientHandler.UseProxy) {
+               //   error = "Проверьте настройки прокси сервера и перезапустите приложение.";
+               //}
+               throw new VkException($"Соеденение не удалось.\nПроверьте настройки прокси сервера и перезапустите приложение.\n{error}", ex);
             }
 
             _timeoutRetry++;

@@ -28,7 +28,7 @@ namespace vk.Models.History {
             try {
                var userid = 0;
                var users = _api.UsersGet.GetAsync();
-               var user = users.Result?.Users?.FirstOrDefault();
+               var user = users.Result?.Content?.FirstOrDefault();
                if (user != null) {
                   userid = user.ID;
                }
@@ -39,7 +39,7 @@ namespace vk.Models.History {
                   Message = info.Message,
                   PostponedDateUnix = info.Date,
                   IsRepost = false,
-                  PublishingDateUnix = info.PublishingDate,
+                  Date = info.PublishingDate,
                   Attachments = info.Attachments.Exposed.Select(attachment => attachment.Photo.GetLargest()).ToList()
                };
                _historyPublisher.LogAsync(post);

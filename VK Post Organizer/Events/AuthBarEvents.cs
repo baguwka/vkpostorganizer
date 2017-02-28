@@ -28,5 +28,7 @@ namespace vk.Events {
       /// Send a request to AuthBar to try to authorize, if user already loggined in before
       /// </summary>
       public class AuthorizeIfAlreadyLoggined : PubSubEvent { }
+
+      public class BusyEvent : PubSubEvent<bool> { }
    }
 }

@@ -25,7 +25,7 @@ namespace vk.Models.VkApi {
 
       public async Task<string> Get(string photo) {
          var parameters = QueryParameters.New()
-            .AddParameter("photos", photo);
+            .Add("photos", photo);
          var result = await _api.ExecuteMethodAsync("photos.getById", parameters, CancellationToken.None);
          return result;
       }
@@ -71,14 +71,14 @@ namespace vk.Models.VkApi {
          }
 
          var parameters = QueryParameters.New()
-            .AddParameter("owner_id", wallId)
-            .AddParameter("filter", "postponed")
-            .AddParameter("publish_date", date)
-            .AddParameter("signed", 0)
-            .AddParameter("from_group", 1)
-            .AddParameter("message", message);
+            .Add("owner_id", wallId)
+            .Add("filter", "postponed")
+            .Add("publish_date", date)
+            .Add("signed", 0)
+            .Add("from_group", 1)
+            .Add("message", message);
 
-         parameters.AppendParameters(attachments.GetAsParameters());
+         parameters.Append(attachments.GetAsParameters());
 
          return parameters;
       }

@@ -25,8 +25,9 @@ namespace vk.ViewModels {
       public bool IsBusy {
          get { return _isBusy; }
          set {
-            SetProperty(ref _isBusy, value);
-            _eventAggregator.GetEvent<ContentEvents.ContentRegionBusyEvent>().Publish(_isBusy);
+            if (SetProperty(ref _isBusy, value)) {
+               _eventAggregator.GetEvent<ContentEvents.ContentRegionBusyEvent>().Publish(_isBusy);
+            }
          }
       }
 

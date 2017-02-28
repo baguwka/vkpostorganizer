@@ -5,7 +5,7 @@ using Prism.Commands;
 using Prism.Mvvm;
 
 namespace vk.ViewModels {
-   public class ScheduleNameEditViewModel : BindableBase, IViewModel {
+   public class ScheduleNameEditViewModel : BindableBase {
       private string _name;
       public ICommand CancelCommand { get; set; }
       public ICommand OkCommand { get; set; }
