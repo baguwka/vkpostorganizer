@@ -14,7 +14,7 @@ namespace vk.Models.VkApi {
    [UsedImplicitly]
    public class VkAuthorization : BindableBase {
       public const string SCOPES = "offline,wall,groups,photos,docs";
-      public const string CLIENT_ID = "5590028";
+      public const string CLIENT_ID = "5730368";
 
       public static void ClearCookies() {
          DeleteSingleCookie("remixsid");
