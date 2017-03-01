@@ -31,7 +31,6 @@ namespace vk {
 
          bs.Run();
          Container = bs.Container;
-
       }
 
       //[System.Runtime.InteropServices.DllImport("wininet.dll", CharSet = System.Runtime.InteropServices.CharSet.Auto, SetLastError = true)]

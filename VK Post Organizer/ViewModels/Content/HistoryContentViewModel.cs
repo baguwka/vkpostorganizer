@@ -16,11 +16,12 @@ namespace vk.ViewModels {
    [UsedImplicitly]
    public class HistoryContentViewModel : WallContentViewModel {
       private readonly HistoryPostViewModelBuilder _postBuilder;
+      private readonly Settings _settings;
 
-      public HistoryContentViewModel(IEventAggregator eventAggregator, PullersController pullersController, 
-         SharedWallContext sharedWallContext, HistoryPostViewModelBuilder postBuilder) 
-         : base(eventAggregator, pullersController, sharedWallContext) {
+      public HistoryContentViewModel(IEventAggregator eventAggregator, PullersController pullersController, HistoryPostViewModelBuilder postBuilder, Settings settings) 
+         : base(eventAggregator, pullersController) {
          _postBuilder = postBuilder;
+         _settings = settings;
 
          _pullersController.History.PullInvoked += onHistoryPullerPullInvoked;
          _pullersController.History.PullCompleted += onHistoryPullerPullCompleted;
@@ -53,6 +54,7 @@ namespace vk.ViewModels {
       protected override async void onIsActiveChanged(object sender, EventArgs eventArgs) {
          base.onIsActiveChanged(sender, eventArgs);
 
+         //lastPostSeenByUser = 
          //if (!IsActive) return;
 
          //if (LastTimeSynced < _pullersController.History.LastTimePulled) {
@@ -80,6 +82,11 @@ namespace vk.ViewModels {
          UnfilteredItems.Clear();
          UnfilteredItems.AddRange(vms);
          filterOut(vms);
+
+         var lastPost = FilteredItems.FirstOrDefault() as HistoryPostViewModel;
+         if (lastPost != null) {
+            _settings.Hidden.SetLastSeenFor(_pullersController.SharedWallHolder.ID, lastPost.Post.Date);
+         }
       }
 
       private void onHistoryPullerPullInvoked(object sender, EventArgs e) {

@@ -18,8 +18,8 @@ namespace vk.ViewModels {
       private readonly VkPostViewModelBuilder _postBuilder;
 
       public WallActualContentViewModel(IEventAggregator eventAggregator, PullersController pullersController, 
-         SharedWallContext sharedWallContext, VkPostViewModelBuilder postBuilder) 
-         : base(eventAggregator, pullersController, sharedWallContext) {
+         VkPostViewModelBuilder postBuilder) 
+         : base(eventAggregator, pullersController) {
 
          _postBuilder = postBuilder;
          _pullersController.Actual.PullInvoked += onActualPullInvoked;

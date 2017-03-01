@@ -23,6 +23,7 @@ namespace vk.ViewModels {
       private readonly VkApiProvider _vkApi;
       private readonly PullersController _pullersController;
       private readonly BusyObserver _busyObserver;
+      private readonly Settings _settings;
       private string _description;
       private ImageSource _profilePhoto;
       private bool _contentIsBusy;
@@ -87,7 +88,7 @@ namespace vk.ViewModels {
       }
 
       public WallContentLeftBlockViewModel(IEventAggregator eventAggregator, IRegionManager regionManager,
-         VkApiProvider vkApi, PullersController pullersController, BusyObserver busyObserver) {
+         VkApiProvider vkApi, PullersController pullersController, BusyObserver busyObserver, Settings settings) {
 
          SetProfilePhoto(AuthBarViewModel.DEFAULT_AVATAR);
          _eventAggregator = eventAggregator;
@@ -95,6 +96,7 @@ namespace vk.ViewModels {
          _vkApi = vkApi;
          _pullersController = pullersController;
          _busyObserver = busyObserver;
+         _settings = settings;
          _busyObserver.PropertyChanged += (sender, args) => {
             ContentIsBusy = _busyObserver.ContentIsBusy;
          };
@@ -124,7 +126,9 @@ namespace vk.ViewModels {
             new DelegateCommand(
                   () => {
                      _regionManager.RequestNavigate(RegionNames.ContentMainRegion,
-                        $"{ViewNames.HistoryContent}?filter=sayhello");
+                        $"{ViewNames.HistoryContent}?filter=sayhello", result => {
+                           recountLastSeen();
+                        });
                   }, () => !ContentIsBusy)
                .ObservesProperty(() => ContentIsBusy);
 
@@ -142,8 +146,13 @@ namespace vk.ViewModels {
             return;
          }
 
-         HistoryUnreadBadgeVisible = e.Items.Any();
-         HistoryUnreadPostCount = e.Items.Count;
+         recountLastSeen();
+      }
+
+      private void recountLastSeen() {
+         var lastSeenHistoryPost = _settings.Hidden.GetLastSeenFor(_pullersController.SharedWallHolder.ID);
+         HistoryUnreadPostCount = _pullersController.History.Items.Count(post => post.Date > lastSeenHistoryPost);
+         HistoryUnreadBadgeVisible = HistoryUnreadPostCount > 0;
       }
 
       private void onPostponedWallHolderChanged(object sender, IWallHolder wallHolder) {

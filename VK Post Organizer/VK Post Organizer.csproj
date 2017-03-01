@@ -207,6 +207,7 @@
     <Compile Include="Infrastructure\IViewRegionRegistration.cs" />
     <Compile Include="Infrastructure\ViewExportAttribute.cs" />
     <Compile Include="Models\BusyObserver.cs" />
+    <Compile Include="Models\Configuration\HiddenState.cs" />
     <Compile Include="Models\Content\IContentPopulator.cs" />
     <Compile Include="Models\Content\PostponeContentPopulator.cs" />
     <Compile Include="Models\Post\HistoryPostViewModelBuilder.cs" />

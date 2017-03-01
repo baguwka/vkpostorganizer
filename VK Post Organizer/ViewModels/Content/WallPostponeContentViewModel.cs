@@ -31,9 +31,8 @@ namespace vk.ViewModels {
       public ICommand MissingFilterCheckedCommand { get; private set; }
       public ICommand MissingFilterUncheckedCommand { get; private set; }
 
-      public WallPostponeContentViewModel(IEventAggregator eventAggregator, PullersController pullersController,
-         SharedWallContext sharedWallContext, VkPostViewModelBuilder postBuilder)
-         : base(eventAggregator, pullersController, sharedWallContext) {
+      public WallPostponeContentViewModel(IEventAggregator eventAggregator, PullersController pullersController, VkPostViewModelBuilder postBuilder)
+         : base(eventAggregator, pullersController) {
          _postBuilder = postBuilder;
 
          FilterMissingIsChecked = true;

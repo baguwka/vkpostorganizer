@@ -40,14 +40,14 @@ namespace vk.ViewModels {
          _sharedWallContext = sharedWallContext;
       }
 
-      public void OnNavigatedTo(NavigationContext navigationContext) {
+      public async void OnNavigatedTo(NavigationContext navigationContext) {
          if (App.IsInitialized) {
             _regionManager.RequestNavigate(RegionNames.ContentMainRegion, ViewNames.WallPostponeContent);
 
             IsBusy = true;
             try {
                _pullersController.SharedWallHolder = _sharedWallContext.SelectedWallHolder;
-               _pullersController.SharedPull();
+               await _pullersController.SharedPullAsync();
             }
             finally {
                IsBusy = false;

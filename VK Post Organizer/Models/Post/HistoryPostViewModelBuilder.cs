@@ -9,6 +9,7 @@ using vk.Models.VkApi.Entities;
 using vk.ViewModels;
 
 namespace vk.Models {
+   [UsedImplicitly]
    public class HistoryPostViewModelBuilder : IPostViewModelBuilder {
       private readonly VkApiProvider _api;
 

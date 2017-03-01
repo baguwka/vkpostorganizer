@@ -18,7 +18,6 @@ namespace vk.ViewModels {
    public abstract class WallContentViewModel : BindableBase, INavigationAware, IActiveAware {
       protected readonly IEventAggregator _eventAggregator;
       protected readonly PullersController _pullersController;
-      protected readonly SharedWallContext _sharedWallContext;
 
       private bool _isBusy;
       private bool _filterPostsIsChecked;
@@ -72,10 +71,9 @@ namespace vk.ViewModels {
       public ICommand RepostFilterCheckedCommand { get; protected set; }
       public ICommand RepostFilterUncheckedCommand { get; protected set; }
 
-      public WallContentViewModel(IEventAggregator eventAggregator, PullersController pullersController, SharedWallContext sharedWallContext) {
+      public WallContentViewModel(IEventAggregator eventAggregator, PullersController pullersController) {
          _eventAggregator = eventAggregator;
          _pullersController = pullersController;
-         _sharedWallContext = sharedWallContext;
          CurrentPostFilter = new CompositePostFilter();
          UnfilteredItems = new List<PostViewModelBase>();
          FilteredItems = new RangeObservableCollection<PostViewModelBase>();

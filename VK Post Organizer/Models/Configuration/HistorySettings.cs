@@ -22,7 +22,8 @@ namespace vk.Models {
 
       public string Url {
          get { return _url; }
-         set {
+         set
+         {
             var uri = new UriBuilder(!string.IsNullOrEmpty(value) ? value : "127.0.0.1").Uri;
             SetProperty(ref _url, uri.ToString());
             updateUri();

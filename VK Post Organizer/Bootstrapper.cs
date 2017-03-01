@@ -11,6 +11,7 @@ using vk.Models.JsonServerApi;
 using vk.Models.Pullers;
 using vk.Models.UrlHelper;
 using vk.Models.VkApi;
+using vk.ViewModels;
 using vk.Views;
 
 namespace vk {
@@ -57,6 +58,7 @@ namespace vk {
          Container.RegisterType<ProxySettings>(new InjectionFactory(container => container.Resolve<Settings>().Proxy));
          Container.RegisterType<UploadSettings>(new InjectionFactory(container => container.Resolve<Settings>().Upload));
          Container.RegisterType<HistorySettings>(new InjectionFactory(container => container.Resolve<Settings>().History));
+         Container.RegisterType<HiddenState>(new InjectionFactory(container => container.Resolve<Settings>().Hidden));
 
          Container.RegisterType<HttpClientHandlerFactory>(Lifetime.Singleton);
          Container.RegisterType<HttpMessageHandler>(new InjectionFactory(container =>

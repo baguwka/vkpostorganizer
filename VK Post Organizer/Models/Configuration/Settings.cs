@@ -7,6 +7,7 @@ namespace vk.Models {
    public class Settings : BindableBase {
       private ProxySettings _proxy;
       private HistorySettings _history;
+      private HiddenState _hidden;
 
       public Settings() {
          Proxy = new ProxySettings {
@@ -22,6 +23,8 @@ namespace vk.Models {
             SignedPosting = false,
             PostFromGroup = true
          };
+
+         Hidden = new HiddenState();
       }
 
       public ProxySettings Proxy {
@@ -37,12 +40,18 @@ namespace vk.Models {
       [JsonProperty(Required = Required.DisallowNull)]
       public UploadSettings Upload { get; set; }
 
+      public HiddenState Hidden {
+         get { return _hidden; }
+         private set { _hidden = value; }
+      }
+
       public void ApplySettings(Settings other) {
          if (other == null) return;
 
          Proxy.Set(other.Proxy);
          Upload.Set(other.Upload);
          History.Set(other.History);
+         Hidden.Set(other.Hidden);
       }
    }
 }

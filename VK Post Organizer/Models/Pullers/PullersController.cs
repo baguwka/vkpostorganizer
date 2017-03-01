@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -40,16 +41,12 @@ namespace vk.Models.Pullers {
          Actual = new ContentPuller(strategies.ActualPullerStrategyStrategy);
          Postponed = new ContentPuller(strategies.PostponePullerStrategyStrategy);
          History = new ContentPuller(strategies.HistoryPullerStrategyStrategy);
-
-         Postponed.PullCompleted += onPostponedPullCompleted;
-
-         _eventAggregator.GetEvent<MainBottomEvents.Refresh>().Subscribe(() => {
-            Debug.WriteLine($"REFRESH FROM {Thread.CurrentThread.ManagedThreadId} THREAD");
-            SharedPull();
+         
+         _eventAggregator.GetEvent<MainBottomEvents.Refresh>().Subscribe(async () => {
+            await SharedPullAsync();
          });
 
          _eventAggregator.GetEvent<WallSelectorEvents.WallSelected>().Subscribe(item => {
-            Debug.WriteLine($"HISTORY TIMER START IN {Thread.CurrentThread.ManagedThreadId} THREAD");
 
             if (_historyPullTimer != null) {
                _historyPullTimer.Stop();
@@ -63,19 +60,13 @@ namespace vk.Models.Pullers {
          });
 
          _eventAggregator.GetEvent<MainBottomEvents.Back>().Subscribe(() => {
-            Debug.WriteLine("HISTORY TIMER DISPOSE");
             _historyPullTimer?.Dispose();
          });
 
       }
 
-      private async void onPostponedPullCompleted(object sender, ContentPullerEventArgs e) {
-         if (!e.Successful) return;
-      }
-
       private void onTimerElapsed(object sender, ElapsedEventArgs elapsedEventArgs) {
          _currentDispatcher.Invoke(async () => {
-            Debug.WriteLine($"HISTORY TIMER TICK IN {Thread.CurrentThread.ManagedThreadId} THREAD");
             if (!_settings.History.Use) {
                return;
             }
@@ -92,17 +83,14 @@ namespace vk.Models.Pullers {
          });
       }
 
-      public void SharedPull() {
-         //fire and forget
-         /*await*/
-         Postponed.PullAsync();
-         /*await*/ Actual.PullAsync();
+      public async Task SharedPullAsync() {
+         var tasks = new List<Task> {Actual.PullAsync(), Postponed.PullAsync()};
 
          if (_settings.History.Use) {
-#pragma warning disable 4014
-            History.PullAsync();
-#pragma warning restore 4014
+            tasks.Add(History.PullAsync());
          }
+
+         await Task.WhenAll(tasks);
       }
    }
 }

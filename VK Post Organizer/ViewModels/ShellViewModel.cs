@@ -1,6 +1,5 @@
-﻿using System;
+﻿using System.Threading.Tasks;
 using System.Windows;
-using Data_Persistence_Provider;
 using JetBrains.Annotations;
 using Prism.Events;
 using Prism.Mvvm;
@@ -20,7 +19,8 @@ namespace vk.ViewModels {
       private readonly Settings _settings;
 
 
-      public ShellViewModel(IRegionManager regionManager, IEventAggregator eventAggregator, VkPostponeSaveLoader saveLoader, Settings settings) {
+      public ShellViewModel(IRegionManager regionManager, IEventAggregator eventAggregator, VkPostponeSaveLoader saveLoader, 
+         Settings settings) {
          _regionManager = regionManager;
          _eventAggregator = eventAggregator;
          _saveLoader = saveLoader;
@@ -90,49 +90,18 @@ namespace vk.ViewModels {
          }
       }
 
-      public async void OnLoad() {
-         //IsBusy = true;
-
+      public void OnLoad() {
          //todo get rid of silly workaround to preinitialize views
          _regionManager.RequestNavigate(RegionNames.MainRegion, ViewNames.Content, result => {
             _regionManager.RequestNavigate(RegionNames.MainRegion, ViewNames.AvailableWalls);
          });
 
-         var mainVmData = await _saveLoader.TryLoadAsync<MainVMSaveInfo>("MainVM");
-         if (mainVmData.Successful) {
-            //TestingGroup = data.TestingGroup;
-         }
-
-         //var loadedSettings = await _saveLoader.TryLoadAsync<Settings>("Settings");
-
-         //if (loadedSettings.Successful) {
-         //   _settings.ApplySettings(loadedSettings.Result);
-         //}
-         //else {
-         //   //defaults
-         //   _settings.ApplySettings(new Settings());
-         //}
-
-         //SetUpAvatar(DEFAULT_AVATAR);
-
-         //await authorizeIfAlreadyLoggined();
          _eventAggregator.GetEvent<AuthBarEvents.AuthorizeIfAlreadyLoggined>().Publish();
-
-         //IsBusy = false;
-
-         //_eventAggregator.GetEvent<FillWallListEvent>().Publish();
          App.IsInitialized = true;
       }
 
       public void OnClosing() {
-         _saveLoader.Save("MainVM", new MainVMSaveInfo());
          _saveLoader.Save("Settings", _settings);
-      }
-   }
-
-   [Serializable]
-   public class MainVMSaveInfo : CommonSaveData {
-      public MainVMSaveInfo() {
       }
    }
 }

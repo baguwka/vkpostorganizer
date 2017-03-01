@@ -109,7 +109,6 @@ namespace vk.ViewModels {
       private async Task saveData() {
          if (CurrentSettings != null) {
             _settings.ApplySettings(CurrentSettings);
-
             await _saveLoader.SaveAsync("Settings", _settings);
          }
       }
