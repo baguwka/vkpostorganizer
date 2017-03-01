@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -32,6 +34,7 @@ namespace vk.Models.VkApi {
       private readonly HttpMessageHandler _httpClientHandler;
       private readonly AccessToken _token;
       private readonly ConcurrentDictionary<string, VkApiResponseInfo> _responseCache;
+      private readonly ConcurrentDictionary<string, DateTimeOffset> _requestLog;
 
       private readonly TimeLimiter _rateLimiter;
       private int _tooMuchRequestsOccurrences;
@@ -44,6 +47,7 @@ namespace vk.Models.VkApi {
          _httpClientHandler = httpClientHandler;
          _httpClient = new HttpClient(httpClientHandler) {Timeout = TimeSpan.FromSeconds(4)};
          _responseCache = new ConcurrentDictionary<string, VkApiResponseInfo>();
+         _requestLog = new ConcurrentDictionary<string, DateTimeOffset>();
 
          _rateLimiter = TimeLimiter.GetFromMaxCountByInterval(3, TimeSpan.FromSeconds(1.00f));
       }
@@ -58,27 +62,50 @@ namespace vk.Models.VkApi {
             throw new VkException($"Код ошибки: {error.ErrorCode}\n{error.ErrorMessage}", error.ErrorCode);
          }
       }
-
+      
       public async Task<string> ExecuteMethodAsync(string method, [NotNull] QueryParameters query, CancellationToken ct) {
          if (query == null) {
             throw new ArgumentNullException(nameof(query));
          }
 
          var uri = buildCompleteUri(method, query);
-         if (_responseCache.ContainsKey(uri.ToString())) {
+
+         var key = uri.ToString();
+
+         //защита от множества запросов за короткое время, что бы они возможно получили данные из кэша
+         if (_requestLog.ContainsKey(key)) {
+            DateTimeOffset lastLog;
+            if (_requestLog.TryGetValue(key, out lastLog)) {
+               var timeSpan = DateTimeOffset.Now - lastLog;
+               if (timeSpan < TimeSpan.FromSeconds(1)) {
+                  await Task.Delay(TimeSpan.FromSeconds(1), ct);
+               }
+               else {
+                  _requestLog.TryRemove(key, out lastLog);
+               }
+            }
+         }
+         else {
+            _requestLog.TryAdd(key, DateTimeOffset.Now);
+         }
+
+         if (_responseCache.ContainsKey(key)) {
             VkApiResponseInfo responseInfo;
-            var result = _responseCache.TryGetValue(uri.ToString(), out responseInfo);
+            var result = _responseCache.TryGetValue(key, out responseInfo);
             if (result) {
                var timeSpan = DateTimeOffset.Now - responseInfo.StoredAt;
                if (timeSpan < TimeSpan.FromSeconds(5)) {
                   return responseInfo.Response;
                }
                else {
-                  _responseCache.TryRemove(uri.ToString(), out responseInfo);
+                  _responseCache.TryRemove(key, out responseInfo);
                }
             }
          }
 
+         if (method == "users.get") {
+            Debug.WriteLine($">>>>> GOING TO DOWNLOAD REQUEST - {uri}");
+         }
          return await _rateLimiter.Perform(() => callAsync(uri, ct), ct).ConfigureAwait(false);
       }
 
@@ -195,7 +222,8 @@ namespace vk.Models.VkApi {
       protected virtual void OnCallPerformed(VkApiResponseInfo e) {
          CallPerformed?.Invoke(this, e);
 
-         _responseCache.TryAdd(e.Uri.ToString(), e);
+         var key = e.Uri.ToString();
+         _responseCache.TryAdd(key, e);
 
          _tooMuchRequestsOccurrences = 0;
          _timeoutRetry = 0;

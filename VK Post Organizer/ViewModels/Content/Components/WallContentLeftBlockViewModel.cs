@@ -13,6 +13,7 @@ using vk.Infrastructure;
 using vk.Models;
 using vk.Models.Pullers;
 using vk.Models.VkApi;
+using vk.Utils;
 
 namespace vk.ViewModels {
    [UsedImplicitly]
@@ -73,6 +74,10 @@ namespace vk.ViewModels {
       }
 
       public void SetProfilePhoto(string url) {
+         if (string.IsNullOrEmpty(url) || !UrlHelper.IsUrlIsValid(url)) {
+            return;
+         }
+
          var bitmap = new BitmapImage();
          bitmap.BeginInit();
          bitmap.UriSource = new Uri(url, UriKind.Absolute);
@@ -141,11 +146,7 @@ namespace vk.ViewModels {
          HistoryUnreadPostCount = e.Items.Count;
       }
 
-      private async void onPostponedWallHolderChanged(object sender, IWallHolder wallHolder) {
-         //var response = await _vkApi.GroupsGetById.GetAsync(wallHolder.ID);
-         //var thisGroup = response.Content.FirstOrDefault();
-         //if (thisGroup == null) return;
-
+      private void onPostponedWallHolderChanged(object sender, IWallHolder wallHolder) {
          Name = wallHolder.Name;
          Description = wallHolder.Description;
          SetProfilePhoto(wallHolder.Photo200);

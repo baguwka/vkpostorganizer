@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Prism.Commands;
 using Prism.Events;
@@ -14,9 +15,12 @@ using vk.Models.VkApi.Entities;
 namespace vk.ViewModels {
    [UsedImplicitly]
    public class HistoryContentViewModel : WallContentViewModel {
+      private readonly HistoryPostViewModelBuilder _postBuilder;
+
       public HistoryContentViewModel(IEventAggregator eventAggregator, PullersController pullersController, 
-         SharedWallContext sharedWallContext) 
+         SharedWallContext sharedWallContext, HistoryPostViewModelBuilder postBuilder) 
          : base(eventAggregator, pullersController, sharedWallContext) {
+         _postBuilder = postBuilder;
 
          _pullersController.History.PullInvoked += onHistoryPullerPullInvoked;
          _pullersController.History.PullCompleted += onHistoryPullerPullCompleted;
@@ -44,7 +48,6 @@ namespace vk.ViewModels {
             filterOut(UnfilteredItems);
          }, () => !IsBusy)
             .ObservesProperty(() => IsBusy);
-         Debug.WriteLine($"GOOD THREAD IS {Thread.CurrentThread.ManagedThreadId}");
       }
 
       protected override async void onIsActiveChanged(object sender, EventArgs eventArgs) {
@@ -64,13 +67,16 @@ namespace vk.ViewModels {
          //}
       }
 
-      protected void buildViewModelPosts(IEnumerable<IPost> posts) {
+      protected override async Task buildViewModelPosts(IEnumerable<IPost> posts) {
          clear(UnfilteredItems);
          clear(FilteredItems);
 
          Debug.WriteLine($"--- HISTORY BUILD POSTS. THREAD {Thread.CurrentThread.ManagedThreadId}");
-         var builder = new HistoryPostViewModelBuilder();
-         var vms = builder.Build(posts).ToList();
+
+         var vms = new List<HistoryPostViewModel>();
+         var freshVms = await _postBuilder.BuildAsync(posts);
+         vms.AddRange(freshVms.Cast<HistoryPostViewModel>());
+
          UnfilteredItems.Clear();
          UnfilteredItems.AddRange(vms);
          filterOut(vms);
@@ -80,27 +86,15 @@ namespace vk.ViewModels {
          //IsBusy = true;
       }
 
-      private void onHistoryPullerPullCompleted(object sender, ContentPullerEventArgs e) {
-         if (!IsActive || IsBusy) return;
+      private async void onHistoryPullerPullCompleted(object sender, ContentPullerEventArgs e) {
+         //if (!IsActive || IsBusy) return;
          Debug.WriteLine($"History vm pull completed event listener. Successful? {e.Successful}. THREAD {Thread.CurrentThread.ManagedThreadId}");
          if (e.Successful) {
-            IsBusy = true;
-            try {
-               LastTimeSynced = DateTimeOffset.Now;
-               buildViewModelPosts(e.Items);
-            }
-            finally {
-               IsBusy = false;
-            }
+            await syncAsync(e.Items);
          }
       }
 
-      protected override void updateFilter() {
-         base.updateFilter();
-
-         _eventAggregator.GetEvent<FlagsChangedEvent>().Publish(CurrentPostFilter.CompositePostType);
-      }
-      public override void OnNavigatedTo(NavigationContext navigationContext) {
+      public override async void OnNavigatedTo(NavigationContext navigationContext) {
          base.OnNavigatedTo(navigationContext);
 
          if (LastTimeSynced < _pullersController.History.LastTimePulled) {
@@ -108,7 +102,7 @@ namespace vk.ViewModels {
             IsBusy = true;
             try {
                LastTimeSynced = DateTimeOffset.Now;
-               buildViewModelPosts(_pullersController.History.Items);
+               await buildViewModelPosts(_pullersController.History.Items);
                //_pullersController.SharedWallHolder = _sharedWallContext.SelectedWallHolder;
                //await _pullersController.History.PullAsync();
             }

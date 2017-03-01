@@ -48,8 +48,6 @@ namespace vk.ViewModels {
       public MainBottomViewModel(IEventAggregator eventAggregator, BusyObserver busyObserver) {
          var aggregator = eventAggregator;
          _busyObserver = busyObserver;
-
-         _busyObserver = busyObserver;
          _busyObserver.PropertyChanged += (sender, args) => {
             ContentIsBusy = _busyObserver.ContentIsBusy;
             UploaderIsBusy = _busyObserver.UploaderIsBusy;

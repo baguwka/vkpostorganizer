@@ -26,16 +26,17 @@
         <Image Grid.Row="1" ToolTip="{Binding Description, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
                            Source="{Binding ProfilePhoto, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"/>
 
-        <Label Grid.Row="2" Style="{StaticResource VkLabel}" Content="{Binding Description, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" FontSize="12"/>
+        <!--<TextBlock TextWrapping="Wrap" Grid.Row="2" Style="{StaticResource VkTextBlock}" MaxHeight="70"
+                   Text="{Binding Description, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" FontSize="12"/>-->
 
         <StackPanel Grid.Row="3" Orientation="Vertical" HorizontalAlignment="Center">
             <Label Height="60" Style="{StaticResource VkLabel}" Content="{Binding InfoPanel, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"/>
 
             <Separator Style="{StaticResource VkSeparator}"/>
 
-            <!--<Button Margin="2" Content="Актуальная стена" Style="{StaticResource VkCommon}" 
+            <Button Margin="2" Content="Актуальная стена" Style="{StaticResource VkCommon}" 
                                 Command="{Binding ShowActualWallCommand}"
-                                Height="25" Width="150" IsEnabled="True"></Button>-->
+                                Height="25" Width="150" IsEnabled="True"></Button>
             <Button Margin="2" Content="Отложенные посты" Style="{StaticResource VkCommon}" 
                                 Command="{Binding ShowPostponeWallCommand}"
                                 Height="25" Width="150" IsEnabled="True"></Button>

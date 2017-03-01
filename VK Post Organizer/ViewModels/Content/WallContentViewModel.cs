@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Prism;
 using Prism.Events;
@@ -11,6 +12,7 @@ using vk.Models;
 using vk.Models.Filter;
 using vk.Models.Pullers;
 using vk.Utils;
+using vk.Models.VkApi.Entities;
 
 namespace vk.ViewModels {
    public abstract class WallContentViewModel : BindableBase, INavigationAware, IActiveAware {
@@ -90,6 +92,12 @@ namespace vk.ViewModels {
       protected virtual void onIsActiveChanged(object sender, EventArgs eventArgs) {
 
       }
+      
+      //todo: put this somewhere else
+      public bool IsDateMatchTheSchedule(int unixTime, Schedule schedule) {
+         var dateTime = UnixTimeConverter.ToDateTime(unixTime);
+         return schedule.Items.Any(i => i.Hour == dateTime.Hour && i.Minute == dateTime.Minute);
+      }
 
       protected virtual void expandAllItems() {
          if (!IsActive) return;
@@ -121,6 +129,21 @@ namespace vk.ViewModels {
 
       protected virtual void clearPost(PostViewModelBase post) {
          post.ClearPreview();
+      }
+
+      protected abstract Task buildViewModelPosts(IEnumerable<IPost> posts);
+
+      protected virtual async Task syncAsync(IEnumerable<IPost> items) {
+         if (IsBusy) return;
+
+         IsBusy = true;
+         try {
+            LastTimeSynced = DateTimeOffset.Now;
+            await buildViewModelPosts(items);
+         }
+         finally {
+            IsBusy = false;
+         }
       }
 
       protected void filterOut(IEnumerable<PostViewModelBase> items) {

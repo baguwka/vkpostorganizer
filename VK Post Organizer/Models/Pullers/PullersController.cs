@@ -43,9 +43,9 @@ namespace vk.Models.Pullers {
 
          Postponed.PullCompleted += onPostponedPullCompleted;
 
-         _eventAggregator.GetEvent<MainBottomEvents.Refresh>().Subscribe(async () => {
+         _eventAggregator.GetEvent<MainBottomEvents.Refresh>().Subscribe(() => {
             Debug.WriteLine($"REFRESH FROM {Thread.CurrentThread.ManagedThreadId} THREAD");
-            await SharedPull();
+            SharedPull();
          });
 
          _eventAggregator.GetEvent<WallSelectorEvents.WallSelected>().Subscribe(item => {
@@ -92,11 +92,13 @@ namespace vk.Models.Pullers {
          });
       }
 
-      public async Task SharedPull() {
-         await Postponed.PullAsync();
+      public void SharedPull() {
+         //fire and forget
+         /*await*/
+         Postponed.PullAsync();
+         /*await*/ Actual.PullAsync();
 
          if (_settings.History.Use) {
-            //fire and forget
 #pragma warning disable 4014
             History.PullAsync();
 #pragma warning restore 4014

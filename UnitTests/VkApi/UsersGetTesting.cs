@@ -1,8 +1,4 @@
-﻿using Microsoft.Practices.Unity;
-using NSubstitute;
-using NUnit.Framework;
-using vk.Models;
-using vk.Models.VkApi;
+﻿using NUnit.Framework;
 
 namespace UnitTests.VkApi {
 

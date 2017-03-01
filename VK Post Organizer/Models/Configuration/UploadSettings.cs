@@ -25,6 +25,8 @@ namespace vk.Models {
 
       public void Set(UploadSettings other) {
          CloseUploadWindowAfterPublish = other.CloseUploadWindowAfterPublish;
+         PostFromGroup = other.PostFromGroup;
+         SignedPosting = other.SignedPosting;
       }
    }
 }

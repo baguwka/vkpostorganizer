@@ -74,7 +74,7 @@ namespace vk.Models {
             var post = VkPostViewModel.Create(new Post {
                Date = missing,
                ID = 0,
-               Message = "Здесь должен быть пост."
+               Message = "Здесь может быть пост."
             });
 
             post.Mark = PostMark.Bad;

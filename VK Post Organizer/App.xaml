@@ -49,6 +49,10 @@
             <Setter Property="Background" Value="#4a7198"></Setter>
         </Style>
 
+        <Style TargetType="{x:Type TextBlock}" x:Key="VkTextBlock">
+            <Setter Property="Foreground" Value="#4a7198"></Setter>
+        </Style>
+        
         <Style TargetType="{x:Type Label}" x:Key="VkLabel">
             <Setter Property="Foreground" Value="#4a7198"></Setter>
         </Style>

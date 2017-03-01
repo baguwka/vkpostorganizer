@@ -13,55 +13,65 @@
              d:DataContext="{d:DesignInstance d:Type=vm:WallPostponeContentViewModel, IsDesignTimeCreatable=False}"
              
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="400">
+             d:DesignHeight="300" d:DesignWidth="500">
 
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="45"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
+        
         <!-- filter -->
-        <Border Grid.Row="0" Height="35" Style="{StaticResource VkBorder}" Margin="5,0,5,0">
-            <StackPanel Orientation="Horizontal" Height="25" Margin="5,0,0,0" HorizontalAlignment="Center">
-                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Посты" 
-                              IsChecked="{Binding FilterPostsIsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="Checked">
-                            <i:InvokeCommandAction Command="{Binding PostFilterCheckedCommand}"/>
-                        </i:EventTrigger>
-                        <i:EventTrigger EventName="Unchecked">
-                            <i:InvokeCommandAction Command="{Binding PostFilterUncheckedCommand}"/>
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                </ToggleButton>
+        <Border Grid.Row="0" Height="35" Style="{StaticResource VkBorder}" Margin="5,0,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Label Grid.Column="0" Style="{StaticResource VkLabel}" Margin="5,0,5,0"
+                   Content="Отложенные посты" FontSize="14" VerticalAlignment="Center"></Label>
 
-                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Репосты" 
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Height="25" Margin="5,0,0,0" HorizontalAlignment="Right">
+                    <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Посты" 
+                              IsChecked="{Binding FilterPostsIsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Checked">
+                                <i:InvokeCommandAction Command="{Binding PostFilterCheckedCommand}"/>
+                            </i:EventTrigger>
+                            <i:EventTrigger EventName="Unchecked">
+                                <i:InvokeCommandAction Command="{Binding PostFilterUncheckedCommand}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </ToggleButton>
+
+                    <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Репосты" 
                               IsChecked="{Binding FilterRepostsIsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="Checked">
-                            <i:InvokeCommandAction Command="{Binding RepostFilterCheckedCommand}"/>
-                        </i:EventTrigger>
-                        <i:EventTrigger EventName="Unchecked">
-                            <i:InvokeCommandAction Command="{Binding RepostFilterUncheckedCommand}"/>
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                </ToggleButton>
-                
-                <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Слоты" 
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Checked">
+                                <i:InvokeCommandAction Command="{Binding RepostFilterCheckedCommand}"/>
+                            </i:EventTrigger>
+                            <i:EventTrigger EventName="Unchecked">
+                                <i:InvokeCommandAction Command="{Binding RepostFilterUncheckedCommand}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </ToggleButton>
+
+                    <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Слоты" 
                               IsChecked="{Binding FilterMissingIsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="Checked">
-                            <i:InvokeCommandAction Command="{Binding MissingFilterCheckedCommand}"/>
-                        </i:EventTrigger>
-                        <i:EventTrigger EventName="Unchecked">
-                            <i:InvokeCommandAction Command="{Binding MissingFilterUncheckedCommand}"/>
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                </ToggleButton>
-            </StackPanel>
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Checked">
+                                <i:InvokeCommandAction Command="{Binding MissingFilterCheckedCommand}"/>
+                            </i:EventTrigger>
+                            <i:EventTrigger EventName="Unchecked">
+                                <i:InvokeCommandAction Command="{Binding MissingFilterUncheckedCommand}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </ToggleButton>
+                </StackPanel>
+            </Grid>
         </Border>
 
-        <xctk:BusyIndicator Grid.Row="1" IsBusy="{Binding IsBusy, UpdateSourceTrigger=PropertyChanged}">
+        <xctk:BusyIndicator Grid.Row="2" IsBusy="{Binding IsBusy, UpdateSourceTrigger=PropertyChanged}">
 
             <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="5"
                           Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityNegativeConverter}, UpdateSourceTrigger=PropertyChanged}">
@@ -89,11 +99,7 @@
                                             <Label Height="25" Content="{Binding Post.DateString}"></Label>
                                         </Button>
 
-                                        <Label Grid.Column="1" Height="25" Content="{Binding Post.Message}"
-                                               Visibility="{Binding PostType, Converter={StaticResource MissingPostIsHiddenConverter}, UpdateSourceTrigger=PropertyChanged}"></Label>
-
-                                        <Label Grid.Column="1" HorizontalAlignment="Stretch" Height="25" Content="Здесь может быть пост"
-                                                Visibility="{Binding PostType, Converter={StaticResource MissingPostIsShowingConverter}}"/>
+                                        <Label Grid.Column="1" Height="25" Content="{Binding Post.Message}"/>
 
                                         <Button Grid.Column="2" HorizontalAlignment="Right" Margin="4" Height="21" Width="96" Content="Загрузить" Style="{StaticResource VkCommon}"
                                                 Visibility="{Binding PostType, Converter={StaticResource MissingPostIsShowingConverter}, UpdateSourceTrigger=PropertyChanged}"

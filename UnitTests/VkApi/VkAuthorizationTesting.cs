@@ -1,6 +1,5 @@
 ﻿using System.Web;
 using NUnit.Framework;
-using vk.Models;
 using vk.Models.VkApi;
 
 namespace UnitTests.VkApi {

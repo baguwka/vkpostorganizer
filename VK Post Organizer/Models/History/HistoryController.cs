@@ -23,26 +23,27 @@ namespace vk.Models.History {
          _api.WallPost.PostSuccessful -= onWallPostSuccessful;
       }
 
-      private void onWallPostSuccessful(object sender, WallPostEventArgs info) {
-         Task.Run(() => {
+      private void onWallPostSuccessful(object sender, WallPostInfo info) {
+         Task.Run(async () => {
             try {
                var userid = 0;
-               var users = _api.UsersGet.GetAsync(QueryParameters.No());
-               var user = users.Result?.Content?.FirstOrDefault();
+               var users = await _api.UsersGet.GetAsync(QueryParameters.No());
+               var user = users.Content?.FirstOrDefault();
                if (user != null) {
                   userid = user.ID;
                }
 
                var post = new HistoryPost {
                   OwnerId = userid,
-                  WallId = info.WallId,
+                  WallId = info.OwnerId,
                   Message = info.Message,
-                  PostponedDateUnix = info.Date,
+                  PostponedDateUnix = info.PostponedDate,
                   IsRepost = false,
                   Date = info.PublishingDate,
                   Attachments = info.Attachments.Exposed.Select(attachment => attachment.Photo.GetLargest()).ToList()
                };
-               _historyPublisher.LogAsync(post);
+
+               await _historyPublisher.LogAsync(post);
             }
             catch (VkException) {
                //ignore

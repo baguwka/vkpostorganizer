@@ -15,8 +15,6 @@ using vk.Models.VkApi.Entities;
 using vk.Utils;
 
 namespace vk.ViewModels {
-   public class FlagsChangedEvent : PubSubEvent<PostType> { }
-
    [UsedImplicitly]
    public class WallPostponeContentViewModel : WallContentViewModel {
       private readonly VkPostViewModelBuilder _postBuilder;
@@ -81,7 +79,7 @@ namespace vk.ViewModels {
             .ObservesProperty(() => IsBusy);
       }
 
-      protected async Task buildViewModelPosts(IEnumerable<IPost> posts) {
+      protected override async Task buildViewModelPosts(IEnumerable<IPost> posts) {
          clear(UnfilteredItems);
          clear(FilteredItems);
 
@@ -91,11 +89,11 @@ namespace vk.ViewModels {
          var vms = new List<VkPostViewModel>();
          var freshViewModels = await _postBuilder.BuildAsync(rawPosts);
          vms.AddRange(freshViewModels.Cast<VkPostViewModel>());
+
          vms.Where(post => {
             var vmPost = post;
             if (vmPost == null) return false;
             return IsDateMatchTheSchedule(vmPost.Post.Date, schedule);
-
          }).ForEach(post => {
             var vmPost = post;
             if (vmPost == null) return;
@@ -134,11 +132,6 @@ namespace vk.ViewModels {
          _eventAggregator.GetEvent<UploaderEvents.SetVisibility>().Publish(true);
       }
 
-      public bool IsDateMatchTheSchedule(int unixTime, Schedule schedule) {
-         var dateTime = UnixTimeConverter.ToDateTime(unixTime);
-         return schedule.Items.Any(i => i.Hour == dateTime.Hour && i.Minute == dateTime.Minute);
-      }
-
       protected async void onPostponedPullCompleted(object sender, ContentPullerEventArgs e) {
          if (!IsActive) return;
          Debug.WriteLine($"Postpone vm pull completed event listener. Successful? {e.Successful}");
@@ -147,21 +140,6 @@ namespace vk.ViewModels {
          }
       }
 
-      private async Task syncAsync(IEnumerable<IPost> items) {
-         if (IsBusy) return;
-
-         var sw = Stopwatch.StartNew();
-         IsBusy = true;
-         try {
-            LastTimeSynced = DateTimeOffset.Now;
-            await buildViewModelPosts(items);
-         }
-         finally {
-            sw.Stop();
-            Debug.WriteLine(sw.ElapsedMilliseconds);
-            IsBusy = false;
-         }
-      }
 
       private void onPostponedPullInvoked(object sender, EventArgs eventArgs) {
          //IsBusy = true;
@@ -175,8 +153,6 @@ namespace vk.ViewModels {
             CurrentPostFilter.CompositePostType &= ~PostType.Missing;
          }
          base.updateFilter();
-
-         _eventAggregator.GetEvent<FlagsChangedEvent>().Publish(CurrentPostFilter.CompositePostType);
       }
 
       public override async void OnNavigatedTo(NavigationContext navigationContext) {

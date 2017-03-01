@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.Practices.Unity;
+﻿using System.Threading.Tasks;
 using NUnit.Framework;
 using UnitTests.Fakes;
 using vk.Models;

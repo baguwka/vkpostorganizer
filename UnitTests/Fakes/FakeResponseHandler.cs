@@ -12,7 +12,7 @@ namespace UnitTests.Fakes {
          _FakeResponses.Add(uri, responseMessage);
       }
 
-      protected async override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, System.Threading.CancellationToken cancellationToken) {
+      protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, System.Threading.CancellationToken cancellationToken) {
          if (_FakeResponses.ContainsKey(request.RequestUri)) {
             return _FakeResponses[request.RequestUri];
          }

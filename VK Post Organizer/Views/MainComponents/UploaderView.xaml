@@ -93,7 +93,11 @@
                         <ColumnDefinition/>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
-                    <Label Style="{StaticResource VkLabel}" Content="{Binding InfoPanel, UpdateSourceTrigger=PropertyChanged}"></Label>
+
+                    <CheckBox Grid.Column="0" Style="{StaticResource VkCheckBox}" Content="Подпись автора" Width="150" HorizontalAlignment="Left" VerticalAlignment="Center"  Margin="10,0,0,0"
+                                        Visibility="{Binding IsGroup, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}"
+                                        IsChecked="{Binding SignedPost, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    
                     <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
                         <Button Content="«" Height="25" Width="25" Margin="5,0,5,0" Style="{StaticResource VkCommon}" Command="{Binding MovePreviousCommand}"/>
                         <Label  Content="{Binding DateString}" Height="30" MouseWheel="onMouseWheel"
@@ -103,14 +107,15 @@
                 </Grid>
 
                 <Grid Grid.Row="3">
-                    <Button Style="{StaticResource VkDanger}" Command="{Binding WipeCommand}" 
-                            HorizontalAlignment="Left" Margin="5" Content="Стереть" Width="100"/>
+                    <CheckBox Style="{StaticResource VkCheckBox}" Content="От имени группы" Width="150" HorizontalAlignment="Left" VerticalAlignment="Center"  Margin="10,0,0,0"
+                              Visibility="{Binding IsGroup, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}"
+                              IsChecked="{Binding PostFromGroup, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
                     <Button Style="{StaticResource VkBlue}" Command="{Binding PublishCommand}" 
                             HorizontalAlignment="Center" Margin="5" Content="Пост" Width="100"/>
 
-                    <CheckBox Style="{StaticResource VkCheckBox}" Content="Свернуть после поста" Width="150" HorizontalAlignment="Right" VerticalAlignment="Center"  Margin="0,0,10,0"
-                                          IsChecked="{Binding ShrinkAfterPublish, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <CheckBox Style="{StaticResource VkCheckBox}" Content="Свернуть после поста" Width="150" HorizontalAlignment="Right" VerticalAlignment="Center"  Margin="0,10,0,10"
+                              IsChecked="{Binding ShrinkAfterPublish, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 </Grid>
             </Grid>
 

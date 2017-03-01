@@ -44,13 +44,12 @@ namespace vk.ViewModels {
       private string _urlOfImageToUpload;
       private string _message;
       private bool _isShowing;
-      private bool _shrinkAfterPublish;
       private float _uploadProgress;
       private string _progressString;
       private string _dateString;
       private int _dateUnix;
       private string _wallName;
-      private string _infoPanel; private bool _isPublishing;
+      private bool _isPublishing;
 
       public bool IsEnabled {
          get { return _isEnabled; }
@@ -60,7 +59,7 @@ namespace vk.ViewModels {
       public bool IsBusy {
          get { return _isBusy; }
          set {
-            SetProperty(ref _isBusy, value); 
+            SetProperty(ref _isBusy, value);
             _eventAggregator.GetEvent<UploaderEvents.BusyEvent>().Publish(_isBusy);
          }
       }
@@ -79,13 +78,6 @@ namespace vk.ViewModels {
          }
       }
 
-      public bool ShrinkAfterPublish {
-         get { return _shrinkAfterPublish; }
-         set {
-            SetProperty(ref _shrinkAfterPublish, value);
-            _uploadSettings.CloseUploadWindowAfterPublish = _shrinkAfterPublish;
-         }
-      }
 
       public bool IsShowing {
          get { return _isShowing; }
@@ -125,11 +117,6 @@ namespace vk.ViewModels {
          set { SetProperty(ref _wallName, value); }
       }
 
-      public string InfoPanel {
-         get { return _infoPanel; }
-         set { SetProperty(ref _infoPanel, value); }
-      }
-
       public bool IsPublishing {
          get { return _isPublishing; }
          set { SetProperty(ref _isPublishing, value); }
@@ -140,12 +127,49 @@ namespace vk.ViewModels {
       public ICommand ShowHideCommand { get; private set; }
       public ICommand PublishCommand { get; private set; }
       public ICommand CancelCommand { get; private set; }
-      public ICommand WipeCommand { get; private set; }
       public ICommand BrowseCommand { get; private set; }
       public ICommand MovePreviousCommand { get; private set; }
       public ICommand MoveNextCommand { get; private set; }
 
-      public UploaderViewModel(IEventAggregator eventAggregator, VkUploader uploader, UploadSettings uploadSettings, 
+      private bool _isGroup;
+
+      public bool IsGroup {
+         get { return _isGroup; }
+         set { SetProperty(ref _isGroup, value); }
+      }
+
+      private bool _shrinkAfterPublish;
+      private bool _signedPost;
+      private bool _postFromGroup;
+
+      public bool ShrinkAfterPublish {
+         get { return _shrinkAfterPublish; }
+         set {
+            if (SetProperty(ref _shrinkAfterPublish, value)) {
+               _uploadSettings.CloseUploadWindowAfterPublish = _shrinkAfterPublish;
+            }
+         }
+      }
+
+      public bool SignedPost {
+         get { return _signedPost; }
+         set {
+            if (SetProperty(ref _signedPost, value)) {
+               _uploadSettings.SignedPosting = _shrinkAfterPublish;
+            }
+         }
+      }
+
+      public bool PostFromGroup {
+         get { return _postFromGroup; }
+         set {
+            if (SetProperty(ref _postFromGroup, value)) {
+               _uploadSettings.PostFromGroup = _shrinkAfterPublish;
+            }
+         }
+      }
+
+      public UploaderViewModel(IEventAggregator eventAggregator, VkUploader uploader, UploadSettings uploadSettings,
          VkApiProvider vkApi, PullersController pullersController) {
 
          _eventAggregator = eventAggregator;
@@ -160,34 +184,32 @@ namespace vk.ViewModels {
          _pullersController.Postponed.WallHolderChanged += onPostponedWallHolderChanged;
 
          _shrinkAfterPublish = _uploadSettings.CloseUploadWindowAfterPublish;
+         _signedPost = _uploadSettings.SignedPosting;
+         _postFromGroup = _uploadSettings.PostFromGroup;
 
          Attachments = new ObservableCollection<AttachmentItem>();
 
          _cts = new CancellationTokenSource();
 
          CancelCommand = new DelegateCommand(() => {
-            _cts.Cancel();
-         }, () => IsShowing)
-         .ObservesProperty(() => IsShowing);
+               _cts.Cancel();
+            }, () => IsShowing)
+            .ObservesProperty(() => IsShowing);
 
          ShowHideCommand = new DelegateCommand(() => {
             IsShowing = !IsShowing;
          });
 
-         PublishCommand = DelegateCommand.FromAsyncHandler(publishExecute, 
-            () => IsEnabled && IsShowing && !IsBusy && (!string.IsNullOrWhiteSpace(Message) || Attachments.Any()))
-         .ObservesProperty(() => IsShowing)
-         .ObservesProperty(() => IsBusy)
-         .ObservesProperty(() => Message)
-         .ObservesProperty(() => Attachments)
-         .ObservesProperty(() => IsEnabled);
+         PublishCommand = DelegateCommand.FromAsyncHandler(publishExecute,
+               () => IsEnabled && IsShowing && !IsBusy && (!string.IsNullOrWhiteSpace(Message) || Attachments.Any()))
+            .ObservesProperty(() => IsShowing)
+            .ObservesProperty(() => IsBusy)
+            .ObservesProperty(() => Message)
+            .ObservesProperty(() => Attachments)
+            .ObservesProperty(() => IsEnabled);
 
          BrowseCommand = DelegateCommand.FromAsyncHandler(browseExecute, () => IsShowing)
             .ObservesProperty(() => IsShowing);
-
-         WipeCommand = new DelegateCommand(wipeExecute, () => IsShowing )
-         //.ObservesProperty(() => IsBusy)
-         .ObservesProperty(() => IsShowing);
 
          MovePreviousCommand = new DelegateCommand(moveToPreviousMissing);
          MoveNextCommand = new DelegateCommand(moveToNextMissing);
@@ -216,7 +238,6 @@ namespace vk.ViewModels {
 
       private async void onPostponedPullCompleted(object sender, ContentPullerEventArgs e) {
          await fillMissing(e.Items);
-         InfoPanel = $"{MissingFiller.MAX_POSTPONED - (MissingDates.Count - MissingFiller.RESERVE)}/{MissingFiller.MAX_POSTPONED}";
          IsBusy = false;
          ProgressString = "";
       }
@@ -228,9 +249,10 @@ namespace vk.ViewModels {
          MissingDates.AddRange(await filler.GetMissingDates(posts, schedule));
       }
 
-      private async void onPostponedWallHolderChanged(object sender, IWallHolder holder) {
-         var thisGroup = await _vkApi.GroupsGetById.GetAsync(holder.ID);
-         WallName = thisGroup.Content.FirstOrDefault()?.Name;
+      private void onPostponedWallHolderChanged(object sender, IWallHolder holder) {
+         //var thisGroup = await _vkApi.GroupsGetById.GetAsync(holder.ID);
+         IsGroup = holder.ID < 0;
+         WallName = holder?.Name;
       }
 
       private void onSetVisibility(bool visibility) {
@@ -261,7 +283,7 @@ namespace vk.ViewModels {
             }
 
             if (await Waiter.WaitUntilConditionSetsTrue(() => _pullersController.Postponed.Items.Any(), 5,
-               TimeSpan.FromSeconds(1f)) == false) {
+                   TimeSpan.FromSeconds(1f)) == false) {
                return;
             }
 
@@ -326,7 +348,7 @@ namespace vk.ViewModels {
       private async Task browseExecute() {
          if (!canUpload()) return;
 
-         var openFile = new OpenFileDialog { Multiselect = true };
+         var openFile = new OpenFileDialog {Multiselect = true};
          var checker = new ImageExtensionChecker();
 
          _cts = new CancellationTokenSource();
@@ -336,7 +358,7 @@ namespace vk.ViewModels {
             var files = openFile.FileNames.Take(10);
             foreach (var file in files.Where(file => checker
                   .IsFileHaveValidExtension(file))
-                  .TakeWhile(file => !_cts.IsCancellationRequested)) {
+               .TakeWhile(file => !_cts.IsCancellationRequested)) {
 
                await doBusyWork(tryToUploadFromFile(file, _cts.Token));
             }
@@ -363,7 +385,7 @@ namespace vk.ViewModels {
             return;
          }
 
-         var image = await Task.Run(() =>File.ReadAllBytes(filePath), cancellationToken);
+         var image = await Task.Run(() => File.ReadAllBytes(filePath), cancellationToken);
          await uploadFromBytes(image, cancellationToken);
       }
 
@@ -403,7 +425,8 @@ namespace vk.ViewModels {
       private async Task uploadFromBytes(byte[] photo, CancellationToken cancellationToken) {
          ProgressString = "Uploading...";
          UploadProgress = 100;
-         var result = await _uploader.TryUploadPhotoToWallAsync(photo, _pullersController.Postponed.WallHolder.ID, cancellationToken);
+         var result = await _uploader.TryUploadPhotoToWallAsync(photo, _pullersController.Postponed.WallHolder.ID,
+            cancellationToken);
          if (result.Successful) {
             addPhotoToAttachments(result.Photo);
          }
@@ -417,7 +440,7 @@ namespace vk.ViewModels {
          ProgressString = string.Empty;
       }
 
-      
+
 
       private void onProgressChanged(object sender, int e) {
          UploadProgress = e;
@@ -450,8 +473,16 @@ namespace vk.ViewModels {
          IsPublishing = true;
          bool successful = true;
          try {
-            await _vkApi.WallPost.PostAsync(_pullersController.Postponed.WallHolder.ID, Message, 
-               DateUnix, Attachments.Take(10).ToAttachments());
+            var postInfo = new WallPostInfo {
+               OwnerId = _pullersController.Postponed.WallHolder.ID,
+               Message = Message,
+               FromGroup = PostFromGroup,
+               Signed = SignedPost,
+               PostponedDate = DateUnix,
+               Attachments = Attachments.Take(10).ToAttachments(),
+            };
+
+            await _vkApi.WallPost.PostponeAsync(postInfo);
          }
          catch (VkException ex) {
             // 150 postpone posts reached (probably)
@@ -476,7 +507,7 @@ namespace vk.ViewModels {
             moveToNextMissing();
             IsBusy = false;
             IsPublishing = false;
-         } 
+         }
       }
 
       private void wipeExecute() {

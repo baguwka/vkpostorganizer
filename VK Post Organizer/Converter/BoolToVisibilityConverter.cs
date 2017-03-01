@@ -11,7 +11,7 @@ namespace vk.Converter {
       public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
          if (!(value is bool)) return Visibility.Visible;
 
-         return ((bool)value) ? visibility = Visibility.Visible : visibility = Visibility.Hidden;
+         return ((bool)value) ? visibility = Visibility.Visible : Visibility.Hidden;
       }
 
       public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
@@ -26,7 +26,7 @@ namespace vk.Converter {
       public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
          if (!(value is bool)) return Visibility.Visible;
 
-         return ((bool)value) ? visibility = Visibility.Visible : visibility = Visibility.Collapsed;
+         return ((bool)value) ? visibility = Visibility.Visible : Visibility.Collapsed;
       }
 
       public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
@@ -41,7 +41,7 @@ namespace vk.Converter {
       public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
          if (!(value is bool)) return Visibility.Visible;
 
-         return (!(bool)value) ? visibility = Visibility.Visible : visibility = Visibility.Collapsed;
+         return (!(bool)value) ? visibility = Visibility.Visible : Visibility.Collapsed;
       }
 
       public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {

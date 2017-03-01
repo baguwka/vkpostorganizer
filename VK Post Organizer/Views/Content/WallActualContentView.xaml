@@ -4,19 +4,113 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:vk.Views"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              xmlns:prism="http://prismlibrary.com/"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              prism:ViewModelLocator.AutoWireViewModel="True"
              mc:Ignorable="d" 
              
              xmlns:vm="clr-namespace:vk.ViewModels"
              d:DataContext="{d:DesignInstance d:Type=vm:WallActualContentViewModel, IsDesignTimeCreatable=False}"
              
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="300" d:DesignWidth="500">
     <Grid>
-        <StackPanel>
-            <Label Content="Hello there! ^-^ I'ma actual wall content view!"></Label>
-            <Label Content="Ow! Looks like i got a payload from master o3o. Here it is:"></Label>
-            <Label Content="{Binding Message, UpdateSourceTrigger=PropertyChanged}"></Label>
-        </StackPanel>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="45"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <!-- filter -->
+        <Border Grid.Row="0" Height="35" Style="{StaticResource VkBorder}" Margin="5,0,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Label Grid.Column="0" Style="{StaticResource VkLabel}" Margin="5,0,5,0"
+                   Content="Актуальная стена" FontSize="14" VerticalAlignment="Center"></Label>
+                
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Height="25" Margin="5,0,0,0" HorizontalAlignment="Right">
+                    <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Посты" 
+                              IsChecked="{Binding FilterPostsIsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Checked">
+                                <i:InvokeCommandAction Command="{Binding PostFilterCheckedCommand}"/>
+                            </i:EventTrigger>
+                            <i:EventTrigger EventName="Unchecked">
+                                <i:InvokeCommandAction Command="{Binding PostFilterUncheckedCommand}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </ToggleButton>
+
+                    <ToggleButton Style="{StaticResource VkToggleCommon}" Margin="0,0,5,0" Width="70" Content="Репосты" 
+                              IsChecked="{Binding FilterRepostsIsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Checked">
+                                <i:InvokeCommandAction Command="{Binding RepostFilterCheckedCommand}"/>
+                            </i:EventTrigger>
+                            <i:EventTrigger EventName="Unchecked">
+                                <i:InvokeCommandAction Command="{Binding RepostFilterUncheckedCommand}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </ToggleButton>
+                </StackPanel>
+
+            </Grid>
+        </Border>
+
+        <xctk:BusyIndicator Grid.Row="2" IsBusy="{Binding IsBusy, UpdateSourceTrigger=PropertyChanged}">
+
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="5"
+                          Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityNegativeConverter}, UpdateSourceTrigger=PropertyChanged}">
+                <ItemsControl BorderThickness="0" Background="Transparent" VerticalAlignment="Top" HorizontalAlignment="Stretch"
+                          ItemsSource="{Binding FilteredItems, UpdateSourceTrigger=PropertyChanged, IsAsync=True, Mode=OneWay}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel VerticalAlignment="Bottom"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Style="{StaticResource VkBorder}"
+                                Background="{Binding Mark, Converter={StaticResource PostMarkToColorConverter}}" Margin="5" MinWidth="400" MaxWidth="750">
+                                <StackPanel Orientation="Vertical">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="100"/>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition Width="100"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Button Grid.Column="0" Height="25" Style="{StaticResource VkMimic}" Command="{Binding OpenPost}"
+                                                IsEnabled="{Binding PostType, Converter={StaticResource PostTypeToBoolConverter}, UpdateSourceTrigger=PropertyChanged}">
+                                            <Label Height="25" Content="{Binding Post.DateString}"></Label>
+                                        </Button>
+
+                                        <Label Grid.Column="1" Height="25" Content="{Binding Post.Message}"/>
+
+                                        <Button Grid.Column="2" HorizontalAlignment="Right" Height="25" Width="25" Content="+" Style="{StaticResource VkCommon}"
+                                                Visibility="{Binding CanExpand, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}"
+                                                Command="{Binding ExpandToggleCommand}"/>
+                                    </Grid>
+                                    <ItemsControl Margin="10" HorizontalAlignment="Center" ItemsSource="{Binding PreviewImages, UpdateSourceTrigger=PropertyChanged}" 
+                                           Visibility="{Binding Expanded, Converter={StaticResource BoolToVisibilityConverter}}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Button Style="{StaticResource VkMimic}"  Margin="0,5,0,5" HorizontalAlignment="Left" MinWidth="400" MaxWidth="604" 
+                                                         Command="{Binding ClickCommand}" Background="White" BorderThickness="0">
+                                                    <Image  Source="{Binding Preview, IsAsync=True}"></Image>
+                                                </Button>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </xctk:BusyIndicator>
     </Grid>
 </UserControl>

@@ -10,6 +10,7 @@ namespace vk.ViewModels {
    public class HistoryPostViewModel : PostViewModelBase {
       private HistoryPost _post;
       private string _date;
+      private string _publisherName;
 
       private HistoryPostViewModel() {
       }
@@ -22,6 +23,11 @@ namespace vk.ViewModels {
       public string Date {
          get { return _date; }
          set { SetProperty(ref _date, value); }
+      }
+
+      public string PublisherName {
+         get { return _publisherName; }
+         set { SetProperty(ref _publisherName, value); }
       }
 
       public static HistoryPostViewModel Create([NotNull] IPost postReference) {
