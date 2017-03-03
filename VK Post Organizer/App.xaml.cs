@@ -18,7 +18,7 @@ namespace vk {
             return;
          }
 
-         Version = new Version(1, 0, 3);
+         Version = new Version(1, 0, 4);
 
          base.OnStartup(e);
 
