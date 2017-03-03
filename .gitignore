@@ -88,3 +88,5 @@ $RECYCLE.BIN/
 # Mac crap
 .DS_Store
 *.DotSettings
+ILMerge/merge_all.bat
+ILMerge/ILMerge.exe

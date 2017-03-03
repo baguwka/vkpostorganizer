@@ -1,42 +1,38 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Navigation;
-using JetBrains.Annotations;
-using vk.Models.VkApi;
+using vk.ViewModels;
+using NavigationEventArgs = System.Windows.Navigation.NavigationEventArgs;
 
 namespace vk.Views {
    /// <summary>
    /// Interaction logic for AuthView.xaml
    /// </summary>
    public partial class AuthView : Window {
-      private readonly AccessToken _token;
+      private readonly AuthViewModel _viewModel;
 
-      private const string SCOPES = "offline,wall,groups,photos,docs";
-      private const string CLIENT_ID = "5590028";
-
-      public AuthView([NotNull] AccessToken token, bool clearCookies) {
+      public AuthView() {
          InitializeComponent();
          HideScriptErrors(InternalWebBrowser, true);
-         _token = token;
 
-         Loaded += (sender, args) => {
-            InternalWebBrowser.MessageHook += internalWebBrowserOnMessageHook;
-
-            if (clearCookies) {
-               deleteCookies();
-            }
-
-            var destinationUrl =
-               $"https://oauth.vk.com/" +
-               $"authorize?client_id={CLIENT_ID}&response_type=token" +
-               $"&v=5.60&scope={SCOPES}&redirect_uri=oauth.vk.com/blank.html";
-            InternalWebBrowser.Navigate(destinationUrl);
+         _viewModel = (AuthViewModel)DataContext;
+         Loaded += onViewLoaded;
+         Closing += (sender, args) => {
+            InternalWebBrowser.MessageHook -= internalWebBrowserOnMessageHook;
          };
-
-         Closing += (sender, args) => InternalWebBrowser.MessageHook -= internalWebBrowserOnMessageHook;
       }
+
+      public AuthAction Action { get; set; }
+
+      //private void onAdressChanged(object sender, UrlEventArgs e) {
+      //   var url = e.Url.ToString();
+      //   //close if token acquired
+      //   if (_viewModel.OnWebBrowserNavigated(url)) {
+      //      this.Close();
+      //   }
+      //}
 
       public static void HideScriptErrors(WebBrowser wb, bool hide) {
          var fiComWebBrowser = typeof(WebBrowser).GetField("_axIWebBrowser2", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -49,10 +45,19 @@ namespace vk.Views {
          objComWebBrowser.GetType().InvokeMember("Silent", BindingFlags.SetProperty, null, objComWebBrowser, new object[] { hide });
       }
 
-      private static void deleteCookies() {
-         var expiration = DateTime.UtcNow - TimeSpan.FromDays(1);
-         string cookie = $"remixsid=; expires={expiration.ToString("R")}; path=/; domain=.vk.com";
-         Application.SetCookie(new Uri("https://www.vk.com"), cookie);
+      private void onViewLoaded(object sender, RoutedEventArgs routedEventArgs) {
+         InternalWebBrowser.MessageHook += internalWebBrowserOnMessageHook;
+         _viewModel.OnLoaded(Action);
+         //InternalWebBrowser.Navigate(destinationUrl);
+      }
+
+      private void WebBrowser_OnNavigated(object sender, NavigationEventArgs e) {
+         Debug.WriteLine("ON NAVIGATED");
+         var url = e.Uri.ToString();
+         //close if token acquired
+         if (_viewModel.OnWebBrowserNavigated(url, Action)) {
+            this.Close();
+         }
       }
 
       private IntPtr internalWebBrowserOnMessageHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled) {
@@ -63,18 +68,5 @@ namespace vk.Views {
          return IntPtr.Zero;
       }
 
-      private void WebBrowser_OnNavigated(object sender, NavigationEventArgs e) {
-         var url = e.Uri.Fragment;
-         if (url.Contains("access_token") && url.Contains("#")) {
-            var response = url.Split('=', '&');
-            _token.Token = response[1];
-            _token.UserID = int.Parse(response[5]);
-            DialogResult = true;
-            this.Close();
-         }
-      }
-
-      private void WebBrowser_OnNavigating(object sender, NavigatingCancelEventArgs e) {
-      }
    }
 }

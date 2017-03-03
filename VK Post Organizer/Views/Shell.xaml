@@ -1,0 +1,42 @@
+﻿<Window x:Class="vk.Views.Shell"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:views="clr-namespace:vk.Views"
+        xmlns:mvvm="http://prismlibrary.com/"
+        xmlns:inf="clr-namespace:vk.Infrastructure"
+        mvvm:ViewModelLocator.AutoWireViewModel="True"
+        mc:Ignorable="d"
+        MinHeight="725" MinWidth="900"
+        Height="725" Width="900"
+        Name="ShellWindow"
+        Title="Vk.com postpone helper" WindowStartupLocation="CenterScreen"
+        Icon="/Resources/32x32.ico"
+        
+        Initialized="onInitialized"
+        Loaded="onLoaded"
+        Closing="onClosing" Background="#edeef0">
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="65"/>
+            <RowDefinition/>
+            <RowDefinition Height="35"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Top region -->
+        <Border Grid.Row="0" Height="65" Style="{StaticResource VkBorder}" >
+            <ContentControl mvvm:RegionManager.RegionName="{x:Static inf:RegionNames.AuthRegion}" 
+                            Margin="5"/>
+        </Border>
+        
+        <!-- Main region -->
+        <ContentControl Grid.Row="1" mvvm:RegionManager.RegionName="{x:Static inf:RegionNames.MainRegion}"/>
+
+        <!-- Bottom region  -->
+        <Border Grid.Row="2" Height="35" Style="{StaticResource VkBorder}" >
+            <ContentControl mvvm:RegionManager.RegionName="{x:Static inf:RegionNames.BottomRegion}"/>
+        </Border>
+    </Grid>
+</Window>

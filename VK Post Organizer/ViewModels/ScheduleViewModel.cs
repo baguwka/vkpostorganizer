@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using Microsoft.Practices.Prism.Commands;
-using Microsoft.Practices.Prism.Mvvm;
+using Prism.Commands;
+using Prism.Mvvm;
 using vk.Models;
 
 namespace vk.ViewModels {
-   public class ScheduleViewModel : BindableBase, IViewModel {
+   public class ScheduleViewModel : BindableBase {
       private bool _isAnyItemSelected;
       private ScheduleItem _selectedItem;
       private ScheduleItem _editableItem;
@@ -27,7 +28,7 @@ namespace vk.ViewModels {
          set { SetProperty(ref _isAnyItemSelected, value); }
       }
 
-      public SmartCollection<ScheduleItem> Items { get; }
+      public ObservableCollection<ScheduleItem> Items { get; }
 
       public ScheduleItem SelectedItem {
          get { return _selectedItem; }
@@ -45,7 +46,7 @@ namespace vk.ViewModels {
       public ScheduleViewModel() {
          EditableItem = new ScheduleItem(12, 00);
 
-         Items = new SmartCollection<ScheduleItem>();
+         Items = new ObservableCollection<ScheduleItem>();
          Items.Add(new ScheduleItem(9, 00));
          Items.Add(new ScheduleItem(9, 05));
          Items.Add(new ScheduleItem(9, 10));

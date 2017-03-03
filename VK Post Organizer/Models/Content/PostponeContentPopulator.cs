@@ -1,0 +1,2 @@
+namespace vk.Models.Content {
+}

@@ -5,11 +5,11 @@ namespace vk.Models.Files {
    [UsedImplicitly]
    public class ImageExtensionChecker : ExtensionChecker {
       public override IEnumerable<string> GetValidExtensions() {
-         return new[] { ".jpg", ".jpeg", ".bmp", ".gif", ".png" };
+         return new[] { ".jpg", ".jpeg", ".bmp", ".png" };
       }
 
       public override string GetFileFilter() {
-         return "Images (*.jpg, *.jpeg, *.bmp, *.gif, *.png)|*.jpg;*.jpeg;*.bmp;*.gif;*.png|All files (*.*)|*.*";
+         return "Images (*.jpg, *.jpeg, *.bmp, *.png)|*.jpg;*.jpeg;*.bmp;*.png|All files (*.*)|*.*";
       }
    }
 }

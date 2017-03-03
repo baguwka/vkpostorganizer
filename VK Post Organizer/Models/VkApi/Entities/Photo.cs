@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
-using Microsoft.Practices.Prism.Mvvm;
 using Newtonsoft.Json;
+using Prism.Mvvm;
 
 namespace vk.Models.VkApi.Entities {
    [UsedImplicitly]
@@ -87,6 +87,10 @@ namespace vk.Models.VkApi.Entities {
          }
 
          return "";
+      }
+
+      public override string ToString() {
+         return $"{OwnerId}_{Id}";
       }
    }
 }

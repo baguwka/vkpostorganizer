@@ -1,34 +1,30 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Input;
-using Microsoft.Practices.Prism.Commands;
+using Prism.Commands;
+using Prism.Mvvm;
+using vk.Models.UrlHelper;
 using vk.Models.VkApi.Entities;
 
 namespace vk.Models {
-   public class AttachmentItem {
-      private Photo _photo;
-
-      public string Attachment { get; private set; }
+   public class AttachmentItem : BindableBase {
+      public string Preview { get; private set; }
+      public Attachment Attachment { get; private set; }
 
       public event EventHandler RemoveRequested;
 
-      public ICommand OpenInBrowserCommand { get; set; }
-      public ICommand RemoveCommand { get; set; }
-
-      public Photo Photo {
-         get { return _photo; }
-         set { _photo = value; }
-      }
-
-      public string _preview;
+      public ICommand OpenInBrowserCommand { get; private set; }
+      public ICommand RemoveCommand { get; private set; }
 
       public AttachmentItem() {
+         Attachment = new Attachment();
          RemoveCommand = new DelegateCommand(onRemoveRequested);
-         OpenInBrowserCommand = new DelegateCommand(openInBrowserExecute);
-      }
+         OpenInBrowserCommand = new DelegateCommand(openInBrowserExecute/*, () => Photo != null).ObservesProperty(() => Photo*/);
+      } 
 
       private void openInBrowserExecute() {
-         var largestImageUrl = _photo?.GetLargest();
+         var largestImageUrl = Attachment.Photo?.GetLargest();
          if (!string.IsNullOrEmpty(largestImageUrl)) {
             Process.Start(largestImageUrl);
          }
@@ -38,9 +34,29 @@ namespace vk.Models {
          RemoveRequested?.Invoke(this, EventArgs.Empty);
       }
 
-      public void Set(string kind, Photo photo) {
-         _photo = photo;
-         Attachment = $"{kind}{photo.OwnerId}_{photo.Id}";
+      public void SetAsPhotoAttachment(Photo photo) {
+         Attachment.Type = "photo";
+         Attachment.Photo = photo;
+
+         Preview = Attachment.Photo.Photo75;
+      }
+
+      public void SetAsDocumentAttachment(Document doc) {
+         Attachment.Type = "document";
+         Attachment.Document = doc;
+
+         var previewObtainer = new DocumentPreviewUrlObtainer();
+         Preview = previewObtainer.Obtain(Attachment, ImageSize.Small).Preview;
+      }
+   }
+
+   public static class AttachmentsExtensins {
+      public static Attachments ToAttachments(this IEnumerable<AttachmentItem> items) {
+         var attachments = new Attachments();
+         foreach (var item in items) {
+            attachments.Add(item.Attachment);
+         }
+         return attachments;
       }
    }
 }

@@ -4,6 +4,14 @@ using JetBrains.Annotations;
 
 namespace vk.Utils {
    public static class UrlHelper {
+      public static bool IsUriIsValid(Uri uri) {
+         if (uri != null) {
+            return uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps;
+
+         }
+         return false;
+      }
+
       public static bool IsUrlIsValid(string url) {
          if (!string.IsNullOrEmpty(url)) {
             Uri uriResult;
@@ -18,7 +26,6 @@ namespace vk.Utils {
       public static IWebProxy GetProxy(Uri uri, string username, string password) {
          if (IsUrlIsValid(uri.ToString()) && uri.Port > 0) {
             var credentials = new NetworkCredential(username, password);
-            //MessageBox.Show($"url: {uri}\nusrnm: {credentials.UserName}\n pswd: {credentials.Password}");
             return new WebProxy(uri, true, null, credentials);
          }
          return null;

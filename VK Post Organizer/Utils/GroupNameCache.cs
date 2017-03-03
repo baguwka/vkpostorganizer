@@ -1,27 +1,29 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using vk.Models.VkApi;
+//using System.Collections.Concurrent;
+//using System.Linq;
+//using System.Threading.Tasks;
+//using Microsoft.Practices.Unity;
+//using vk.Models.VkApi;
 
-namespace vk.Utils {
-   public static class GroupNameCache {
-      public static Dictionary<int, string> GroupNamesById { get; set; }
+//namespace vk.Utils {
+//   public static class GroupNameCache {
+//      private static ConcurrentDictionary<int, string> _groupNamesById { get; }
 
-      static GroupNameCache() {
-         GroupNamesById = new Dictionary<int, string>();
-      }
+//      static GroupNameCache() {
+//         _groupNamesById = new ConcurrentDictionary<int, string>();
+//      }
 
-      public static string GetGroupName(int groupId) {
-         if (GroupNamesById.ContainsKey(groupId)) {
-            return GroupNamesById[groupId];
-         }
+//      public static async Task<string> GetGroupNameAsync(int groupId) {
+//         if (_groupNamesById.ContainsKey(groupId)) {
+//            return _groupNamesById[groupId];
+//         }
 
-         var groupsGet = App.Container.GetInstance<GroupsGetById>();
-         var response = groupsGet.Get(Math.Abs(groupId));
-         var group = response.Response.FirstOrDefault();
+//         var groupsGetById = App.Container.Resolve<GroupsGetById>();
 
-         GroupNamesById.Add(groupId, group?.Name);
-         return group?.Name;
-      }
-   }
-}
+//         var response = await groupsGetById.GetAsync(groupId);
+//         var group = response.Content.FirstOrDefault();
+
+//         _groupNamesById.TryAdd(groupId, group?.Name);
+//         return group?.Name;
+//      }
+//   }
+//}

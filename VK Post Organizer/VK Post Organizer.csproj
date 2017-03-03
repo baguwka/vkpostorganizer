@@ -15,6 +15,9 @@
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFrameworkProfile />
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -26,8 +29,7 @@
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <ApplicationVersion>1.0.2.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -40,6 +42,8 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>true</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -87,35 +91,48 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Data Persistence Provider.dll</HintPath>
     </Reference>
-    <Reference Include="GongSolutions.Wpf.DragDrop, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\gong-wpf-dragdrop.1.0.0\lib\net45\GongSolutions.Wpf.DragDrop.dll</HintPath>
+    <Reference Include="GongSolutions.Wpf.DragDrop, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\gong-wpf-dragdrop.1.1.0\lib\net45\GongSolutions.Wpf.DragDrop.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="JetBrains.Annotations, Version=10.2.1.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
       <HintPath>..\packages\JetBrains.Annotations.10.2.1\lib\net\JetBrains.Annotations.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Messenger">
-      <HintPath>..\packages\Messenger.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Practices.Prism.Mvvm, Version=1.1.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Prism.Mvvm.1.1.1\lib\net45\Microsoft.Practices.Prism.Mvvm.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.Practices.Prism.Mvvm.Desktop, Version=1.1.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Prism.Mvvm.1.1.1\lib\net45\Microsoft.Practices.Prism.Mvvm.Desktop.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.Practices.Prism.SharedInterfaces, Version=1.1.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Prism.Mvvm.1.1.1\lib\net45\Microsoft.Practices.Prism.SharedInterfaces.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\CommonServiceLocator.1.3\lib\portable-net4+sl5+netcore45+wpa81+wp8\Microsoft.Practices.ServiceLocation.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Microsoft.Practices.Unity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.4.0.1\lib\net45\Microsoft.Practices.Unity.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity.Configuration, Version=4.0.0.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.4.0.1\lib\net45\Microsoft.Practices.Unity.Configuration.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity.RegistrationByConvention, Version=4.0.0.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.4.0.1\lib\net45\Microsoft.Practices.Unity.RegistrationByConvention.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Prism, Version=6.2.0.0, Culture=neutral, PublicKeyToken=91a96d2a154366d8, processorArchitecture=MSIL">
+      <HintPath>..\packages\Prism.Core.6.2.0\lib\net45\Prism.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Prism.Unity.Wpf, Version=6.2.0.0, Culture=neutral, PublicKeyToken=91a96d2a154366d8, processorArchitecture=MSIL">
+      <HintPath>..\packages\Prism.Unity.6.2.0\lib\net45\Prism.Unity.Wpf.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Prism.Wpf, Version=6.2.0.0, Culture=neutral, PublicKeyToken=91a96d2a154366d8, processorArchitecture=MSIL">
+      <HintPath>..\packages\Prism.Wpf.6.2.0\lib\net45\Prism.Wpf.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="RateLimiter, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RateLimiter.1.0.0\lib\net45\RateLimiter.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="SimpleInjector, Version=3.3.2.0, Culture=neutral, PublicKeyToken=984cb50dea722e99, processorArchitecture=MSIL">
@@ -123,9 +140,14 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Web" />
+    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Prism.Wpf.6.2.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -169,21 +191,75 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AppWinApi.cs" />
+    <Compile Include="Bootstrapper.cs" />
     <Compile Include="Converter\InverseBooleanConverter.cs" />
     <Compile Include="Converter\PostMarkToColorConverter.cs" />
     <Compile Include="Converter\PostTypeToBoolConverter.cs" />
     <Compile Include="Converter\MissingPostIsHiddenConverter.cs" />
+    <Compile Include="Events\AuthBarEvents.cs" />
+    <Compile Include="Events\ContentEvents.cs" />
+    <Compile Include="Events\MainBottomEvents.cs" />
+    <Compile Include="Events\ShellEvents.cs" />
+    <Compile Include="Events\UploaderEvents.cs" />
+    <Compile Include="Events\VkAuthorizationEvents.cs" />
+    <Compile Include="Events\WallSelectorEvents.cs" />
+    <Compile Include="Infrastructure\AutoPopulateExportedViewsBehavior.cs" />
+    <Compile Include="Infrastructure\IViewRegionRegistration.cs" />
+    <Compile Include="Infrastructure\ViewExportAttribute.cs" />
+    <Compile Include="Models\BusyObserver.cs" />
+    <Compile Include="Models\Configuration\HiddenState.cs" />
+    <Compile Include="Models\Content\IContentPopulator.cs" />
+    <Compile Include="Models\Content\PostponeContentPopulator.cs" />
+    <Compile Include="Models\Post\HistoryPostViewModelBuilder.cs" />
+    <Compile Include="Models\Post\IPostViewModelBuilder.cs" />
+    <Compile Include="Models\Post\VkPostViewModelBuilder.cs" />
+    <Compile Include="Models\VkApi\Entities\IPost.cs" />
+    <Compile Include="Models\HttpClientHandlerFactory.cs" />
+    <Compile Include="Models\History\HistoryController.cs" />
+    <Compile Include="Models\JsonServerApi\GetPosts.cs" />
+    <Compile Include="Models\JsonServerApi\JsApi.cs" />
+    <Compile Include="Models\Pullers\ContentPuller.cs" />
+    <Compile Include="Models\Pullers\HistoryPullerStrategy.cs" />
+    <Compile Include="Models\Pullers\IContentPuller.cs" />
+    <Compile Include="Models\Pullers\IPullerStrategy.cs" />
+    <Compile Include="Models\Pullers\PullerStrategies.cs" />
+    <Compile Include="Models\Pullers\VkActualPullerStrategy.cs" />
+    <Compile Include="Models\Pullers\VkPostponePullerStrategy.cs" />
+    <Compile Include="Models\VkApi\Entities\Attachments.cs" />
+    <Compile Include="Models\JsonServerApi\JsonServerException.cs" />
+    <Compile Include="Models\VkApi\Interfaces\IPhotosGetWallUploadSever.cs" />
+    <Compile Include="Models\VkApi\Interfaces\IPhotosSaveWallPhoto.cs" />
+    <Compile Include="Models\VkApi\Interfaces\IGroupsGet.cs" />
+    <Compile Include="Models\VkApi\Interfaces\IUsersGet.cs" />
+    <Compile Include="Models\JsonServerApi\JsApiProvider.cs" />
+    <Compile Include="Models\VkApi\VkApiProvider.cs" />
+    <Compile Include="Models\VkApi\VkAuthorization.cs" />
     <Compile Include="Models\AppDataFolderProvider.cs" />
-    <Compile Include="Models\DefaultWebClient.cs" />
+    <Compile Include="Models\Configuration\ProxySettings.cs" />
+    <Compile Include="Models\Configuration\UploadSettings.cs" />
+    <Compile Include="Models\Configuration\UrlSettings.cs" />
+    <Compile Include="Models\Configuration\HistorySettings.cs" />
     <Compile Include="Models\Files\ExtensionChecker.cs" />
     <Compile Include="Models\Files\FileFilter.cs" />
+    <Compile Include="Models\Files\GifExtensionChecker.cs" />
+    <Compile Include="Models\History\IHistoryPublisher.cs" />
+    <Compile Include="Models\History\JsonServerHistoryPublisher.cs" />
+    <Compile Include="Models\History\NoHistoryPublisher.cs" />
+    <Compile Include="Models\Post\HistoryPost.cs" />
     <Compile Include="Models\ProxyProvider.cs" />
-    <Compile Include="Models\Settings.cs" />
-    <Compile Include="Models\VkApi\PhotosGetWallUploadSever.cs" />
-    <Compile Include="Models\VkApi\PhotosSaveWallPhoto.cs" />
-    <Compile Include="Models\VkApi\StatsTrackVisitor.cs" />
-    <Compile Include="Models\VkApi\VkParameters.cs" />
+    <Compile Include="Models\Configuration\Settings.cs" />
+    <Compile Include="Models\VkUploader.cs" />
+    <Compile Include="Models\VkApi\Concrete\PhotosGetWallUploadSever.cs" />
+    <Compile Include="Models\VkApi\Concrete\PhotosSaveWallPhoto.cs" />
+    <Compile Include="Models\VkApi\Concrete\StatsTrackVisitor.cs" />
+    <Compile Include="Models\VkApi\QueryParameters.cs" />
+    <Compile Include="Infrastructure\WebBrowserUtility.cs" />
+    <Compile Include="Models\Content\WallContentFiller.cs" />
+    <Compile Include="Models\Waiter.cs" />
+    <Compile Include="Models\Pullers\PullersController.cs" />
+    <Compile Include="Models\WinInetHelper.cs" />
     <Compile Include="ProgramInfo.cs" />
+    <Compile Include="Infrastructure\RegionNames.cs" />
     <Compile Include="SingleInstance.cs" />
     <Compile Include="Utils\EnumerableExtensions.cs" />
     <Compile Include="Utils\GroupNameCache.cs" />
@@ -191,9 +267,23 @@
     <Compile Include="Models\UrlHelper\DocumentPreviewUrlObtainer.cs" />
     <Compile Include="Models\UrlHelper\PhotoUrlObtainer.cs" />
     <Compile Include="Models\VkApi\Entities\Document.cs" />
-    <Compile Include="Models\VkApi\GroupsGetById.cs" />
-    <Compile Include="Models\VkApi\WallPost.cs" />
-    <Compile Include="SaveLoaderHelper.cs" />
+    <Compile Include="Models\VkApi\Concrete\GroupsGetById.cs" />
+    <Compile Include="Models\VkApi\Concrete\WallPost.cs" />
+    <Compile Include="Models\AvailableWallsFiller.cs" />
+    <Compile Include="Models\SharedWallContext.cs" />
+    <Compile Include="Models\MissingFiller.cs" />
+    <Compile Include="ViewModels\Content\WallContentViewModel.cs" />
+    <Compile Include="Models\IPostType.cs" />
+    <Compile Include="ViewModels\Post\HistoryPostViewModel.cs" />
+    <Compile Include="ViewModels\Post\PostViewModelBase.cs" />
+    <Compile Include="ViewModels\UploaderViewModel.cs" />
+    <Compile Include="Views\MainComponents\UploaderView.xaml.cs">
+      <DependentUpon>UploaderView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\post.xaml.cs">
+      <DependentUpon>post.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="VkPostponeSaveLoader.cs" />
     <Compile Include="Converter\BoolToVisibilityConverter.cs" />
     <Compile Include="Models\Filter\PostFilters.cs" />
     <Compile Include="Models\IWallHolder.cs" />
@@ -203,46 +293,64 @@
     <Compile Include="Models\VkApi\Entities\VkException.cs" />
     <Compile Include="Utils\EnumExtensions.cs" />
     <Compile Include="Utils\EnumHelper.cs" />
-    <Compile Include="Models\Filter\IPostFilter.cs" />
+    <Compile Include="Models\Filter\PostFilter.cs" />
     <Compile Include="Utils\SizeHelper.cs" />
     <Compile Include="Utils\MimeTypeLibrary.cs" />
     <Compile Include="Utils\UnixTimeConverter.cs" />
     <Compile Include="Models\UrlHelper\IImageUrlObtainer.cs" />
     <Compile Include="Utils\UrlHelper.cs" />
     <Compile Include="Models\AttachmentItem.cs" />
+    <Compile Include="ViewModels\MainComponents\AuthBarViewModel.cs" />
+    <Compile Include="ViewModels\AuthViewModel.cs" />
+    <Compile Include="ViewModels\Content\AvailableWallsViewModel.cs" />
+    <Compile Include="ViewModels\MainComponents\ContentViewModel.cs" />
+    <Compile Include="ViewModels\Content\HistoryContentViewModel.cs" />
+    <Compile Include="ViewModels\Content\WallActualContentViewModel.cs" />
     <Compile Include="ViewModels\ImageItem.cs" />
+    <Compile Include="ViewModels\MainComponents\MainBottomViewModel.cs" />
     <Compile Include="ViewModels\ScheduleNameEditViewModel.cs" />
     <Compile Include="ViewModels\ScheduleViewModel.cs" />
     <Compile Include="ViewModels\SettingsViewModel.cs" />
-    <Compile Include="ViewModels\UploadViewModel.cs" />
-    <Compile Include="ViewModels\WallControl.cs" />
+    <Compile Include="ViewModels\ShellViewModel.cs" />
+    <Compile Include="ViewModels\Content\Components\WallContentLeftBlockViewModel.cs" />
+    <Compile Include="ViewModels\Content\WallPostponeContentViewModel.cs" />
+    <Compile Include="Models\Pullers\ContentPullerEventArgs.cs" />
     <Compile Include="Models\WallItem.cs" />
     <Compile Include="Models\WallList.cs" />
-    <Compile Include="ViewModels\PostControl.cs" />
+    <Compile Include="ViewModels\Post\VkPostViewModel.cs" />
     <Compile Include="Models\PostType.cs" />
-    <Compile Include="Models\SmartCollection.cs" />
+    <Compile Include="Models\RangeObservableCollection.cs" />
     <Compile Include="Models\Schedule.cs" />
-    <Compile Include="Models\VkApi\AccessToken.cs" />
-    <Compile Include="Models\WebClientWithProxy.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="Models\VkApi\Concrete\AccessToken.cs" />
     <Compile Include="Models\VkApi\Entities\Attachment.cs" />
     <Compile Include="Models\VkApi\Entities\Group.cs" />
     <Compile Include="Models\VkApi\Entities\Post.cs" />
     <Compile Include="Models\VkApi\Entities\User.cs" />
-    <Compile Include="Models\VkApi\GroupsGet.cs" />
-    <Compile Include="Models\IWebClient.cs" />
+    <Compile Include="Models\VkApi\Concrete\GroupsGet.cs" />
     <Compile Include="Models\VkApi\Entities\Photo.cs" />
-    <Compile Include="Models\VkApi\VkApiBase.cs" />
-    <Compile Include="Models\VkApi\UsersGet.cs" />
-    <Compile Include="Models\VkApi\WallGet.cs" />
-    <Compile Include="ViewModels\IViewModel.cs" />
-    <Compile Include="ViewModels\MainViewModel.cs" />
+    <Compile Include="Models\VkApi\VkApi.cs" />
+    <Compile Include="Models\VkApi\Concrete\UsersGet.cs" />
+    <Compile Include="Models\VkApi\Concrete\WallGet.cs" />
+    <Compile Include="Views\MainComponents\ContentView.xaml.cs">
+      <DependentUpon>ContentView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Content\HistoryContentView.xaml.cs">
+      <DependentUpon>HistoryContentView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\LoadingPlaceholder.xaml.cs">
+      <DependentUpon>LoadingPlaceholder.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\StartPageView.xaml.cs">
+      <DependentUpon>StartPageView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\MainComponents\AuthBarView.xaml.cs">
+      <DependentUpon>AuthBarView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\AuthView.xaml.cs">
       <DependentUpon>AuthView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\ScheduleNameEdit.xaml.cs">
-      <DependentUpon>ScheduleNameEdit.xaml</DependentUpon>
+    <Compile Include="Views\MainComponents\MainBottomView.xaml.cs">
+      <DependentUpon>MainBottomView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ScheduleWindow.xaml.cs">
       <DependentUpon>ScheduleWindow.xaml</DependentUpon>
@@ -250,17 +358,55 @@
     <Compile Include="Views\SettingsView.xaml.cs">
       <DependentUpon>SettingsView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\UploadWindow.xaml.cs">
-      <DependentUpon>UploadWindow.xaml</DependentUpon>
+    <Compile Include="Views\Content\AvailableWallsView.xaml.cs">
+      <DependentUpon>AvailableWallsView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\WallSelection.xaml.cs">
-      <DependentUpon>WallSelection.xaml</DependentUpon>
+    <Compile Include="Views\Content\WallActualContentView.xaml.cs">
+      <DependentUpon>WallActualContentView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Content\Components\WallContentLeftBlockView.xaml.cs">
+      <DependentUpon>WallContentLeftBlockView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Content\WallPostponeContentView.xaml.cs">
+      <DependentUpon>WallPostponeContentView.xaml</DependentUpon>
+    </Compile>
+    <Page Include="Views\MainComponents\ContentView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Content\HistoryContentView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\LoadingPlaceholder.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\MainComponents\UploaderView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\post.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\StartPageView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\MainComponents\AuthBarView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\AuthView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\MainView.xaml">
+    <Page Include="Views\MainComponents\MainBottomView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Shell.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -268,14 +414,10 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Views\MainView.xaml.cs">
-      <DependentUpon>MainView.xaml</DependentUpon>
+    <Compile Include="Views\Shell.xaml.cs">
+      <DependentUpon>Shell.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Views\ScheduleNameEdit.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Views\ScheduleWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -284,11 +426,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\UploadWindow.xaml">
+    <Page Include="Views\Content\AvailableWallsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\WallSelection.xaml">
+    <Page Include="Views\Content\WallActualContentView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Content\Components\WallContentLeftBlockView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Content\WallPostponeContentView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -297,11 +447,6 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
@@ -309,7 +454,7 @@
     </Compile>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="packages.config">
       <SubType>Designer</SubType>
@@ -330,7 +475,9 @@
   <ItemGroup>
     <Resource Include="Resources\default_avatar.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Models\Extensions\" />
+  </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\16x16 icon.ico" />
   </ItemGroup>
@@ -350,6 +497,10 @@
     </BootstrapperPackage>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

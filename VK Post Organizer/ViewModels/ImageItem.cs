@@ -1,25 +1,25 @@
 ﻿using System.Windows.Input;
-using Microsoft.Practices.Prism.Commands;
-using Microsoft.Practices.Prism.Mvvm;
+using Prism.Commands;
+using Prism.Mvvm;
 
 namespace vk.ViewModels {
    public class ImageItem : BindableBase {
-      private string _url;
+      private string _preview;
       private string _source;
 
-      public ImageItem(string url, string source) {
+      public ImageItem(string preview, string source) {
          ClickCommand = new DelegateCommand(() => {
-            if (!string.IsNullOrEmpty(Source)) {
                System.Diagnostics.Process.Start(Source);
-            }
-         });
-         _url = url;
+            }, () => !string.IsNullOrEmpty(Source))
+            .ObservesProperty(() => Source);
+
+         _preview = preview;
          _source = source;
       }
 
-      public string Url {
-         get { return _url; }
-         set { SetProperty(ref _url, value); }
+      public string Preview {
+         get { return _preview; }
+         set { SetProperty(ref _preview, value); }
       }
 
       public string Source {

@@ -1,24 +1,45 @@
 ﻿using System;
-using System.Net;
+using System.ComponentModel;
 using System.Net.NetworkInformation;
-using System.Text;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using Microsoft.Practices.Prism.Commands;
-using Microsoft.Practices.Prism.Mvvm;
+using Prism.Commands;
+using Prism.Mvvm;
 using vk.Models;
 using vk.Utils;
 
 namespace vk.ViewModels {
+   public class PingInfo {
+      public PingReply Reply { get; set; }
+      public bool IsAvailable { get; set; }
+   }
+
    public class SettingsViewModel : BindableBase {
-      private Settings _currentSettings;
+      private readonly VkPostponeSaveLoader _saveLoader;
+      private readonly Settings _settings;
       private bool _isBusy;
       private string _proxyPingMs;
+      private string _historyServerPingMs;
+
+      private Settings _currentSettings;
 
       public Settings CurrentSettings {
          get { return _currentSettings; }
-         set { SetProperty(ref _currentSettings, value); }
+         private set {
+            if (_currentSettings != null) {
+               _currentSettings.Proxy.PropertyChanged -= OnProxyPropertyChanged;
+               _currentSettings.History.PropertyChanged -= OnHistoryPropertyChanged;
+            }
+
+            SetProperty(ref _currentSettings, value);
+
+            if (_currentSettings != null) {
+               _currentSettings.Proxy.PropertyChanged += OnProxyPropertyChanged;
+               _currentSettings.History.PropertyChanged += OnHistoryPropertyChanged;
+            }
+         }
       }
 
       public bool IsBusy {
@@ -31,66 +52,89 @@ namespace vk.ViewModels {
          set { SetProperty(ref _proxyPingMs, value); }
       }
 
-      public ICommand OkCommand { get; set; }
-      public ICommand RevertSettingsCommand { get; set; }
-      public ICommand PingCommand { get; set; }
+      public string HistoryServerPingMs {
+         get { return _historyServerPingMs; }
+         set { SetProperty(ref _historyServerPingMs, value); }
+      }
 
-      public SettingsViewModel() {
+      public ICommand OkCommand { get; private set; }
+      public ICommand RevertSettingsCommand { get; private set; }
+      public DelegateCommand PingProxyCommand { get; private set; }
+      public DelegateCommand PingHistoryServerCommand { get; private set; }
+
+      public SettingsViewModel(VkPostponeSaveLoader saveLoader, Settings settings) {
+         _saveLoader = saveLoader;
+         _settings = settings;
          OkCommand = new DelegateCommand<Window>(okCommandexecute);
          RevertSettingsCommand = new DelegateCommand(revert);
 
-         PingCommand = new DelegateCommand(pingProxy);
+         CurrentSettings = new Settings();
+
+         PingProxyCommand = new DelegateCommand(pingProxy,
+               () => CurrentSettings.Proxy.UseProxy && UrlHelper.IsUrlIsValid(CurrentSettings.Proxy.ProxyAddress));
+
+         PingHistoryServerCommand = new DelegateCommand(pingHistoryServerCommandExecute,
+               () => CurrentSettings.History.Use && UrlHelper.IsUrlIsValid(CurrentSettings.History.Url));
 
          revert();
-         //pingProxy();
+      }
+
+      private async void pingHistoryServerCommandExecute() {
+         var response = await checkAvailability(CurrentSettings.History.Uri);
+         if (!response.IsAvailable) {
+            HistoryServerPingMs = "n/a";
+            return;
+         }
+         HistoryServerPingMs = $"~{response.Reply?.RoundtripTime} ms";
       }
 
       private async void pingProxy() {
-         if (CurrentSettings.Proxy.UseProxy) {
-            if (UrlHelper.IsUrlIsValid(CurrentSettings.Proxy.ProxyAddress)) {
-               try {
-                  var ping = new Ping();
-                  var reply = await ping.SendPingAsync(new Uri(CurrentSettings.Proxy.ProxyAddress).Host, 3000);
-                  if (reply == null) return;
-                  ProxyPingMs = $"~{reply.RoundtripTime} ms";
-               }
-               catch (PingException ex) {
-                  MessageBox.Show($"{ex.Message}\n\n{ex.StackTrace}", ex.ToString());
-               }
-            }
+         var response = await checkAvailability(CurrentSettings.Proxy.ProxyUri);
+         if (!response.IsAvailable) {
+            ProxyPingMs = "n/a";
+            return;
+         }
+         ProxyPingMs = $"~{response.Reply?.RoundtripTime} ms";
+      }
 
-            var proxy = UrlHelper.GetProxy(CurrentSettings.Proxy.ProxyUri, CurrentSettings.Proxy.Username, CurrentSettings.Proxy.Password);
-            if (proxy != null) {
-               using (var wc = new WebClient()) {
-                  wc.Encoding = Encoding.UTF8;
-                  var uriBuilder = new UriBuilder($"https://api.vk.com/method/users.get?access_token=2312&v=5.60");
+      private static async Task<PingInfo> checkAvailability(Uri uri) {
+         try {
+            var ping = new Ping();
+            var pingReply = await ping.SendPingAsync(uri.Host, 3000);
 
-                  wc.Proxy = proxy;
-                  try {
-                     //MessageBox.Show("Downloading string via proxy, please wait...");
-                     var str = await wc.DownloadStringTaskAsync(uriBuilder.Uri);
-                     var some = str.Length;
-                     //MessageBox.Show(str);
-                  }
-                  catch (Exception ex) {
-                     MessageBox.Show($"{ex.Message}\n\n{ex.StackTrace}", ex.ToString());
-                  }
-               }
+            //check port
+            using (var client = new TcpClient()) {
+               await client.ConnectAsync(uri.Host, uri.Port);
+               return new PingInfo {
+                  Reply = pingReply,
+                  IsAvailable = true
+               };
             }
+         }
+         catch (PingException) {
+            return new PingInfo {IsAvailable = false};
+         }
+         catch (Exception) {
+            return new PingInfo { IsAvailable = false };
          }
       }
 
+      private void OnHistoryPropertyChanged(object sender, PropertyChangedEventArgs e) {
+         PingHistoryServerCommand.RaiseCanExecuteChanged();
+      }
+
+      private void OnProxyPropertyChanged(object sender, PropertyChangedEventArgs e) {
+         PingProxyCommand.RaiseCanExecuteChanged();
+      }
+
       private void revert() {
-         CurrentSettings = new Settings();
-         CurrentSettings.ApplySettings(App.Container.GetInstance<Settings>());
+         CurrentSettings.ApplySettings(_settings);
       }
 
       private async Task saveData() {
          if (CurrentSettings != null) {
-            var settings = App.Container.GetInstance<Settings>();
-            settings.ApplySettings(CurrentSettings);
-
-            await SaveLoaderHelper.SaveAsync("Settings", settings);
+            _settings.ApplySettings(CurrentSettings);
+            await _saveLoader.SaveAsync("Settings", _settings);
          }
       }
 

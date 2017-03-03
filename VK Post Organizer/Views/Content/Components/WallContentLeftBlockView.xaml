@@ -1,0 +1,74 @@
+﻿<UserControl x:Class="vk.Views.WallContentLeftBlockView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:vk.ViewModels"
+             xmlns:local="clr-namespace:vk.Views"
+             xmlns:prism="http://prismlibrary.com/"
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance d:Type=vm:WallContentLeftBlockViewModel, IsDesignTimeCreatable=False}"
+             d:DesignHeight="800" d:DesignWidth="250"
+             Background="White">
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="35"/>
+            <RowDefinition Height="200"/>
+            <RowDefinition Height="70"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        
+        <Label Grid.Row="0" Style="{StaticResource VkLabel}" HorizontalAlignment="Center"
+               Content="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" FontSize="16"/>
+
+        <Image Grid.Row="1" ToolTip="{Binding Description, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                           Source="{Binding ProfilePhoto, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"/>
+
+        <!--<TextBlock TextWrapping="Wrap" Grid.Row="2" Style="{StaticResource VkTextBlock}" MaxHeight="70"
+                   Text="{Binding Description, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" FontSize="12"/>-->
+
+        <StackPanel Grid.Row="3" Orientation="Vertical" HorizontalAlignment="Center">
+            <Label Height="60" Style="{StaticResource VkLabel}" Content="{Binding InfoPanel, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"/>
+
+            <Separator Style="{StaticResource VkSeparator}"/>
+
+            <Button Margin="2" Content="Актуальная стена" Style="{StaticResource VkCommon}" 
+                                Command="{Binding ShowActualWallCommand}"
+                                Height="25" Width="150" IsEnabled="True"></Button>
+            <Button Margin="2" Content="Отложенные посты" Style="{StaticResource VkCommon}" 
+                                Command="{Binding ShowPostponeWallCommand}"
+                                Height="25" Width="150" IsEnabled="True"></Button>
+            <Grid>
+                <Button Margin="2" Content="История" Style="{StaticResource VkCommon}" 
+                                Command="{Binding ShowHistoryCommand}"
+                                Height="25" Width="150" IsEnabled="True"></Button>
+                <Border CornerRadius="999" Padding="4" Height="25" Width="25" IsHitTestVisible="False"
+                        HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-5,30,0"
+                        Visibility="{Binding HistoryUnreadBadgeVisible, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <Border.Background>
+                        <LinearGradientBrush EndPoint="0.5,0.9" StartPoint="0.5,0">
+                            <GradientStop Color="#f44242" Offset="0.9"/>
+                            <GradientStop Color="#f46141"/>
+                        </LinearGradientBrush>
+                    </Border.Background>
+                    
+                    <TextBlock Foreground="White" FontWeight="Bold" FontSize="10"
+                               HorizontalAlignment="Center" VerticalAlignment="Center"
+                               Text="{Binding HistoryUnreadPostCount, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"/>
+                </Border>
+            </Grid>
+
+            <Separator Style="{StaticResource VkSeparator}"/>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button Width="75" Height="25" Margin="5" Content="Развернуть" Style="{StaticResource VkCommon}"
+                                Command="{Binding ExpandAllCommand}"/>
+
+                <Button Width="75" Height="25" Margin="5" Content="Свернуть" Style="{StaticResource VkCommon}"
+                                Command="{Binding CollapseAllCommand}"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>

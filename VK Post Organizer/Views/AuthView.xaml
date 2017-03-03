@@ -4,15 +4,24 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:vk.Views"
+        xmlns:prism="http://prismlibrary.com/"
+        xmlns:osm="http://schemas.awesomium.com/winfx"
+        xmlns:inf="clr-namespace:vk.Infrastructure"
+        prism:ViewModelLocator.AutoWireViewModel="True"
         mc:Ignorable="d"
         Icon="/Resources/32x32.ico"
         WindowStartupLocation="CenterScreen"
         Title="Authentication" Height="700" Width="800">
     <Grid>
-        <WebBrowser Name="InternalWebBrowser" 
-                    Navigated="WebBrowser_OnNavigated"
-                    Navigating="WebBrowser_OnNavigating">
-            
+        <!--<osm:WebControl Name="webControl"
+                        Source="{Binding WebAdress, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        
+                        AddressChanged="onAdressChanged">
+
+        </osm:WebControl>-->
+        <WebBrowser inf:WebBrowserUtility.BindableSource="{Binding WebAdress, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    Name="InternalWebBrowser" 
+                    Navigated="WebBrowser_OnNavigated">
         </WebBrowser>
     </Grid>
 </Window>

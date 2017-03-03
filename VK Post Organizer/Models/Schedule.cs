@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using JetBrains.Annotations;
-using Microsoft.Practices.Prism.Mvvm;
+using Prism.Mvvm;
 
 namespace vk.Models {
    [Serializable]
@@ -59,9 +60,6 @@ namespace vk.Models {
          }
       }
 
-      public ScheduleItem() {
-      }
-
       public ScheduleItem(DateTime time) {
          Hour = time.Hour;
          Minute = time.Minute;
@@ -76,10 +74,10 @@ namespace vk.Models {
          set { SetProperty(ref _name, value); }
       }
 
-      public SmartCollection<ScheduleItem> Items { get; }
+      public ObservableCollection<ScheduleItem> Items { get; }
 
       public Schedule() {
-         Items = new SmartCollection<ScheduleItem> {
+         Items = new ObservableCollection<ScheduleItem> {
             new ScheduleItem(9, 00),
             new ScheduleItem(9, 05),
             new ScheduleItem(9, 10),

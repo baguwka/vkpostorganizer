@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Input;
 
 namespace vk.Views {
    /// <summary>
@@ -11,6 +12,12 @@ namespace vk.Views {
 
       private void onCloseClick(object sender, RoutedEventArgs e) {
          Close();
+      }
+
+      private void SettingsView_OnKeyDown(object sender, KeyEventArgs e) {
+         if (e.Key == Key.Escape) {
+            this.Close();
+         }
       }
    }
 }

@@ -6,6 +6,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:vk.ViewModels"
         xmlns:local="clr-namespace:vk.Views"
+        xmlns:mvvm="http://prismlibrary.com/"
+        mvvm:ViewModelLocator.AutoWireViewModel="True"
         mc:Ignorable="d"
         Icon="/Resources/32x32.ico"
         
@@ -15,12 +17,12 @@
         Height="500"
         Width="400"
         Background="#edeef0"
-        ResizeMode="NoResize">
-    <Window.DataContext>
-        <vm:SettingsViewModel/>
-    </Window.DataContext>
+        ResizeMode="NoResize"
+        KeyDown="SettingsView_OnKeyDown">
     <Grid Margin="10" IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBooleanConverter}}">
         <Grid.RowDefinitions>
+            <RowDefinition Height="115"/>
+            <RowDefinition Height="85"/>
             <RowDefinition/>
             <RowDefinition Height="35"/>
         </Grid.RowDefinitions>
@@ -60,15 +62,52 @@
                     </StackPanel>
                     
                     <StackPanel Orientation="Horizontal">
-                        <Button Margin="5" Style="{StaticResource VkBlue}" Height="25" Width="75"
-                        Command="{Binding PingCommand}" Content="Ping"></Button>
+                        <Button Margin="5" Style="{StaticResource VkBlue}" Height="25" Width="85"
+                        Command="{Binding PingProxyCommand}" Content="Проверить"></Button>
                         <Label Content="{Binding ProxyPingMs, UpdateSourceTrigger=PropertyChanged}" Height="25" Width="100"></Label>
                     </StackPanel>
                 </StackPanel>
             </Grid>
         </Border>
 
-        <Border Grid.Row="1" Style="{StaticResource VkBorder}">
+        <Border Grid.Row="1" Style="{StaticResource VkBorder}" Margin="0,0,0,10">
+            <Grid Margin="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="120"/>
+                    <RowDefinition Height="35"/>
+                    <RowDefinition Height="35"/>
+                </Grid.RowDefinitions>
+
+                <CheckBox Grid.Column="0" Grid.Row="0" Style="{StaticResource VkCheckBox}" VerticalAlignment="Top" Margin="5,10,0,0"
+                           IsChecked="{Binding CurrentSettings.History.Use}">
+                    <TextBlock Text="Use history JSON server" TextWrapping="Wrap"></TextBlock>
+                </CheckBox>
+
+                <StackPanel Grid.Column="1" Grid.Row="0" Orientation="Vertical" IsEnabled="{Binding CurrentSettings.History.Use}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBox Margin="5" Style="{StaticResource VkTextBox}" Height="20" Width="155"
+                         Text="{Binding CurrentSettings.History.Url, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+
+                        <xctk:IntegerUpDown Style="{StaticResource VkIntegerUpDown}" Watermark="Port"
+                            Margin="5" Height="20" Width="60" Minimum="0" Maximum="65535"
+                            Value="{Binding CurrentSettings.History.Port, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal">
+                        <Button Margin="5" Style="{StaticResource VkBlue}" Height="25" Width="85"
+                        Command="{Binding PingHistoryServerCommand}" Content="Проверить"></Button>
+                        <Label Content="{Binding HistoryServerPingMs, UpdateSourceTrigger=PropertyChanged}" Height="25" Width="100"></Label>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="3" Style="{StaticResource VkBorder}">
             <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="5" HorizontalAlignment="Center">
                 <Button Style="{StaticResource VkBlue}" Width="100" Content="Ok" Margin="0,0,5,0"
                         Command="{Binding OkCommand}" CommandParameter="{Binding ElementName=SettingsWindow}"></Button>
