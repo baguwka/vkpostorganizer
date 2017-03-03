@@ -62,8 +62,8 @@
                     </StackPanel>
                     
                     <StackPanel Orientation="Horizontal">
-                        <Button Margin="5" Style="{StaticResource VkBlue}" Height="25" Width="75"
-                        Command="{Binding PingProxyCommand}" Content="Ping"></Button>
+                        <Button Margin="5" Style="{StaticResource VkBlue}" Height="25" Width="85"
+                        Command="{Binding PingProxyCommand}" Content="Проверить"></Button>
                         <Label Content="{Binding ProxyPingMs, UpdateSourceTrigger=PropertyChanged}" Height="25" Width="100"></Label>
                     </StackPanel>
                 </StackPanel>
@@ -99,8 +99,8 @@
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal">
-                        <Button Margin="5" Style="{StaticResource VkBlue}" Height="25" Width="75"
-                        Command="{Binding PingHistoryServerCommand}" Content="Ping"></Button>
+                        <Button Margin="5" Style="{StaticResource VkBlue}" Height="25" Width="85"
+                        Command="{Binding PingHistoryServerCommand}" Content="Проверить"></Button>
                         <Label Content="{Binding HistoryServerPingMs, UpdateSourceTrigger=PropertyChanged}" Height="25" Width="100"></Label>
                     </StackPanel>
                 </StackPanel>

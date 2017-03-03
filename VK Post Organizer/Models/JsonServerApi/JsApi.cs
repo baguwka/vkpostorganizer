@@ -13,14 +13,12 @@ namespace vk.Models.JsonServerApi {
    [UsedImplicitly]
    public class JsApi {
       private readonly HttpClient _httpClient;
-      private readonly HttpMessageHandler _httpClientHandler;
       private readonly HistorySettings _historySettings;
       private readonly TimeLimiter _rateLimiter;
 
       private int _timeoutRetry;
 
       public JsApi(HttpMessageHandler httpClientHandler, HistorySettings historySettings) {
-         _httpClientHandler = httpClientHandler;
          _historySettings = historySettings;
          _httpClient = new HttpClient(httpClientHandler) { Timeout = TimeSpan.FromSeconds(4) };
          _rateLimiter = TimeLimiter.GetFromMaxCountByInterval(3, TimeSpan.FromSeconds(1.00f));
@@ -43,17 +41,23 @@ namespace vk.Models.JsonServerApi {
 
          // Httpclient timeout
          catch (TaskCanceledException ex) {
-            if (_timeoutRetry > 2) {
-               var error = "";
-               //if (_httpClientHandler.UseProxy) {
-               //   error = "Проверьте настройки прокси сервера и перезапустите приложение.";
-               //}
-               throw new JsonServerException($"Соеденение не удалось.\nПроверьте настройки прокси сервера и перезапустите приложение.\n{error}", ex);
-            }
-
             _timeoutRetry++;
             if (!ct.IsCancellationRequested) {
+               if (_timeoutRetry > 2) {
+                  //var error = "";
+                  //if (_httpClientHandler.UseProxy) {
+                  //   error = "Проверьте настройки прокси сервера и перезапустите приложение.";
+                  //}
+                  throw new JsonServerException(
+                     $"Соеденение не удалось.\nПроверьте настройки прокси сервера и перезапустите приложение.\n{ex.Message}",
+                     ex);
+               }
+
                return await CallAsync(path, query, ct).ConfigureAwait(false);
+            }
+            else {
+               //it's not timeout
+               throw;
             }
          }
 

@@ -31,7 +31,6 @@ namespace vk.Models.VkApi {
       public const string VERSION = "5.62";
 
       private readonly HttpClient _httpClient;
-      private readonly HttpMessageHandler _httpClientHandler;
       private readonly AccessToken _token;
       private readonly ConcurrentDictionary<string, VkApiResponseInfo> _responseCache;
       private readonly ConcurrentDictionary<string, DateTimeOffset> _requestLog;
@@ -44,7 +43,6 @@ namespace vk.Models.VkApi {
 
       public VkApi(AccessToken token, HttpMessageHandler httpClientHandler) {
          _token = token;
-         _httpClientHandler = httpClientHandler;
          _httpClient = new HttpClient(httpClientHandler) {Timeout = TimeSpan.FromSeconds(4)};
          _responseCache = new ConcurrentDictionary<string, VkApiResponseInfo>();
          _requestLog = new ConcurrentDictionary<string, DateTimeOffset>();
@@ -129,10 +127,13 @@ namespace vk.Models.VkApi {
             var vkResponse = new VkApiResponseInfo(result, DateTimeOffset.Now) {
                Uri = uri
             };
-            
+
             OnCallPerformed(vkResponse);
 
             return result;
+         }
+         catch (HttpRequestException ex) {
+            throw new VkException($"Соеденение не удалось.\nПроверьте настройки прокси сервера и перезапустите приложение.\n{ex.Message}", ex);
          }
          catch (WebException ex) {
             if (tryToHandleException(ex) == false) {
@@ -157,18 +158,15 @@ namespace vk.Models.VkApi {
          }
          // Httpclient timeout
          catch (TaskCanceledException ex) {
-            if (_timeoutRetry > 2) {
-               var error = "";
-               //if (_httpClientHandler.UseProxy) {
-               //   error = "Проверьте настройки прокси сервера и перезапустите приложение.";
-               //}
-               throw new VkException($"Соеденение не удалось.\nПроверьте настройки прокси сервера и перезапустите приложение.\n{error}", ex);
+            if (ct.IsCancellationRequested) {
+               throw;
             }
 
-            _timeoutRetry++;
-            if (!ct.IsCancellationRequested) {
-               return await callAsync(uri, ct).ConfigureAwait(false);
+            if (_timeoutRetry > 1) {
+               throw new VkException($"Соеденение не удалось.\nПроверьте настройки прокси сервера и перезапустите приложение.\n{ex.Message}", ex);
             }
+            _timeoutRetry++;
+            return await callAsync(uri, ct).ConfigureAwait(false);
          }
          //catch (VkException ex) {
          //   //captcha needed

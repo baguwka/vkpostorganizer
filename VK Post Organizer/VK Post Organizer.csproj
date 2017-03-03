@@ -220,7 +220,6 @@
     <Compile Include="Models\JsonServerApi\JsApi.cs" />
     <Compile Include="Models\Pullers\ContentPuller.cs" />
     <Compile Include="Models\Pullers\HistoryPullerStrategy.cs" />
-    <Compile Include="Models\Pullers\HistoryPuller.cs" />
     <Compile Include="Models\Pullers\IContentPuller.cs" />
     <Compile Include="Models\Pullers\IPullerStrategy.cs" />
     <Compile Include="Models\Pullers\PullerStrategies.cs" />

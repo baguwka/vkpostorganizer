@@ -8,6 +8,7 @@ namespace vk.Models {
       private ProxySettings _proxy;
       private HistorySettings _history;
       private HiddenState _hidden;
+      private UploadSettings _upload;
 
       public Settings() {
          Proxy = new ProxySettings {
@@ -37,12 +38,14 @@ namespace vk.Models {
          private set { SetProperty(ref _history, value); }
       }
 
-      [JsonProperty(Required = Required.DisallowNull)]
-      public UploadSettings Upload { get; set; }
+      public UploadSettings Upload {
+         get { return _upload; }
+         set { SetProperty(ref _upload, value); }
+      }
 
       public HiddenState Hidden {
          get { return _hidden; }
-         private set { _hidden = value; }
+         private set { SetProperty(ref _hidden, value); }
       }
 
       public void ApplySettings(Settings other) {

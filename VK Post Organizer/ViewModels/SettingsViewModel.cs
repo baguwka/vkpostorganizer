@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -10,6 +11,11 @@ using vk.Models;
 using vk.Utils;
 
 namespace vk.ViewModels {
+   public class PingInfo {
+      public PingReply Reply { get; set; }
+      public bool IsAvailable { get; set; }
+   }
+
    public class SettingsViewModel : BindableBase {
       private readonly VkPostponeSaveLoader _saveLoader;
       private readonly Settings _settings;
@@ -74,24 +80,43 @@ namespace vk.ViewModels {
       }
 
       private async void pingHistoryServerCommandExecute() {
-         var response = await ping(CurrentSettings.History.Url);
-         HistoryServerPingMs = $"~{response?.RoundtripTime} ms";
+         var response = await checkAvailability(CurrentSettings.History.Uri);
+         if (!response.IsAvailable) {
+            HistoryServerPingMs = "n/a";
+            return;
+         }
+         HistoryServerPingMs = $"~{response.Reply?.RoundtripTime} ms";
       }
 
       private async void pingProxy() {
-         var response = await ping(CurrentSettings.Proxy.ProxyAddress);
-         ProxyPingMs = $"~{response?.RoundtripTime} ms";
+         var response = await checkAvailability(CurrentSettings.Proxy.ProxyUri);
+         if (!response.IsAvailable) {
+            ProxyPingMs = "n/a";
+            return;
+         }
+         ProxyPingMs = $"~{response.Reply?.RoundtripTime} ms";
       }
 
-      private async Task<PingReply> ping(string url) {
+      private static async Task<PingInfo> checkAvailability(Uri uri) {
          try {
             var ping = new Ping();
-            return await ping.SendPingAsync(new Uri(url).Host, 3000);
+            var pingReply = await ping.SendPingAsync(uri.Host, 3000);
+
+            //check port
+            using (var client = new TcpClient()) {
+               await client.ConnectAsync(uri.Host, uri.Port);
+               return new PingInfo {
+                  Reply = pingReply,
+                  IsAvailable = true
+               };
+            }
          }
-         catch (PingException ex) {
-            MessageBox.Show($"{ex.Message}\n\n{ex.StackTrace}", ex.ToString());
+         catch (PingException) {
+            return new PingInfo {IsAvailable = false};
          }
-         return null;
+         catch (Exception) {
+            return new PingInfo { IsAvailable = false };
+         }
       }
 
       private void OnHistoryPropertyChanged(object sender, PropertyChangedEventArgs e) {

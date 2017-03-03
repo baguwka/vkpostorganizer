@@ -6,7 +6,6 @@ using System.Windows.Media.Imaging;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
-using Prism.Regions;
 using vk.Events;
 using vk.Models.VkApi;
 using vk.Models.VkApi.Entities;
@@ -18,7 +17,6 @@ namespace vk.ViewModels {
          "pack://application:,,,/VKPostOrganizer;component/Resources/default_avatar.png";
 
       private readonly IEventAggregator _eventAggregator;
-      private readonly IRegionManager _regionManager;
       private readonly VkApiProvider _vkApi;
       private bool _isAuthorized;
       private bool _isBusy;
@@ -51,9 +49,8 @@ namespace vk.ViewModels {
       public DelegateCommand AuthorizeCommand { get; private set; }
       public DelegateCommand LogOutCommand { get; private set; }
 
-      public AuthBarViewModel(IEventAggregator eventAggregator, IRegionManager regionManager, VkApiProvider vkApi) {
+      public AuthBarViewModel(IEventAggregator eventAggregator, VkApiProvider vkApi) {
          _eventAggregator = eventAggregator;
-         _regionManager = regionManager;
          _vkApi = vkApi;
 
          AuthorizeCommand = new DelegateCommand(authorizeCommandExecute, () => !IsBusy).ObservesProperty(() => IsBusy);

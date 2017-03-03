@@ -17,6 +17,8 @@ namespace vk.Models.JsonServerApi {
          var response = await _api.CallAsync("posts", QueryParameters.New()
             .Add("wall_id", wallId)
             .Add("_page", page)
+            .Add("_sort", "id")
+            .Add("_order", "DESC")
             .Add("_limit", count), CancellationToken.None);
 
          var content = JsonConvert.DeserializeObject<IList<HistoryPost>>(response);

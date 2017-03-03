@@ -145,27 +145,24 @@ namespace vk.ViewModels {
       public bool ShrinkAfterPublish {
          get { return _shrinkAfterPublish; }
          set {
-            if (SetProperty(ref _shrinkAfterPublish, value)) {
+            SetProperty(ref _shrinkAfterPublish, value);
                _uploadSettings.CloseUploadWindowAfterPublish = _shrinkAfterPublish;
-            }
          }
       }
 
       public bool SignedPost {
          get { return _signedPost; }
          set {
-            if (SetProperty(ref _signedPost, value)) {
+            SetProperty(ref _signedPost, value);
                _uploadSettings.SignedPosting = _shrinkAfterPublish;
-            }
          }
       }
 
       public bool PostFromGroup {
          get { return _postFromGroup; }
          set {
-            if (SetProperty(ref _postFromGroup, value)) {
+            SetProperty(ref _postFromGroup, value);
                _uploadSettings.PostFromGroup = _shrinkAfterPublish;
-            }
          }
       }
 

@@ -20,7 +20,6 @@ namespace vk.ViewModels {
    public class WallContentLeftBlockViewModel : BindableBase {
       private readonly IEventAggregator _eventAggregator;
       private readonly IRegionManager _regionManager;
-      private readonly VkApiProvider _vkApi;
       private readonly PullersController _pullersController;
       private readonly BusyObserver _busyObserver;
       private readonly Settings _settings;
@@ -87,13 +86,12 @@ namespace vk.ViewModels {
          ProfilePhoto = bitmap;
       }
 
-      public WallContentLeftBlockViewModel(IEventAggregator eventAggregator, IRegionManager regionManager,
-         VkApiProvider vkApi, PullersController pullersController, BusyObserver busyObserver, Settings settings) {
+      public WallContentLeftBlockViewModel(IEventAggregator eventAggregator, IRegionManager regionManager, 
+         PullersController pullersController, BusyObserver busyObserver, Settings settings) {
 
          SetProfilePhoto(AuthBarViewModel.DEFAULT_AVATAR);
          _eventAggregator = eventAggregator;
          _regionManager = regionManager;
-         _vkApi = vkApi;
          _pullersController = pullersController;
          _busyObserver = busyObserver;
          _settings = settings;
