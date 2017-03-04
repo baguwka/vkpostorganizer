@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using System.Diagnostics;
+using JetBrains.Annotations;
 using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;

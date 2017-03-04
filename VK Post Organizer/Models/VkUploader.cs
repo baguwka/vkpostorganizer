@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Handlers;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,6 +18,7 @@ namespace vk.Models {
       private readonly IPhotosSaveWallPhoto _saveWallPhoto;
       private readonly HttpMessageHandler _messageHandler;
       private HttpClient _client;
+      private ProgressMessageHandler _progressHandler;
 
       public VkUploader(IPhotosGetWallUploadSever getWallUploadServer, IPhotosSaveWallPhoto saveWallPhoto, HttpMessageHandler messageHandler) {
          _getWallUploadServer = getWallUploadServer;
@@ -27,12 +30,13 @@ namespace vk.Models {
 
       //todo: call it when proxy settings change
       private void renewClient() {
-         _client = new HttpClient(_messageHandler);
+         _progressHandler = new ProgressMessageHandler(_messageHandler);
+         _client = new HttpClient(_progressHandler);
       }
 
       public static MultipartContent CreateContentFromBytes(byte[] photo) {
          var content = new MultipartFormDataContent();
-         var file = new ByteArrayContent(photo);
+         var file = new StreamContent(new MemoryStream(photo));
          file.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data") {
             Name = "photo",
             FileName = "photo.jpg"
@@ -41,7 +45,7 @@ namespace vk.Models {
          return content;
       }
 
-      public async Task<DownloadPhotoInfo> DownloadPhotoByUriAsync(Uri uri, [NotNull] IProgress<int> progress, CancellationToken ct) {
+      public async Task<DownloadPhotoInfo> DownloadPhotoByUriAsync(Uri uri, [NotNull] IProgress<HttpProgressEventArgs> progress, CancellationToken ct) {
          try {
             var response = await _client.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead, ct);
             if (!response.IsSuccessStatusCode) {
@@ -73,7 +77,7 @@ namespace vk.Models {
       /// <summary>
       /// Reads incoming content async with progress report.
       /// </summary>
-      private static async Task<DownloadPhotoInfo> readContentStreamAsync(IProgress<int> progress, CancellationToken ct, HttpResponseMessage response) {
+      private static async Task<DownloadPhotoInfo> readContentStreamAsync(IProgress<HttpProgressEventArgs> progress, CancellationToken ct, HttpResponseMessage response) {
          if (response.Content.Headers.ContentLength == null) {
             return new DownloadPhotoInfo {
                Successful = false,
@@ -102,7 +106,8 @@ namespace vk.Models {
                      totalRead += read;
 
                      var progressPercent = (((float)totalRead / (float)totalBytes) * 100);
-                     progress.Report((int)progressPercent);
+                     var e = new HttpProgressEventArgs((int)progressPercent, null, totalRead, totalBytes);
+                     progress.Report(e);
                   }
                } while (isMoreToRead);
 
@@ -116,7 +121,7 @@ namespace vk.Models {
          }
       }
 
-      public async Task<UploadPhotoInfo> TryUploadPhotoToWallAsync(byte[] photo, int wallId, CancellationToken ct) {
+      public async Task<UploadPhotoInfo> TryUploadPhotoToWallAsync(byte[] photo, int wallId, IProgress<HttpProgressEventArgs> progress, CancellationToken ct) {
          var content = CreateContentFromBytes(photo);
          if (content == null) {
             return new UploadPhotoInfo {
@@ -125,16 +130,21 @@ namespace vk.Models {
             };
          }
 
-         return await TryUploadPhotoToWallAsync(content, wallId, ct).ConfigureAwait(false);
+         return await TryUploadPhotoToWallAsync(content, wallId, progress, ct).ConfigureAwait(false);
       }
 
-      public async Task<UploadPhotoInfo> TryUploadPhotoToWallAsync(MultipartContent photo, int wallId, CancellationToken ct) {
+      public async Task<UploadPhotoInfo> TryUploadPhotoToWallAsync(MultipartContent photo, int wallId, IProgress<HttpProgressEventArgs> progress, CancellationToken ct) {
          if (photo == null) throw new ArgumentNullException(nameof(photo));
-
          try {
             var uploadServer = await _getWallUploadServer.GetAsync(wallId, ct);
 
+            var reportProgress = new EventHandler<HttpProgressEventArgs>((sender, args) => {
+               progress.Report(args);
+            });
+
+            _progressHandler.HttpSendProgress += reportProgress;
             var response = await _client.PostAsync(new Uri(uploadServer.UploadUrl), photo, ct);
+            _progressHandler.HttpSendProgress -= reportProgress;
 
             if (!response.IsSuccessStatusCode || response.Content == null) {
                return new UploadPhotoInfo {
@@ -151,6 +161,13 @@ namespace vk.Models {
             return new UploadPhotoInfo {
                Photo = savedPhoto,
                Successful = savedPhoto != null
+            };
+         }
+         catch (NullReferenceException ex) {
+            Debug.WriteLine(ex.Message);
+            return new UploadPhotoInfo {
+               Successful = false,
+               ErrorMessage = ex.Message
             };
          }
          catch (VkException ex) {

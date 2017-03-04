@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Handlers;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -19,6 +20,15 @@ namespace UnitTests.Model {
          var contentToRecieve = new byte[1024 * 2];
          contentToRecieve[233] = byte.MaxValue;
          contentToRecieve[510] = byte.MaxValue;
+         var progress = new Progress<HttpProgressEventArgs>();
+
+         bool progressReportEverCalled = false;
+         int progressPercentage = 0;
+
+         progress.ProgressChanged += (sender, i) => {
+            progressReportEverCalled = true;
+            progressPercentage = i.ProgressPercentage;
+         };
 
          var fakeMessagehandler = new FakeResponseHandler();
          fakeMessagehandler.AddFakeResponse(new Uri("http://upload.uri/"),
@@ -26,10 +36,12 @@ namespace UnitTests.Model {
 
          var uploader = new VkUploader(uploadServer, saveWallPhoto, fakeMessagehandler);
 
-         var info = await uploader.TryUploadPhotoToWallAsync(photo, -1, ct);
+         var info = await uploader.TryUploadPhotoToWallAsync(photo, -1, progress, ct);
 
-         Assert.That(info.Photo?.Photo1280, Is.EqualTo(FakeResponsesForVkApi.ForPhotosSaveWallPhoto().Content[0]?.Photo1280));
          Assert.That(info.Successful, Is.True);
+         Assert.That(info.Photo?.Photo1280, Is.EqualTo(FakeResponsesForVkApi.ForPhotosSaveWallPhoto().Content[0]?.Photo1280));
+         Assert.That(progressReportEverCalled, Is.True);
+         Assert.That(progressPercentage, Is.EqualTo(100));
       }
    }
 }

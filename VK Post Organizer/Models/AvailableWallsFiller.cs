@@ -16,9 +16,15 @@ namespace vk.Models {
       }
 
       public async Task<AvailableWallsInfo> FillAsync(WallList wallList) {
-         var groups = await _groupsGet.GetAsync(QueryParameters.New()
+         var groupsGetTask = _groupsGet.GetAsync(QueryParameters.New()
             .Add("filter", "editor")
             .Add("fields", "description"));
+         var usersGetTask = _usersGet.GetAsync(QueryParameters.New()
+               .Add("fields", "first_name,last_name,photo_50,photo_200"));
+
+         await Task.WhenAll(groupsGetTask, usersGetTask);
+
+         var groups = groupsGetTask.Result;
 
          if (groups.Content == null) {
             return new AvailableWallsInfo {
@@ -27,8 +33,7 @@ namespace vk.Models {
             };
          }
 
-         var users = await _usersGet.GetAsync(QueryParameters.New()
-               .Add("fields", "first_name,last_name,photo_50,photo_200"));
+         var users = usersGetTask.Result;
          if (users.Content == null) {
             return new AvailableWallsInfo {
                Succeed = false,

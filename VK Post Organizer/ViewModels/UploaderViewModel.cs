@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net.Http.Handlers;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -86,7 +88,9 @@ namespace vk.ViewModels {
 
       public float UploadProgress {
          get { return _uploadProgress; }
-         set { SetProperty(ref _uploadProgress, value); }
+         set {
+            SetProperty(ref _uploadProgress, value); 
+         }
       }
 
       public string ProgressString {
@@ -387,7 +391,7 @@ namespace vk.ViewModels {
       }
 
       private async Task tryToUploadImageFromUri(Uri uri, CancellationToken cancellationToken) {
-         var progress = new Progress<int>();
+         var progress = new Progress<HttpProgressEventArgs>();
          progress.ProgressChanged += onProgressChanged;
 
          ProgressString = "Downloading...";
@@ -395,6 +399,7 @@ namespace vk.ViewModels {
 
          var downloadResult = await _uploader.DownloadPhotoByUriAsync(uri, progress, cancellationToken);
 
+         progress.ProgressChanged -= onProgressChanged;
          if (!downloadResult.Successful) {
             if (!_cts.IsCancellationRequested) {
                MessageBox.Show(downloadResult.ErrorMessage, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -420,10 +425,17 @@ namespace vk.ViewModels {
       }
 
       private async Task uploadFromBytes(byte[] photo, CancellationToken cancellationToken) {
+         var progress = new Progress<HttpProgressEventArgs>();
+         progress.ProgressChanged += onProgressChanged;
+
          ProgressString = "Uploading...";
-         UploadProgress = 100;
-         var result = await _uploader.TryUploadPhotoToWallAsync(photo, _pullersController.Postponed.WallHolder.ID,
+         UploadProgress = 0;
+
+         var result = await _uploader.TryUploadPhotoToWallAsync(photo, _pullersController.Postponed.WallHolder.ID, progress,
             cancellationToken);
+
+         progress.ProgressChanged -= onProgressChanged;
+
          if (result.Successful) {
             addPhotoToAttachments(result.Photo);
          }
@@ -439,8 +451,26 @@ namespace vk.ViewModels {
 
 
 
-      private void onProgressChanged(object sender, int e) {
-         UploadProgress = e;
+      private void onProgressChanged(object sender, HttpProgressEventArgs e) {
+         UploadProgress = e.ProgressPercentage;
+         BytesTransferedString = SizeHelper.Suffix(e.BytesTransferred);
+         if (e.TotalBytes != null) {
+            BytesTotalString = SizeHelper.Suffix(e.TotalBytes.Value);
+         }
+      }
+
+      private string _bytesTotalString;
+
+      public string BytesTotalString {
+         get { return _bytesTotalString; }
+         set { SetProperty(ref _bytesTotalString, value); }
+      }
+
+      private string _bytesTransferedString;
+
+      public string BytesTransferedString {
+         get { return _bytesTransferedString; }
+         set { SetProperty(ref _bytesTransferedString, value); }
       }
 
       private void addPhotoToAttachments([NotNull] Photo photo) {

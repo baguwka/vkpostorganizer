@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,39 +27,56 @@ namespace vk.Models {
       }
 
       public async Task<IEnumerable<PostViewModelBase>> BuildAsync(IEnumerable<IPost> posts, CancellationToken ct) {
-         var tasks = posts.Select(async post => {
+         var vms = posts.Select(post => {
             var vm = VkPostViewModel.Create(post);
             vm.IsExisting = true;
-            if (vm.PostType == PostType.Repost) {
-               var name = "";
-               //user owns this post
-               if (vm.Post.OwnerId > 0) {
-                  var result = await _api.UsersGet.GetAsync(QueryParameters.New()
-                     .Add("fields", "first_name,last_name")
-                     .Add("user_ids", post.OwnerId), ct);
-
-                  var user = result?.Content?.FirstOrDefault();
-                  if (user != null) {
-                     name = user.Name;
-                  }
-               }
-
-               //group owns this post
-               if (vm.Post.OwnerId < 0) {
-                  var result = await _api.GroupsGetById.GetAsync(vm.Post.OwnerId, ct);
-                  var group = result?.Content?.FirstOrDefault();
-                  if (group != null) {
-                     name = group.Name;
-                  }
-               }
-
-               vm.Post.Message = $"{name.Substring(0, name.Length > 10 ? 10 : name.Length)}... {vm.Post.Message}";
-            }
             return vm;
-         });
+         }).ToList();
 
-         var vms = await Task.WhenAll(tasks);
+         //await GetOwnerNamesOfPosts(vms.Where(p => p.PostType == PostType.Repost), ct);
+
          return vms;
+      }
+
+      public Task GetOwnerNamesOfPosts(IEnumerable<VkPostViewModel> posts) {
+         return GetOwnerNamesOfPosts(posts, CancellationToken.None);
+      }
+
+      public async Task GetOwnerNamesOfPosts(IEnumerable<VkPostViewModel> posts, CancellationToken ct) {
+         var vkPostViewModels = posts as IList<VkPostViewModel> ?? posts.ToList();
+
+         var publisherIds = vkPostViewModels.Select(post => post.Post.OwnerId).Distinct().ToList();
+
+         var userOwners = publisherIds.Where(id => id > 0).ToList();
+         var groupOwners = publisherIds.Where(id => id < 0).Select(Math.Abs).ToList();
+
+         if (userOwners.Any()) {
+            var users = await _api.UsersGet.GetAsync(QueryParameters.New()
+               .Add("user_ids", string.Join(",", userOwners)), ct);
+
+            if (users.Content.Any()) {
+               foreach (var user in users.Content) {
+                  var ownersPosts = vkPostViewModels.Where(post => post.Post.OwnerId == user.ID);
+                  foreach (var ownersPost in ownersPosts) {
+                     ownersPost.Post.Message = $"{user.Name.Substring(0, user.Name.Length > 20 ? 20 : user.Name.Length)}... {ownersPost.Post.Message}";
+                  }
+               }
+            }
+         }
+
+         if (groupOwners.Any()) {
+            var groups = await _api.GroupsGetById.GetAsync(QueryParameters.New()
+               .Add("group_ids", string.Join(",", groupOwners)), ct);
+
+            if (groups.Content.Any()) {
+               foreach (var group in groups.Content) {
+                  var ownersPosts = vkPostViewModels.Where(post => Math.Abs(post.Post.OwnerId) == group.ID);
+                  foreach (var ownersPost in ownersPosts) {
+                     ownersPost.Post.Message = $"{group.Name.Substring(0, group.Name.Length > 20 ? 20 : group.Name.Length)}... {ownersPost.Post.Message}";
+                  }
+               }
+            }
+         }
       }
    }
 }

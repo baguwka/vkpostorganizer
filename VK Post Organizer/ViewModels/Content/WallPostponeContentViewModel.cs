@@ -79,6 +79,7 @@ namespace vk.ViewModels {
       }
 
       protected override async Task buildViewModelPosts(IEnumerable<IPost> posts) {
+         var sw = Stopwatch.StartNew();
          clear(UnfilteredItems);
          clear(FilteredItems);
 
@@ -99,6 +100,10 @@ namespace vk.ViewModels {
             vmPost.Mark = PostMark.Good;
          });
 
+#pragma warning disable 4014
+         _postBuilder.GetOwnerNamesOfPosts(vms.Where(post => post.PostType == PostType.Repost).ToList());
+#pragma warning restore 4014
+
          var missingFiller = new MissingFiller();
          var missingDates = await missingFiller.GetMissingDates(rawPosts, schedule);
          var missingPosts = missingFiller.BuildMissingViewModels(missingDates).ToList();
@@ -111,6 +116,8 @@ namespace vk.ViewModels {
          UnfilteredItems.Clear();
          UnfilteredItems.AddRange(vms);
          filterOut(vms);
+         sw.Stop();
+         Debug.WriteLine($"Потребовалось времени для билда: {sw.ElapsedMilliseconds}");
       }
 
       protected override void clearPost(PostViewModelBase post) {

@@ -1,4 +1,5 @@
-﻿using NSubstitute;
+﻿using System.Threading;
+using NSubstitute;
 using vk.Models.VkApi;
 
 namespace UnitTests.Fakes {
@@ -6,7 +7,8 @@ namespace UnitTests.Fakes {
       public static IUsersGet UsersGet() {
          var usersGet = Substitute.For<IUsersGet>();
          var fakeUserResponse = FakeResponsesForVkApi.ForUsersGet();
-         usersGet.GetAsync(QueryParameters.No()).Returns(fakeUserResponse);
+         usersGet.GetAsync(QueryParameters.No()).ReturnsForAnyArgs(fakeUserResponse);
+         usersGet.GetAsync(QueryParameters.No(), CancellationToken.None).ReturnsForAnyArgs(fakeUserResponse);
          return usersGet;
       }
 
@@ -14,6 +16,7 @@ namespace UnitTests.Fakes {
          var groupsGet = Substitute.For<IGroupsGet>();
          var fakeGroupResponse = FakeResponsesForVkApi.ForGroupsGet();
          groupsGet.GetAsync(QueryParameters.No()).ReturnsForAnyArgs(fakeGroupResponse);
+         groupsGet.GetAsync(QueryParameters.No(), CancellationToken.None).ReturnsForAnyArgs(fakeGroupResponse);
          return groupsGet;
       }
 
@@ -21,6 +24,7 @@ namespace UnitTests.Fakes {
          var photosGetWallUploadServer = Substitute.For<IPhotosGetWallUploadSever>();
          var fakeResponse = FakeResponsesForVkApi.ForPhotosGetWallUploadServer();
          photosGetWallUploadServer.GetAsync(0).ReturnsForAnyArgs(fakeResponse);
+         photosGetWallUploadServer.GetAsync(0, CancellationToken.None).ReturnsForAnyArgs(fakeResponse);
          return photosGetWallUploadServer;
       }
 
@@ -28,6 +32,7 @@ namespace UnitTests.Fakes {
          var photosSaveWallPhoto = Substitute.For<IPhotosSaveWallPhoto>();
          var fakeResponse = FakeResponsesForVkApi.ForPhotosSaveWallPhoto();
          photosSaveWallPhoto.SaveAsync(0, "uploadResponse").ReturnsForAnyArgs(fakeResponse);
+         photosSaveWallPhoto.SaveAsync(0, "uploadResponse", CancellationToken.None).ReturnsForAnyArgs(fakeResponse);
          return photosSaveWallPhoto;
       }
    }

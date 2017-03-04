@@ -14,6 +14,15 @@ namespace vk.Models.VkApi {
          _api = api;
       }
 
+      public Task<GroupsGetByIdResponse> GetAsync(QueryParameters query) {
+         return GetAsync(query, CancellationToken.None);
+      }
+
+      public async Task<GroupsGetByIdResponse> GetAsync(QueryParameters query, CancellationToken ct) {
+         var response = await _api.ExecuteMethodAsync("groups.getById", query, ct).ConfigureAwait(false);
+         return JsonConvert.DeserializeObject<GroupsGetByIdResponse>(response);
+      }
+
       public async Task<GroupsGetByIdResponse> GetAsync(int id, CancellationToken ct) {
          var query = buildAQuery(id);
          var response = await _api.ExecuteMethodAsync("groups.getById", query, ct).ConfigureAwait(false);

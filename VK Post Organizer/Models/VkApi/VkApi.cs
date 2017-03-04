@@ -57,6 +57,7 @@ namespace vk.Models.VkApi {
 
          if (response.Substring(2, 5) == "error") {
             var error = deserializeError(response);
+            Debug.WriteLine($"Vk error code: {error.ErrorCode}. {error.ErrorMessage}");
             throw new VkException($"Код ошибки: {error.ErrorCode}\n{error.ErrorMessage}", error.ErrorCode);
          }
       }

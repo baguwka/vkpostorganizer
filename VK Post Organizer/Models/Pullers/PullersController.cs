@@ -90,7 +90,7 @@ namespace vk.Models.Pullers {
             tasks.Add(History.PullAsync());
          }
 
-         await Task.WhenAll(tasks);
+         await Task.WhenAny(tasks);
       }
    }
 }
