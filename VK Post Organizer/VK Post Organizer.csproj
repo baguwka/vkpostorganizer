@@ -207,13 +207,8 @@
     <Compile Include="Events\UploaderEvents.cs" />
     <Compile Include="Events\VkAuthorizationEvents.cs" />
     <Compile Include="Events\WallSelectorEvents.cs" />
-    <Compile Include="Infrastructure\AutoPopulateExportedViewsBehavior.cs" />
-    <Compile Include="Infrastructure\IViewRegionRegistration.cs" />
-    <Compile Include="Infrastructure\ViewExportAttribute.cs" />
     <Compile Include="Models\BusyObserver.cs" />
     <Compile Include="Models\Configuration\HiddenState.cs" />
-    <Compile Include="Models\Content\IContentPopulator.cs" />
-    <Compile Include="Models\Content\PostponeContentPopulator.cs" />
     <Compile Include="Models\Post\HistoryPostViewModelBuilder.cs" />
     <Compile Include="Models\Post\IPostViewModelBuilder.cs" />
     <Compile Include="Models\Post\VkPostViewModelBuilder.cs" />
@@ -258,7 +253,6 @@
     <Compile Include="Models\VkApi\Concrete\StatsTrackVisitor.cs" />
     <Compile Include="Models\VkApi\QueryParameters.cs" />
     <Compile Include="Infrastructure\WebBrowserUtility.cs" />
-    <Compile Include="Models\Content\WallContentFiller.cs" />
     <Compile Include="Models\Waiter.cs" />
     <Compile Include="Models\Pullers\PullersController.cs" />
     <Compile Include="Models\WinInetHelper.cs" />
@@ -266,7 +260,6 @@
     <Compile Include="Infrastructure\RegionNames.cs" />
     <Compile Include="SingleInstance.cs" />
     <Compile Include="Utils\EnumerableExtensions.cs" />
-    <Compile Include="Utils\GroupNameCache.cs" />
     <Compile Include="Models\Files\ImageExtensionChecker.cs" />
     <Compile Include="Models\UrlHelper\DocumentPreviewUrlObtainer.cs" />
     <Compile Include="Models\UrlHelper\PhotoUrlObtainer.cs" />
@@ -479,9 +472,7 @@
   <ItemGroup>
     <Resource Include="Resources\default_avatar.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Models\Extensions\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Resource Include="Resources\16x16 icon.ico" />
   </ItemGroup>

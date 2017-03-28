@@ -59,7 +59,7 @@
             </Grid>
         </Border>
 
-        <xctk:BusyIndicator Grid.Row="2" IsBusy="{Binding IsBusy, UpdateSourceTrigger=PropertyChanged}">
+        <xctk:BusyIndicator Grid.Row="1" IsBusy="{Binding IsBusy, UpdateSourceTrigger=PropertyChanged}">
 
             <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="5"
                           Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityNegativeConverter}, UpdateSourceTrigger=PropertyChanged}">

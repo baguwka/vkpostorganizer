@@ -102,9 +102,6 @@ namespace vk.Models.VkApi {
             }
          }
 
-         if (method == "users.get") {
-            Debug.WriteLine($">>>>> GOING TO DOWNLOAD REQUEST - {uri}");
-         }
          return await _rateLimiter.Perform(() => callAsync(uri, ct), ct).ConfigureAwait(false);
       }
 

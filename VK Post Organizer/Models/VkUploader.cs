@@ -135,16 +135,15 @@ namespace vk.Models {
 
       public async Task<UploadPhotoInfo> TryUploadPhotoToWallAsync(MultipartContent photo, int wallId, IProgress<HttpProgressEventArgs> progress, CancellationToken ct) {
          if (photo == null) throw new ArgumentNullException(nameof(photo));
+         var reportProgress = new EventHandler<HttpProgressEventArgs>((sender, args) => {
+            progress.Report(args);
+         });
+
          try {
             var uploadServer = await _getWallUploadServer.GetAsync(wallId, ct);
 
-            var reportProgress = new EventHandler<HttpProgressEventArgs>((sender, args) => {
-               progress.Report(args);
-            });
-
             _progressHandler.HttpSendProgress += reportProgress;
             var response = await _client.PostAsync(new Uri(uploadServer.UploadUrl), photo, ct);
-            _progressHandler.HttpSendProgress -= reportProgress;
 
             if (!response.IsSuccessStatusCode || response.Content == null) {
                return new UploadPhotoInfo {
@@ -173,7 +172,8 @@ namespace vk.Models {
          catch (VkException ex) {
             var errmessage = "";
             if (ex.ErrorCode == 100) {
-               errmessage = "Не удалось загрузить данный файл как фото вк. Либо это не изображение, либо файл поврежден. Детали ниже:\n\n";
+               errmessage =
+                  "Не удалось загрузить данный файл как фото вк. Либо это не изображение, либо файл поврежден. Детали ниже:\n\n";
             }
 
             errmessage += ex.Message;
@@ -188,6 +188,9 @@ namespace vk.Models {
                Successful = false,
                ErrorMessage = ex.Message
             };
+         }
+         finally {
+            _progressHandler.HttpSendProgress -= reportProgress;
          }
       }
    }

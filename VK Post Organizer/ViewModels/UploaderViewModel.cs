@@ -233,13 +233,13 @@ namespace vk.ViewModels {
       }
 
       private void onPostponedPullInvoked(object sender, EventArgs args) {
-         IsBusy = true;
+         //IsBusy = true;
          ProgressString = "Pull...";
       }
 
       private async void onPostponedPullCompleted(object sender, ContentPullerEventArgs e) {
          await fillMissing(e.Items);
-         IsBusy = false;
+         //IsBusy = false;
          ProgressString = "";
       }
 

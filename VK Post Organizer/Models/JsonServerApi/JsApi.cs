@@ -55,13 +55,9 @@ namespace vk.Models.JsonServerApi {
 
                return await CallAsync(path, query, ct).ConfigureAwait(false);
             }
-            else {
-               //it's not timeout
-               throw;
-            }
+            //it's not timeout
+            throw;
          }
-
-         return string.Empty;
       }
 
       private void checkForErrors(string response) {

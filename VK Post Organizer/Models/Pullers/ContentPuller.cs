@@ -30,14 +30,14 @@ namespace vk.Models.Pullers {
          WallHolder = new WallHolder(0);
       }
 
-      private readonly object locker = new object();
+      private readonly object _locker = new object();
 
       public async Task PullAsync(CancellationToken ct) {
          OnPullInvoked();
          try {
             Items.Clear();
             var posts = await _pullerStrategy.GetAsync(WallHolder, ct);
-            lock (locker) {
+            lock (_locker) {
                Items.AddRange(posts);
                LastTimePulled = DateTimeOffset.Now;
                OnPullCompleted(new ContentPullerEventArgs { Successful = true, Items = Items });
