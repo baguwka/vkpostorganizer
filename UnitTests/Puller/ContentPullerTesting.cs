@@ -16,8 +16,8 @@ namespace UnitTests.Puller {
          var vkApi = new vk.Models.VkApi.VkApi(token, handler);
          var apiProvider = new VkApiProvider(token, vkApi);
 
-         IPullerStrategy pullerStrategy = new VkPostponePullerStrategy(apiProvider.WallGet);
-         IContentPuller contentPuller = new ContentPuller(pullerStrategy);
+         IContentPullerStrategy contentPullerStrategy = new VkPostponedContentPullerStrategy(apiProvider.WallGet);
+         IContentPuller contentPuller = new ContentPuller(contentPullerStrategy);
 
          contentPuller.WallHolder = new WallHolder(1);
          await contentPuller.PullAsync();
@@ -30,8 +30,8 @@ namespace UnitTests.Puller {
          var jsApi = new JsApi(handler, historysettings);
          var jsApiProvider = new JsApiProvider(jsApi);
 
-         IPullerStrategy pullerStrategy = new HistoryPullerStrategy(jsApiProvider.GetPosts);
-         IContentPuller contentPuller = new ContentPuller(pullerStrategy);
+         IContentPullerStrategy contentPullerStrategy = new HistoryContentPullerStrategy(jsApiProvider.GetPosts);
+         IContentPuller contentPuller = new ContentPuller(contentPullerStrategy);
 
          contentPuller.WallHolder = new WallHolder(1);
          await contentPuller.PullAsync();

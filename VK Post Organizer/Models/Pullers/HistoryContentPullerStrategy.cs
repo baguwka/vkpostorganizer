@@ -6,12 +6,12 @@ using vk.Models.JsonServerApi;
 using vk.Models.VkApi.Entities;
 
 namespace vk.Models.Pullers {
-   public class HistoryPullerStrategy : IPullerStrategy {
+   public class HistoryContentPullerStrategy : IContentPullerStrategy {
       public const int ITEMS_PER_PAGE = 50;
 
       private readonly GetPosts _getPosts;
 
-      public HistoryPullerStrategy(GetPosts getPosts) {
+      public HistoryContentPullerStrategy(GetPosts getPosts) {
          _getPosts = getPosts;
       }
 

@@ -6,7 +6,7 @@ using vk.Models.VkApi.Entities;
 
 namespace vk.Models.Pullers {
    public sealed class ContentPuller : IContentPuller {
-      private readonly IPullerStrategy _pullerStrategy;
+      private readonly IContentPullerStrategy _contentPullerStrategy;
       private IWallHolder _wallHolder;
 
       public IWallHolder WallHolder {
@@ -24,8 +24,8 @@ namespace vk.Models.Pullers {
       public event EventHandler<ContentPullerEventArgs> PullCompleted;
       public event EventHandler<IWallHolder> WallHolderChanged;
 
-      public ContentPuller(IPullerStrategy pullerStrategy) {
-         _pullerStrategy = pullerStrategy;
+      public ContentPuller(IContentPullerStrategy contentPullerStrategy) {
+         _contentPullerStrategy = contentPullerStrategy;
          Items = new List<IPost>();
          WallHolder = new WallHolder(0);
       }
@@ -36,7 +36,7 @@ namespace vk.Models.Pullers {
          OnPullInvoked();
          try {
             Items.Clear();
-            var posts = await _pullerStrategy.GetAsync(WallHolder, ct);
+            var posts = await _contentPullerStrategy.GetAsync(WallHolder, ct);
             lock (_locker) {
                Items.AddRange(posts);
                LastTimePulled = DateTimeOffset.Now;

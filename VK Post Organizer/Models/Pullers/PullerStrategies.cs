@@ -3,18 +3,20 @@ using JetBrains.Annotations;
 namespace vk.Models.Pullers {
    [UsedImplicitly]
    public class PullerStrategies {
-      private readonly VkActualPullerStrategy _actualPullerStrategy;
-      private readonly VkPostponePullerStrategy _postponePullerStrategy;
-      private readonly HistoryPullerStrategy _historyPullerStrategy;
+      private readonly VkActualContentPullerStrategy _actualContentPullerStrategy;
+      private readonly VkPostponedContentPullerStrategy _postponedContentPullerStrategy;
+      private readonly HistoryContentPullerStrategy _historyContentPullerStrategy;
 
-      public PullerStrategies(VkActualPullerStrategy actualPullerStrategy, VkPostponePullerStrategy postponePullerStrategy, HistoryPullerStrategy historyPullerStrategy) {
-         _actualPullerStrategy = actualPullerStrategy;
-         _postponePullerStrategy = postponePullerStrategy;
-         _historyPullerStrategy = historyPullerStrategy;
+      public PullerStrategies(VkActualContentPullerStrategy actualContentPullerStrategy, 
+         VkPostponedContentPullerStrategy postponedContentPullerStrategy, HistoryContentPullerStrategy historyContentPullerStrategy) {
+
+         _actualContentPullerStrategy = actualContentPullerStrategy;
+         _postponedContentPullerStrategy = postponedContentPullerStrategy;
+         _historyContentPullerStrategy = historyContentPullerStrategy;
       }
 
-      public VkActualPullerStrategy ActualPullerStrategy => _actualPullerStrategy;
-      public VkPostponePullerStrategy PostponePullerStrategy => _postponePullerStrategy;
-      public HistoryPullerStrategy HistoryPullerStrategy => _historyPullerStrategy;
+      public VkActualContentPullerStrategy ActualContentPullerStrategy => _actualContentPullerStrategy;
+      public VkPostponedContentPullerStrategy PostponedContentPullerStrategy => _postponedContentPullerStrategy;
+      public HistoryContentPullerStrategy HistoryContentPullerStrategy => _historyContentPullerStrategy;
    }
 }

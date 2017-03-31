@@ -38,9 +38,9 @@ namespace vk.Models.Pullers {
          _settings = settings;
          _currentDispatcher = Dispatcher.CurrentDispatcher;
 
-         Actual = new ContentPuller(strategies.ActualPullerStrategy);
-         Postponed = new ContentPuller(strategies.PostponePullerStrategy);
-         History = new ContentPuller(strategies.HistoryPullerStrategy);
+         Actual = new ContentPuller(strategies.ActualContentPullerStrategy);
+         Postponed = new ContentPuller(strategies.PostponedContentPullerStrategy);
+         History = new ContentPuller(strategies.HistoryContentPullerStrategy);
          
          _eventAggregator.GetEvent<MainBottomEvents.Refresh>().Subscribe(async () => {
             await SharedPullAsync();

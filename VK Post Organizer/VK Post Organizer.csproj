@@ -218,12 +218,12 @@
     <Compile Include="Models\JsonServerApi\GetPosts.cs" />
     <Compile Include="Models\JsonServerApi\JsApi.cs" />
     <Compile Include="Models\Pullers\ContentPuller.cs" />
-    <Compile Include="Models\Pullers\HistoryPullerStrategy.cs" />
+    <Compile Include="Models\Pullers\HistoryContentPullerStrategy.cs" />
     <Compile Include="Models\Pullers\IContentPuller.cs" />
-    <Compile Include="Models\Pullers\IPullerStrategy.cs" />
+    <Compile Include="Models\Pullers\IContentPullerStrategy.cs" />
     <Compile Include="Models\Pullers\PullerStrategies.cs" />
-    <Compile Include="Models\Pullers\VkActualPullerStrategy.cs" />
-    <Compile Include="Models\Pullers\VkPostponePullerStrategy.cs" />
+    <Compile Include="Models\Pullers\VkActualContentPullerStrategy.cs" />
+    <Compile Include="Models\Pullers\VkPostponedContentPullerStrategy.cs" />
     <Compile Include="Models\VkApi\Entities\Attachments.cs" />
     <Compile Include="Models\JsonServerApi\JsonServerException.cs" />
     <Compile Include="Models\VkApi\Interfaces\IPhotosGetWallUploadSever.cs" />
