@@ -32,11 +32,11 @@ namespace vk.Models.Pullers {
 
       private readonly object _locker = new object();
 
-      public async Task PullAsync(CancellationToken ct) {
+      public async Task PullAsync(PullerSettings settings, CancellationToken ct) {
          OnPullInvoked();
          try {
             Items.Clear();
-            var posts = await _contentPullerStrategy.GetAsync(WallHolder, ct);
+            var posts = await _contentPullerStrategy.GetAsync(WallHolder, settings, ct);
             lock (_locker) {
                Items.AddRange(posts);
                LastTimePulled = DateTimeOffset.Now;
@@ -49,6 +49,18 @@ namespace vk.Models.Pullers {
          }
       }
 
+      public async Task PullAsync(PullerSettings settings) {
+         await PullAsync(settings, CancellationToken.None);
+      }
+
+      public async Task PullAsync(CancellationToken ct) {
+         await PullAsync(PullerSettings.No, ct);
+      }
+
+      public async Task PullAsync() {
+         await PullAsync(PullerSettings.No, CancellationToken.None);
+      }
+
       private void OnPullInvoked() {
          PullInvoked?.Invoke(this, EventArgs.Empty);
       }
@@ -59,10 +71,6 @@ namespace vk.Models.Pullers {
 
       private void OnWallHolderChanged(IWallHolder e) {
          WallHolderChanged?.Invoke(this, e);
-      }
-
-      public async Task PullAsync() {
-         await PullAsync(CancellationToken.None);
       }
    }
 }

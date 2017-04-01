@@ -29,11 +29,11 @@ namespace vk.Models.Pullers {
          }
       }
 
-      public Task<IEnumerable<IPost>> GetAsync(IWallHolder wallHolder) {
-         return GetAsync(wallHolder, CancellationToken.None);
+      public Task<IEnumerable<IPost>> GetAsync(IWallHolder wallHolder, PullerSettings settings) {
+         return GetAsync(wallHolder, settings, CancellationToken.None);
       }
 
-      public async Task<IEnumerable<IPost>> GetAsync(IWallHolder wallHolder, CancellationToken ct) {
+      public async Task<IEnumerable<IPost>> GetAsync(IWallHolder wallHolder, PullerSettings settings, CancellationToken ct) {
          var postList = new List<IPost>();
          postList.AddRange(await getPostsWithAnOffset(wallHolder.ID, 100, 0, ct));
          if (postList.Count == 100) {
