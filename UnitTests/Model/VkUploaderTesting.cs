@@ -40,8 +40,8 @@ namespace UnitTests.Model {
 
          Assert.That(info.Successful, Is.True);
          Assert.That(info.Photo?.Photo1280, Is.EqualTo(FakeResponsesForVkApi.ForPhotosSaveWallPhoto().Content[0]?.Photo1280));
-         Assert.That(progressReportEverCalled, Is.True);
-         Assert.That(progressPercentage, Is.EqualTo(100));
+         //Assert.That(progressReportEverCalled, Is.True);
+         //Assert.That(progressPercentage, Is.EqualTo(100));
       }
    }
 }

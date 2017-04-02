@@ -27,7 +27,7 @@ namespace vk.Models.VkApi {
 
    [UsedImplicitly]
    public class VkApi {
-      public const string VERSION = "5.62";
+      public const string VERSION = "5.63";
 
       private readonly HttpClient _httpClient;
       private readonly AccessToken _token;

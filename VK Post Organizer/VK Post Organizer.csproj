@@ -212,6 +212,10 @@
     <Compile Include="Models\Post\HistoryPostViewModelBuilder.cs" />
     <Compile Include="Models\Post\IPostViewModelBuilder.cs" />
     <Compile Include="Models\Post\VkPostViewModelBuilder.cs" />
+    <Compile Include="Models\Pullers\Settings\NoPullerSettings.cs" />
+    <Compile Include="Models\Pullers\Settings\PullerSettings.cs" />
+    <Compile Include="Models\Pullers\Settings\TimePeriodSettings.cs" />
+    <Compile Include="Models\Pullers\VkActualTimePeriodContentPullerStrategy.cs" />
     <Compile Include="Models\VkApi\Entities\IPost.cs" />
     <Compile Include="Models\HttpClientHandlerFactory.cs" />
     <Compile Include="Models\History\HistoryController.cs" />

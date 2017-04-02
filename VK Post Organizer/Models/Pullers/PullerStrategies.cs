@@ -13,7 +13,7 @@ namespace vk.Models.Pullers {
 
       public PullerStrategies(VkApiProvider vkApi, JsApiProvider jsApi) {
          _actualContentPullerStrategy = new VkActualContentPullerStrategy(vkApi.WallGet);
-         _actualTimePeriodContentPullerStrategy = new VkActualTimePeriodContentPullerStrategy(vkApi.WallGet, 3);
+         _actualTimePeriodContentPullerStrategy = new VkActualTimePeriodContentPullerStrategy(vkApi.WallGet);
          _postponedContentPullerStrategy = new VkPostponedContentPullerStrategy(vkApi.WallGet);
          _historyContentPullerStrategy = new HistoryContentPullerStrategy(jsApi.GetPosts);
       }

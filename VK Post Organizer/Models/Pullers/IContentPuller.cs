@@ -16,5 +16,8 @@ namespace vk.Models.Pullers {
 
       Task PullAsync();
       Task PullAsync(CancellationToken ct);
+
+      Task PullAsync(PullerSettings settings);
+      Task PullAsync(PullerSettings settings, CancellationToken ct);
    }
 }

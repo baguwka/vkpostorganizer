@@ -89,6 +89,9 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Fakes\FakeResponseHandlerByHost.cs" />
+    <Compile Include="FakeTests\FakeResponseHandlerByHostTesting.cs" />
+    <Compile Include="FakeTests\FakeResponseHandlerTesting.cs" />
     <Compile Include="Model\AvailableWallsFillerTesting.cs" />
     <Compile Include="Fakes\FakeResponseHandler.cs" />
     <Compile Include="Fakes\FakeResponsesForVkApi.cs" />
@@ -98,6 +101,7 @@
     <Compile Include="PostFilterTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Puller\ContentPullerTesting.cs" />
+    <Compile Include="Puller\HistoryContentPullerTesting.cs" />
     <Compile Include="VkApi\PhotosSaveWallPhotoTesting.cs" />
     <Compile Include="VkApi\UsersGetTesting.cs" />
     <Compile Include="VkApi\VkAuthorizationTesting.cs" />
