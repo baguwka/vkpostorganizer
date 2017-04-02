@@ -13,6 +13,7 @@ namespace UnitTests.Fakes {
          _fakeResponses.Add(uri, responseMessage);
       }
 
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
       protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, System.Threading.CancellationToken cancellationToken) {
          var firstMatch = _fakeResponses.Keys.FirstOrDefault(response => response.Host == request.RequestUri.Host);
 
@@ -24,4 +25,5 @@ namespace UnitTests.Fakes {
          }
       }
    }
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 }

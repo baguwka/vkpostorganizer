@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using UnitTests.Fakes;
+using UnitTests.Properties;
 using vk.Models;
 using vk.Models.Pullers;
 using vk.Models.VkApi;
@@ -18,8 +19,7 @@ namespace UnitTests.Puller {
          var token = new AccessToken();
          var handler = new FakeResponseHandlerByHost();
          handler.AddFakeResponse(new Uri($"https://api.vk.com/method/wall.get?"),
-
-            new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("boop") });
+            new HttpResponseMessage(HttpStatusCode.OK) { Content = new ByteArrayContent(Resources.FakeWallGetResponse) });
 
          var vkApi = new vk.Models.VkApi.VkApi(token, handler);
          _apiProvider = new VkApiProvider(token, vkApi);
@@ -54,6 +54,8 @@ namespace UnitTests.Puller {
 
          Assert.That(event_pullInvoked_called, Is.True);
          Assert.That(event_pullCompleted_called, Is.True);
+         Assert.That(contentPuller.Items.Count, Is.EqualTo(4));
+         Assert.That(contentPuller.LastTimePulled, Is.LessThanOrEqualTo(DateTimeOffset.Now));
       }
 
    }
