@@ -25,7 +25,7 @@ namespace vk.Models.Pullers {
                .Add("offset", offset)
                .Add("count", count);
 
-            logger.Debug($"Получение {count} постовс актуальной стены {wallHolderId} со смещением {offset}");
+            logger.Debug($"Получение {count} постов актуальной стены {wallHolderId} со смещением {offset}");
 
             var response = await _wallGet.GetAsync(query, ct);
             var posts = response.Content.Wall.ToList();

@@ -78,7 +78,7 @@ namespace vk.Models.Pullers {
       }
 
       private void OnWallHolderChanged(IWallHolder e) {
-         logger.Trace($"WallHolder был изменен на {e.GetType()}");
+         logger.Trace($"WallHolder был изменен. Новое Id - {e.ID}, Name - {e.Name}");
          WallHolderChanged?.Invoke(this, e);
       }
    }

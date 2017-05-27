@@ -389,6 +389,9 @@ namespace vk.ViewModels {
          }
 
          var image = await Task.Run(() => File.ReadAllBytes(filePath), cancellationToken);
+
+         logger.Debug($"Попытка загрузить фото на сервер из файла по пути - {filePath}. Фото весит {SizeHelper.Suffix(image.Length)}");
+
          await uploadFromBytes(image, cancellationToken);
       }
 
@@ -399,11 +402,14 @@ namespace vk.ViewModels {
          ProgressString = "Downloading...";
          UploadProgress = 0;
 
+         logger.Debug($"Попытка асинхронно скачать фото по url - {uri}");
+
          var downloadResult = await _uploader.DownloadPhotoByUriAsync(uri, progress, cancellationToken);
 
          progress.ProgressChanged -= onProgressChanged;
          if (!downloadResult.Successful) {
             if (!_cts.IsCancellationRequested) {
+               logger.Debug($"Ошибка при скачивании фото по url - {uri}.\n{downloadResult.ErrorMessage}");
                MessageBox.Show(downloadResult.ErrorMessage, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                UrlOfImageToUpload = string.Empty;
             }
@@ -411,6 +417,7 @@ namespace vk.ViewModels {
             return;
          }
 
+         logger.Debug($"Асинхронное скачивание успешно из url - {uri}");
          ProgressString = string.Empty;
          await uploadFromBytes(downloadResult.Photo, cancellationToken);
          UrlOfImageToUpload = string.Empty;
@@ -433,7 +440,7 @@ namespace vk.ViewModels {
          ProgressString = "Uploading...";
          UploadProgress = 0;
 
-         logger.Debug($"Попытка загрузить фото из массива байт. Размер - {SizeHelper.Suffix(photo.Length)}");
+         logger.Debug($"Попытка загрузить фото из массива байт на сервер. Размер - {SizeHelper.Suffix(photo.Length)}");
 
          var result = await _uploader.TryUploadPhotoToWallAsync(photo, _pullersController.Postponed.WallHolder.ID, progress,
             cancellationToken);
@@ -441,13 +448,13 @@ namespace vk.ViewModels {
          progress.ProgressChanged -= onProgressChanged;
 
          if (result.Successful) {
-            logger.Debug($"Фото с размером {SizeHelper.Suffix(photo.Length)} успешно загружено. Его id {result.Photo.Id}, " +
+            logger.Debug($"Фото с размером {SizeHelper.Suffix(photo.Length)} успешно загружено на сервер. Его id {result.Photo.Id}, " +
                          $"а ссылка на источник - {result.Photo.GetLargest()}\nДобавление к аттачментам.");
             addPhotoToAttachments(result.Photo);
          }
          else {
             if (!_cts.IsCancellationRequested) {
-               logger.Error($"Ошибка при загрузке фото с размером {SizeHelper.Suffix(photo.Length)}. {result.ErrorMessage}");
+               logger.Error($"Ошибка при загрузке фото с размером {SizeHelper.Suffix(photo.Length)} на сервер. {result.ErrorMessage}");
                MessageBox.Show(result.ErrorMessage, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             ProgressString = string.Empty;

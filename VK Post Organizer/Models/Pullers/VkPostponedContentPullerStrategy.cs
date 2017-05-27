@@ -28,7 +28,7 @@ namespace vk.Models.Pullers {
             var response = await _wallGet.GetAsync(query, ct);
             var posts = response.Content.Wall.ToList();
 
-            logger.Debug($"Отложенные посты со стены ${wallHolderId} успешно получены. Всего их {posts.Count} (ожидалось {count})");
+            logger.Debug($"Отложенные посты со стены #{wallHolderId} успешно получены. Всего их {posts.Count} (ожидалось {count})");
             return posts;
          }
          catch (VkException ex) {

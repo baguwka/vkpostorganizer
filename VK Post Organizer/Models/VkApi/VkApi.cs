@@ -71,10 +71,11 @@ namespace vk.Models.VkApi {
             throw new ArgumentNullException(nameof(query));
          }
 
-
          var uri = buildCompleteUri(method, query);
+         var uriWithoutToken = removeQueryStringByKey(uri, "access_token");
 
-         logger.Debug($"Запрос на выполнение метода Vk api с проверкой на наличие в кэше и ограничением по множеству запросов - {method}. Итоговый url для перехода - {uri}");
+         logger.Debug($"Запрос на выполнение метода Vk api с проверкой на наличие в кэше и ограничением по множеству " +
+                      $"запросов - {method} по url (no access token in logs) {uriWithoutToken}");
 
          var key = uri.ToString();
 
@@ -86,7 +87,7 @@ namespace vk.Models.VkApi {
                if (timeSpan < TimeSpan.FromSeconds(1)) {
                   logger.Debug($"Защита от множества запросов за короткое время обнаружила что подобный запрос выполнялся совсем недавно." +
                                $"Запрос будет задержан на некоторое время.");
-                  logger.Debug($"Задержка для запроса по url {uri} на 1 секунду.");
+                  logger.Debug($"Задержка для запроса по url {uriWithoutToken} на 1 секунду.");
                   await Task.Delay(TimeSpan.FromSeconds(1), ct);
                }
                else {
@@ -122,20 +123,23 @@ namespace vk.Models.VkApi {
          }
 
          var uri = buildCompleteUri(method, query);
+         var uriWithoutToken = removeQueryStringByKey(uri, "access_token");
 
-         logger.Debug($"Запрос на выполнение метода Vk api без каких либо проверок на наличие в кэше - {method}. Итоговый url для перехода - {uri}");
+         logger.Debug($"Запрос на выполнение метода Vk api без каких либо проверок на наличие в кэше - {method}. " +
+                      $"Итоговый url (no access_token in logs) для перехода - {uriWithoutToken}");
 
          return await _rateLimiter.Perform(() => callAsync(uri, ct), ct).ConfigureAwait(false);
       }
 
       private async Task<string> callAsync(Uri uri, CancellationToken ct) {
          try {
+            var uriWithoutToken = removeQueryStringByKey(uri, "access_token");
 
-            logger.Debug($"Выполнение запроса к серверу по url - {uri}");
+            logger.Debug($"Выполнение запроса к серверу по url (no access_token in logs) {uriWithoutToken}");
 
             var response = await _httpClient.GetAsync(uri, ct).ConfigureAwait(false);
 
-            logger.Trace($"Ответ получен для url {uri}");
+            logger.Trace($"Ответ получен.");
 
             response.EnsureSuccessStatusCode();
 
@@ -146,13 +150,13 @@ namespace vk.Models.VkApi {
                Uri = uri
             };
 
-            logger.Trace($"Ответ успешно получен и сериализован для url {uri}");
+            logger.Trace($"Ответ успешно получен и сериализован.");
             OnCallPerformed(vkResponse);
 
             return result;
          }
          catch (HttpRequestException ex) {
-            logger.Error(ex, $"Соединение по url {uri} не удалось. Возможны проблемы с прокси сервером, либо сервер не отвечает.");
+            logger.Error(ex, $"Соединение не удалось. Возможны проблемы с прокси сервером, либо сервер не отвечает.");
             throw new VkException($"Соеденение не удалось.\nПроверьте настройки прокси сервера и перезапустите приложение.\n{ex.Message}", ex);
          }
          catch (WebException ex) {
@@ -172,7 +176,7 @@ namespace vk.Models.VkApi {
             _tooMuchRequestsOccurrences++;
             //too much requests per second
             if (ex.ErrorCode == 6) {
-               logger.Debug(ex, $"Слишком много запросов в секунду. После небольшой задержки запрос будет повторен. Вызванный url - {uri}");
+               logger.Debug(ex, $"Слишком много запросов в секунду. После небольшой задержки запрос будет повторен.");
                await Task.Delay(TimeSpan.FromSeconds(1f), ct);
                if (!ct.IsCancellationRequested) {
                   return await callAsync(uri, ct);
@@ -183,7 +187,7 @@ namespace vk.Models.VkApi {
          }
          // Httpclient timeout
          catch (TaskCanceledException ex) {
-            logger.Error(ex, $"Превышен таймаут ожидания ответа, либо операция была отменена. Вызванный url - {uri}");
+            logger.Error(ex, $"Превышен таймаут ожидания ответа, либо операция была отменена.");
             if (ct.IsCancellationRequested) {
                throw;
             }
@@ -205,6 +209,21 @@ namespace vk.Models.VkApi {
          //}
 
          return string.Empty;
+      }
+
+      private static string removeQueryStringByKey(Uri uri, string key) {
+         // this gets all the query string key value pairs as a collection
+         var newQueryString = HttpUtility.ParseQueryString(uri.Query);
+
+         // this removes the key if exists
+         newQueryString.Remove(key);
+
+         // this gets the page path from root without QueryString
+         string pagePathWithoutQueryString = uri.GetLeftPart(UriPartial.Path);
+
+         return newQueryString.Count > 0
+            ? $"{pagePathWithoutQueryString}?{newQueryString}"
+            : pagePathWithoutQueryString;
       }
 
       private bool tryToHandleException(WebException ex) {
