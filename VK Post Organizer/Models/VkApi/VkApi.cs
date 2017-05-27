@@ -74,8 +74,7 @@ namespace vk.Models.VkApi {
          var uri = buildCompleteUri(method, query);
          var uriWithoutToken = removeQueryStringByKey(uri, "access_token");
 
-         logger.Debug($"Запрос на выполнение метода Vk api с проверкой на наличие в кэше и ограничением по множеству " +
-                      $"запросов - {method} по url (no access token in logs) {uriWithoutToken}");
+         logger.Debug($"{uriWithoutToken}");
 
          var key = uri.ToString();
 
@@ -85,9 +84,7 @@ namespace vk.Models.VkApi {
             if (_requestLog.TryGetValue(key, out lastLog)) {
                var timeSpan = DateTimeOffset.Now - lastLog;
                if (timeSpan < TimeSpan.FromSeconds(1)) {
-                  logger.Debug($"Защита от множества запросов за короткое время обнаружила что подобный запрос выполнялся совсем недавно." +
-                               $"Запрос будет задержан на некоторое время.");
-                  logger.Debug($"Задержка для запроса по url {uriWithoutToken} на 1 секунду.");
+                  logger.Debug($"Запрос \"{uriWithoutToken}\"выполнялся совсем недавно. Инициирована задержка на 1 секунду.");
                   await Task.Delay(TimeSpan.FromSeconds(1), ct);
                }
                else {
@@ -105,7 +102,7 @@ namespace vk.Models.VkApi {
             if (result) {
                var timeSpan = DateTimeOffset.Now - responseInfo.StoredAt;
                if (timeSpan < TimeSpan.FromSeconds(5)) {
-                  logger.Debug($"Система кеширования обнаружила, что подобный запрос выполнялся совсем недавно, а значит данные будут получены из кэша.");
+                  logger.Debug($"Ответ на запрос \"{uriWithoutToken}\" будет извлечен из кеша.");
                   return responseInfo.Response;
                }
                else {
@@ -125,8 +122,7 @@ namespace vk.Models.VkApi {
          var uri = buildCompleteUri(method, query);
          var uriWithoutToken = removeQueryStringByKey(uri, "access_token");
 
-         logger.Debug($"Запрос на выполнение метода Vk api без каких либо проверок на наличие в кэше - {method}. " +
-                      $"Итоговый url (no access_token in logs) для перехода - {uriWithoutToken}");
+         logger.Debug($"{uriWithoutToken}");
 
          return await _rateLimiter.Perform(() => callAsync(uri, ct), ct).ConfigureAwait(false);
       }
@@ -135,7 +131,7 @@ namespace vk.Models.VkApi {
          try {
             var uriWithoutToken = removeQueryStringByKey(uri, "access_token");
 
-            logger.Debug($"Выполнение запроса к серверу по url (no access_token in logs) {uriWithoutToken}");
+            logger.Debug($"GET {uriWithoutToken}");
 
             var response = await _httpClient.GetAsync(uri, ct).ConfigureAwait(false);
 

@@ -14,7 +14,7 @@ DefaultGroupName={#AppName}
 UninstallDisplayIcon={app}\{#ExeName}
 Compression=lzma2
 SolidCompression=yes
-OutputDir=userdocs:Inno Setup Examples Output
+OutputDir=R:\Projects\VK Post Organizer\VK Post Organizer\bin\Setup
 
 [Files]
 Source: "VK Post Organizer\bin\Release\Data Persistence Provider.dll"; DestDir: "{app}"      
@@ -60,7 +60,7 @@ Source: "VK Post Organizer\bin\Release\Xceed.Wpf.AvalonDock.Themes.Metro.dll"; D
 Source: "VK Post Organizer\bin\Release\Xceed.Wpf.AvalonDock.Themes.VS2010.dll"; DestDir: "{app}"
 Source: "VK Post Organizer\bin\Release\Xceed.Wpf.DataGrid.dll"; DestDir: "{app}"
 Source: "VK Post Organizer\bin\Release\Xceed.Wpf.Toolkit.dll"; DestDir: "{app}"
-Source: "VK Post Organizer\bin\Release\Xceed.Wpf.AvalonDock.resources.dll"; DestDir: "{app}\ru"
+Source: "VK Post Organizer\bin\Release\ru\Xceed.Wpf.AvalonDock.resources.dll"; DestDir: "{app}\ru"
 
 
 [Icons]
