@@ -12,6 +12,7 @@ using System.Windows;
 using System.Windows.Input;
 using JetBrains.Annotations;
 using Microsoft.Win32;
+using NLog;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
@@ -32,6 +33,7 @@ namespace vk.ViewModels {
 
    [UsedImplicitly]
    public class UploaderViewModel : BindableBase {
+      private static readonly ILogger logger = LogManager.GetCurrentClassLogger();
       private readonly IEventAggregator _eventAggregator;
       private readonly VkUploader _uploader;
       private readonly UploadSettings _uploadSettings;
@@ -424,12 +426,14 @@ namespace vk.ViewModels {
          }
       }
 
-      private async Task uploadFromBytes(byte[] photo, CancellationToken cancellationToken) {
+      private async Task uploadFromBytes([NotNull] byte[] photo, CancellationToken cancellationToken) {
          var progress = new Progress<HttpProgressEventArgs>();
          progress.ProgressChanged += onProgressChanged;
 
          ProgressString = "Uploading...";
          UploadProgress = 0;
+
+         logger.Debug($"Попытка загрузить фото из массива байт. Размер - {SizeHelper.Suffix(photo.Length)}");
 
          var result = await _uploader.TryUploadPhotoToWallAsync(photo, _pullersController.Postponed.WallHolder.ID, progress,
             cancellationToken);
@@ -437,10 +441,13 @@ namespace vk.ViewModels {
          progress.ProgressChanged -= onProgressChanged;
 
          if (result.Successful) {
+            logger.Debug($"Фото с размером {SizeHelper.Suffix(photo.Length)} успешно загружено. Его id {result.Photo.Id}, " +
+                         $"а ссылка на источник - {result.Photo.GetLargest()}\nДобавление к аттачментам.");
             addPhotoToAttachments(result.Photo);
          }
          else {
             if (!_cts.IsCancellationRequested) {
+               logger.Error($"Ошибка при загрузке фото с размером {SizeHelper.Suffix(photo.Length)}. {result.ErrorMessage}");
                MessageBox.Show(result.ErrorMessage, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             ProgressString = string.Empty;
@@ -478,6 +485,7 @@ namespace vk.ViewModels {
             throw new ArgumentNullException(nameof(photo));
          }
 
+         logger.Debug($"Запрос на добавление фотографии к аттачментам {photo.Id}. Источник - {photo.GetLargest()}");
          var attachment = new AttachmentItem();
          attachment.SetAsPhotoAttachment(photo);
          Attachments.Add(attachment);
@@ -491,6 +499,7 @@ namespace vk.ViewModels {
             return;
          }
 
+         logger.Debug($"Запрос на удаление аттачмента {attachment.Preview}");
          Attachments.Remove(attachment);
          attachment.RemoveRequested -= onAttachmentRemoveRequest;
       }
@@ -509,16 +518,19 @@ namespace vk.ViewModels {
                Attachments = Attachments.Take(10).ToAttachments(),
             };
 
+            logger.Debug($"Публикация отложенного поста от имени пользователя {postInfo.OwnerId} на время {postInfo.PostponedDate}");
             await _vkApi.WallPost.PostponeAsync(postInfo);
          }
          catch (VkException ex) {
             // 150 postpone posts reached (probably)
             if (ex.ErrorCode == 214) {
+               logger.Error(ex, "Ошибка при публикации поста, возможно достигнут лимит 150 отложенных записей.");
                successful = false;
                MessageBox.Show(ex.Message, "Невозможно отложить пост",
                   MessageBoxButton.OK, MessageBoxImage.Information);
             }
             else {
+               logger.Error(ex, "Неизвестная ошибка при публикации поста.");
                MessageBox.Show($"{ex.Message}\n\nStackTrace:\n{ex.StackTrace}", ex.ToString(), MessageBoxButton.OK,
                   MessageBoxImage.Error);
             }

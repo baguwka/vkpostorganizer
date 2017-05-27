@@ -212,8 +212,6 @@
     <Compile Include="Events\WallSelectorEvents.cs" />
     <Compile Include="Models\BusyObserver.cs" />
     <Compile Include="Models\Configuration\HiddenState.cs" />
-    <Compile Include="Models\Logger\ILogger.cs" />
-    <Compile Include="Models\Logger\NLogWrapper.cs" />
     <Compile Include="Models\Post\HistoryPostViewModelBuilder.cs" />
     <Compile Include="Models\Post\IPostViewModelBuilder.cs" />
     <Compile Include="Models\Post\VkPostViewModelBuilder.cs" />

@@ -2,11 +2,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using NLog;
 using vk.Models.JsonServerApi;
 using vk.Models.VkApi.Entities;
 
 namespace vk.Models.Pullers {
    public class HistoryContentPullerStrategy : IContentPullerStrategy {
+      private static readonly ILogger logger = LogManager.GetCurrentClassLogger();
       public const int ITEMS_PER_PAGE = 50;
 
       private readonly GetPosts _getPosts;
@@ -17,10 +19,12 @@ namespace vk.Models.Pullers {
 
       private async Task<IEnumerable<IPost>> getPostsOfPage(int wallId, int count, int page) {
          try {
+            logger.Debug($"«апрос на пулл контента с JsonServer дл€ стены #{wallId} со страницы #{page} в количестве {count}");
             var response = await _getPosts.GetAsync(wallId, count, page);
             return response.Content.ToList();
          }
-         catch (JsonServerException) {
+         catch (JsonServerException ex) {
+            logger.Error(ex, $"ѕроизошла ошибка во врем€ выполнени€ пулла контента с JsonServer дл€ стены #{wallId} со страницы #{page} в количестве {count}");
             //ignore (???) todo: do not ignore
          }
          return null;

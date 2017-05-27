@@ -2,6 +2,7 @@
 using System.Windows;
 using Data_Persistence_Provider;
 using Microsoft.Practices.Unity;
+using NLog;
 using Prism.Regions;
 using Prism.Unity;
 using vk.Infrastructure;
@@ -16,11 +17,16 @@ using vk.Views;
 
 namespace vk {
    public class Bootstrapper : UnityBootstrapper {
+      private static readonly ILogger logger = LogManager.GetCurrentClassLogger();
+
       protected override DependencyObject CreateShell() {
+         logger.Debug("Создание оболочки");
          return Container.Resolve<Shell>();
       }
 
       protected override void InitializeShell() {
+         logger.Debug("Инициализация оболочки");
+
          var regionManager = Container.Resolve<IRegionManager>();
 
          var settings = Container.Resolve<Settings>();
@@ -39,10 +45,13 @@ namespace vk {
          regionManager.RegisterViewWithRegion(RegionNames.ContentMainRegion, typeof(StartPageView));
          regionManager.RegisterViewWithRegion(RegionNames.ContentOverlayRegion, typeof(UploaderView));
 
+         logger.Debug("Успешная инициализация. Показ оболочки.");
          Application.Current.MainWindow.Show();
       }
 
       protected override void ConfigureContainer() {
+         logger.Debug("Конфигурирование контейнера.");
+
          base.ConfigureContainer();
          Container.RegisterTypeForNavigation<AvailableWallsView>(ViewNames.AvailableWalls);
          Container.RegisterTypeForNavigation<MainBottomView>(ViewNames.MainBottomButtons);
@@ -106,6 +115,8 @@ namespace vk {
 
          Container.RegisterType<PhotoUrlObtainer>(Lifetime.Singleton);
          Container.RegisterType<DocumentPreviewUrlObtainer>(Lifetime.Singleton);
+
+         logger.Debug("Успешное конфигурирование контейнера.");
       }
    }
 
