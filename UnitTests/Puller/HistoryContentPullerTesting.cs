@@ -19,6 +19,7 @@ namespace UnitTests.Puller {
       }
 
       [Test]
+      [Ignore("Not implemented")]
       public async Task History_puller_pull_async() {
          IContentPullerStrategy contentPullerStrategy = new HistoryContentPullerStrategy(_apiProvider.GetPosts);
          IContentPuller contentPuller = new ContentPuller(contentPullerStrategy);

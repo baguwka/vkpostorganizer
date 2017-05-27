@@ -26,6 +26,7 @@ namespace UnitTests.Puller {
       }
 
       [Test]
+      [Ignore("Infinite")]
       public async Task Vk_timePeriod_puller_pull() {
          IContentPullerStrategy contentPullerStrategy = new VkActualTimePeriodContentPullerStrategy(_apiProvider.WallGet);
          IContentPuller contentPuller = new ContentPuller(contentPullerStrategy);
