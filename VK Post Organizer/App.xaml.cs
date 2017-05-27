@@ -14,6 +14,8 @@ namespace vk {
       public static Version Version { get; private set; }
 
       protected override void OnStartup(StartupEventArgs e) {
+         Version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+
          logger.Debug($"VK Postpone Helper ({Version}) пытается запуститься");
 
          if (SingleInstance.IsOnlyInstance() == false) {
@@ -22,8 +24,6 @@ namespace vk {
             Current.Shutdown();
             return;
          }
-
-         Version = new Version(1, 1, 6);
 
          base.OnStartup(e);
 
