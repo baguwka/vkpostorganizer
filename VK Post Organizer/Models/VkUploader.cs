@@ -1,21 +1,27 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Handlers;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
+using NLog;
 using Prism.Mvvm;
 using vk.Models.VkApi;
 using vk.Models.VkApi.Entities;
+using vk.Utils;
 
 namespace vk.Models {
    public class VkUploader : BindableBase {
+      private static readonly ILogger logger = LogManager.GetCurrentClassLogger();
       private readonly IPhotosGetWallUploadSever _getWallUploadServer;
       private readonly IPhotosSaveWallPhoto _saveWallPhoto;
       private readonly HttpMessageHandler _messageHandler;
       private HttpClient _client;
+      private ProgressMessageHandler _progressHandler;
 
       public VkUploader(IPhotosGetWallUploadSever getWallUploadServer, IPhotosSaveWallPhoto saveWallPhoto, HttpMessageHandler messageHandler) {
          _getWallUploadServer = getWallUploadServer;
@@ -27,12 +33,15 @@ namespace vk.Models {
 
       //todo: call it when proxy settings change
       private void renewClient() {
-         _client = new HttpClient(_messageHandler);
+         _progressHandler = new ProgressMessageHandler(_messageHandler);
+         _client = new HttpClient(_progressHandler);
       }
 
       public static MultipartContent CreateContentFromBytes(byte[] photo) {
+         logger.Debug($"Создание контента из массива байт с размером {SizeHelper.Suffix(photo.Length)}");
+
          var content = new MultipartFormDataContent();
-         var file = new ByteArrayContent(photo);
+         var file = new StreamContent(new MemoryStream(photo));
          file.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data") {
             Name = "photo",
             FileName = "photo.jpg"
@@ -41,7 +50,7 @@ namespace vk.Models {
          return content;
       }
 
-      public async Task<DownloadPhotoInfo> DownloadPhotoByUriAsync(Uri uri, [NotNull] IProgress<int> progress, CancellationToken ct) {
+      public async Task<DownloadPhotoInfo> DownloadPhotoByUriAsync(Uri uri, [NotNull] IProgress<HttpProgressEventArgs> progress, CancellationToken ct) {
          try {
             var response = await _client.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead, ct);
             if (!response.IsSuccessStatusCode) {
@@ -54,6 +63,7 @@ namespace vk.Models {
             return await readContentStreamAsync(progress, ct, response);
          }
          catch (OperationCanceledException ex) {
+            logger.Error(ex, $"Операция асинхронного скачивания фото по ссылке отменена. url - {uri}");
             return new DownloadPhotoInfo {
                Successful = false,
                Photo = null,
@@ -61,6 +71,8 @@ namespace vk.Models {
             };
          }
          catch (HttpRequestException ex) {
+            logger.Error(ex, $"При асинхронном скачивании фото по ссылке произошла ошибка. url - {uri}");
+
             return new DownloadPhotoInfo {
                Successful = false,
                Photo = null,
@@ -73,11 +85,16 @@ namespace vk.Models {
       /// <summary>
       /// Reads incoming content async with progress report.
       /// </summary>
-      private static async Task<DownloadPhotoInfo> readContentStreamAsync(IProgress<int> progress, CancellationToken ct, HttpResponseMessage response) {
+      private static async Task<DownloadPhotoInfo> readContentStreamAsync(IProgress<HttpProgressEventArgs> progress, CancellationToken ct, HttpResponseMessage response) {
+         logger.Debug($"Асинхронное чтение контента из потока.");
+
          if (response.Content.Headers.ContentLength == null) {
+            const string msg = "У загружаемого контента отсутствуют заголовки (Headers.ContentLenght == null).";
+            logger.Error(msg);
+
             return new DownloadPhotoInfo {
                Successful = false,
-               ErrorMessage = "У загружаемого контента отсутствуют заголовки (Headers.ContentLenght == null)."
+               ErrorMessage = msg
             };
          }
 
@@ -102,7 +119,8 @@ namespace vk.Models {
                      totalRead += read;
 
                      var progressPercent = (((float)totalRead / (float)totalBytes) * 100);
-                     progress.Report((int)progressPercent);
+                     var e = new HttpProgressEventArgs((int)progressPercent, null, totalRead, totalBytes);
+                     progress.Report(e);
                   }
                } while (isMoreToRead);
 
@@ -116,24 +134,32 @@ namespace vk.Models {
          }
       }
 
-      public async Task<UploadPhotoInfo> TryUploadPhotoToWallAsync(byte[] photo, int wallId, CancellationToken ct) {
+      public async Task<UploadPhotoInfo> TryUploadPhotoToWallAsync(byte[] photo, int wallId, IProgress<HttpProgressEventArgs> progress, CancellationToken ct) {
          var content = CreateContentFromBytes(photo);
          if (content == null) {
+            const string msg = "Не удалось создать контент из массива байт.";
+            logger.Error(msg);
             return new UploadPhotoInfo {
                Successful = false,
                ErrorMessage = "Не удалось создать контент из массива байт."
             };
          }
 
-         return await TryUploadPhotoToWallAsync(content, wallId, ct).ConfigureAwait(false);
+         return await TryUploadPhotoToWallAsync(content, wallId, progress, ct).ConfigureAwait(false);
       }
 
-      public async Task<UploadPhotoInfo> TryUploadPhotoToWallAsync(MultipartContent photo, int wallId, CancellationToken ct) {
+      public async Task<UploadPhotoInfo> TryUploadPhotoToWallAsync(MultipartContent photo, int wallId, IProgress<HttpProgressEventArgs> progress, CancellationToken ct) {
          if (photo == null) throw new ArgumentNullException(nameof(photo));
+         var reportProgress = new EventHandler<HttpProgressEventArgs>((sender, args) => {
+            progress.Report(args);
+         });
 
          try {
             var uploadServer = await _getWallUploadServer.GetAsync(wallId, ct);
 
+            logger.Debug($"Попытка асинхронно загрузить фото на стену");
+
+            _progressHandler.HttpSendProgress += reportProgress;
             var response = await _client.PostAsync(new Uri(uploadServer.UploadUrl), photo, ct);
 
             if (!response.IsSuccessStatusCode || response.Content == null) {
@@ -153,10 +179,18 @@ namespace vk.Models {
                Successful = savedPhoto != null
             };
          }
+         catch (NullReferenceException ex) {
+            Debug.WriteLine(ex.Message);
+            return new UploadPhotoInfo {
+               Successful = false,
+               ErrorMessage = ex.Message
+            };
+         }
          catch (VkException ex) {
             var errmessage = "";
             if (ex.ErrorCode == 100) {
-               errmessage = "Не удалось загрузить данный файл как фото вк. Либо это не изображение, либо файл поврежден. Детали ниже:\n\n";
+               errmessage =
+                  "Не удалось загрузить данный файл как фото вк. Либо это не изображение, либо файл поврежден. Детали ниже:\n\n";
             }
 
             errmessage += ex.Message;
@@ -171,6 +205,9 @@ namespace vk.Models {
                Successful = false,
                ErrorMessage = ex.Message
             };
+         }
+         finally {
+            _progressHandler.HttpSendProgress -= reportProgress;
          }
       }
    }

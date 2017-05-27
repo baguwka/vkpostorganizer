@@ -90,3 +90,4 @@ $RECYCLE.BIN/
 *.DotSettings
 ILMerge/merge_all.bat
 ILMerge/ILMerge.exe
+.idea/

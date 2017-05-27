@@ -86,7 +86,7 @@ namespace vk.ViewModels {
          ProfilePhoto = bitmap;
       }
 
-      public WallContentLeftBlockViewModel(IEventAggregator eventAggregator, IRegionManager regionManager, 
+      public WallContentLeftBlockViewModel(IEventAggregator eventAggregator, IRegionManager regionManager,
          PullersController pullersController, BusyObserver busyObserver, Settings settings) {
 
          SetProfilePhoto(AuthBarViewModel.DEFAULT_AVATAR);
@@ -106,7 +106,7 @@ namespace vk.ViewModels {
          ShowActualWallCommand =
             new DelegateCommand(
                   () => {
-                     var parameters = new NavigationParameters { { "filter", "howdy" } };
+                     var parameters = new NavigationParameters {{"filter", "howdy"}};
                      _regionManager.RequestNavigate(RegionNames.ContentMainRegion, ViewNames.WallActualContent,
                         parameters);
                   }, () => !ContentIsBusy)
@@ -175,5 +175,5 @@ namespace vk.ViewModels {
                      //$"\nРепостов: {repostCount}" +
                      $"\nСлоты для отложек: {missingPosts}";
       }
-   }
+   };
 }

@@ -2,11 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using NLog;
 using vk.Models.VkApi.Entities;
 
 namespace vk.Models.Pullers {
    public sealed class ContentPuller : IContentPuller {
-      private readonly IPullerStrategy _pullerStrategy;
+      private static readonly ILogger logger = LogManager.GetCurrentClassLogger();
+
+      private readonly IContentPullerStrategy _contentPullerStrategy;
       private IWallHolder _wallHolder;
 
       public IWallHolder WallHolder {
@@ -24,29 +27,46 @@ namespace vk.Models.Pullers {
       public event EventHandler<ContentPullerEventArgs> PullCompleted;
       public event EventHandler<IWallHolder> WallHolderChanged;
 
-      public ContentPuller(IPullerStrategy pullerStrategy) {
-         _pullerStrategy = pullerStrategy;
+      public ContentPuller(IContentPullerStrategy contentPullerStrategy) {
+         _contentPullerStrategy = contentPullerStrategy;
          Items = new List<IPost>();
          WallHolder = new WallHolder(0);
       }
 
-      private readonly object locker = new object();
+      private readonly object _locker = new object();
 
-      public async Task PullAsync(CancellationToken ct) {
+      public async Task PullAsync(PullerSettings settings, CancellationToken ct) {
+         // ReSharper disable once InconsistentlySynchronizedField
+         logger.Debug($"Попытка сделать pull контента из источника");
          OnPullInvoked();
          try {
             Items.Clear();
-            var posts = await _pullerStrategy.GetAsync(WallHolder, ct);
-            lock (locker) {
+            var posts = await _contentPullerStrategy.GetAsync(WallHolder, settings, ct);
+            lock (_locker) {
                Items.AddRange(posts);
                LastTimePulled = DateTimeOffset.Now;
+               logger.Debug($"Pull удачный. Получено элементов - {Items?.Count}");
                OnPullCompleted(new ContentPullerEventArgs { Successful = true, Items = Items });
             }
          }
-         catch {
+         catch (Exception ex) {
+            // ReSharper disable once InconsistentlySynchronizedField
+            logger.Debug(ex, "Ошибка при пуллинге контента. Очистка текущих элементов.");
             Items.Clear();
             OnPullCompleted(new ContentPullerEventArgs {Successful = false});
          }
+      }
+
+      public async Task PullAsync(PullerSettings settings) {
+         await PullAsync(settings, CancellationToken.None);
+      }
+
+      public async Task PullAsync(CancellationToken ct) {
+         await PullAsync(PullerSettings.No, ct);
+      }
+
+      public async Task PullAsync() {
+         await PullAsync(PullerSettings.No, CancellationToken.None);
       }
 
       private void OnPullInvoked() {
@@ -58,11 +78,8 @@ namespace vk.Models.Pullers {
       }
 
       private void OnWallHolderChanged(IWallHolder e) {
+         logger.Trace($"WallHolder был изменен. Новое Id - {e.ID}, Name - {e.Name}");
          WallHolderChanged?.Invoke(this, e);
-      }
-
-      public async Task PullAsync() {
-         await PullAsync(CancellationToken.None);
       }
    }
 }

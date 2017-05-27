@@ -12,7 +12,7 @@ namespace vk.Models {
       private string dataPath {
          get {
             if (string.IsNullOrEmpty(_dataPath)) {
-               _dataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) +
+               _dataPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) +
                            "\\Baguwk\\Vk Postpone Helper\\";
                if (!Directory.Exists(_dataPath)) {
                   Directory.CreateDirectory(_dataPath);

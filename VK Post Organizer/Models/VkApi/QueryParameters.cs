@@ -27,6 +27,13 @@ namespace vk.Models.VkApi {
          return this;
       }
 
+      public QueryParameters Remove(string paramName) {
+         if (!string.IsNullOrEmpty(paramName)) {
+            Query.Remove(paramName);
+         }
+         return this;
+      }
+
       public QueryParameters Add(string paramName, object paramValue) {
          return Add(paramName, paramValue.ToString());
       }

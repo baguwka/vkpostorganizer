@@ -53,6 +53,8 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>
@@ -62,7 +64,7 @@
     <ApplicationIcon>Resources\32x32.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>true</SignManifests>
+    <SignManifests>false</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestCertificateThumbprint>546AD69BEC3FB7D7E8FFFAA54E22681CFE424AA8</ManifestCertificateThumbprint>
@@ -75,7 +77,7 @@
     <TargetZone>LocalIntranet</TargetZone>
   </PropertyGroup>
   <PropertyGroup>
-    <GenerateManifests>true</GenerateManifests>
+    <GenerateManifests>false</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
@@ -119,6 +121,9 @@
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.4.4.9\lib\net45\NLog.dll</HintPath>
+    </Reference>
     <Reference Include="Prism, Version=6.2.0.0, Culture=neutral, PublicKeyToken=91a96d2a154366d8, processorArchitecture=MSIL">
       <HintPath>..\packages\Prism.Core.6.2.0\lib\net45\Prism.dll</HintPath>
       <Private>True</Private>
@@ -143,6 +148,10 @@
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Prism.Wpf.6.2.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
@@ -203,28 +212,27 @@
     <Compile Include="Events\UploaderEvents.cs" />
     <Compile Include="Events\VkAuthorizationEvents.cs" />
     <Compile Include="Events\WallSelectorEvents.cs" />
-    <Compile Include="Infrastructure\AutoPopulateExportedViewsBehavior.cs" />
-    <Compile Include="Infrastructure\IViewRegionRegistration.cs" />
-    <Compile Include="Infrastructure\ViewExportAttribute.cs" />
     <Compile Include="Models\BusyObserver.cs" />
     <Compile Include="Models\Configuration\HiddenState.cs" />
-    <Compile Include="Models\Content\IContentPopulator.cs" />
-    <Compile Include="Models\Content\PostponeContentPopulator.cs" />
     <Compile Include="Models\Post\HistoryPostViewModelBuilder.cs" />
     <Compile Include="Models\Post\IPostViewModelBuilder.cs" />
     <Compile Include="Models\Post\VkPostViewModelBuilder.cs" />
+    <Compile Include="Models\Pullers\Settings\NoPullerSettings.cs" />
+    <Compile Include="Models\Pullers\Settings\PullerSettings.cs" />
+    <Compile Include="Models\Pullers\Settings\TimePeriodSettings.cs" />
+    <Compile Include="Models\Pullers\VkActualTimePeriodContentPullerStrategy.cs" />
     <Compile Include="Models\VkApi\Entities\IPost.cs" />
     <Compile Include="Models\HttpClientHandlerFactory.cs" />
     <Compile Include="Models\History\HistoryController.cs" />
     <Compile Include="Models\JsonServerApi\GetPosts.cs" />
     <Compile Include="Models\JsonServerApi\JsApi.cs" />
     <Compile Include="Models\Pullers\ContentPuller.cs" />
-    <Compile Include="Models\Pullers\HistoryPullerStrategy.cs" />
+    <Compile Include="Models\Pullers\HistoryContentPullerStrategy.cs" />
     <Compile Include="Models\Pullers\IContentPuller.cs" />
-    <Compile Include="Models\Pullers\IPullerStrategy.cs" />
+    <Compile Include="Models\Pullers\IContentPullerStrategy.cs" />
     <Compile Include="Models\Pullers\PullerStrategies.cs" />
-    <Compile Include="Models\Pullers\VkActualPullerStrategy.cs" />
-    <Compile Include="Models\Pullers\VkPostponePullerStrategy.cs" />
+    <Compile Include="Models\Pullers\VkActualContentPullerStrategy.cs" />
+    <Compile Include="Models\Pullers\VkPostponedContentPullerStrategy.cs" />
     <Compile Include="Models\VkApi\Entities\Attachments.cs" />
     <Compile Include="Models\JsonServerApi\JsonServerException.cs" />
     <Compile Include="Models\VkApi\Interfaces\IPhotosGetWallUploadSever.cs" />
@@ -254,7 +262,6 @@
     <Compile Include="Models\VkApi\Concrete\StatsTrackVisitor.cs" />
     <Compile Include="Models\VkApi\QueryParameters.cs" />
     <Compile Include="Infrastructure\WebBrowserUtility.cs" />
-    <Compile Include="Models\Content\WallContentFiller.cs" />
     <Compile Include="Models\Waiter.cs" />
     <Compile Include="Models\Pullers\PullersController.cs" />
     <Compile Include="Models\WinInetHelper.cs" />
@@ -262,7 +269,6 @@
     <Compile Include="Infrastructure\RegionNames.cs" />
     <Compile Include="SingleInstance.cs" />
     <Compile Include="Utils\EnumerableExtensions.cs" />
-    <Compile Include="Utils\GroupNameCache.cs" />
     <Compile Include="Models\Files\ImageExtensionChecker.cs" />
     <Compile Include="Models\UrlHelper\DocumentPreviewUrlObtainer.cs" />
     <Compile Include="Models\UrlHelper\PhotoUrlObtainer.cs" />
@@ -456,6 +462,13 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <Content Include="NLog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
+    </Content>
+    <None Include="NLog.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
@@ -475,9 +488,7 @@
   <ItemGroup>
     <Resource Include="Resources\default_avatar.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Models\Extensions\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Resource Include="Resources\16x16 icon.ico" />
   </ItemGroup>

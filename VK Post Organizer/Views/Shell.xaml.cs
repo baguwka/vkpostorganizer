@@ -2,10 +2,13 @@
 using System.ComponentModel;
 using System.Windows;
 using Data_Persistence_Provider;
+using NLog;
 using vk.ViewModels;
 
 namespace vk.Views {
    public partial class Shell : Window {
+      private static readonly ILogger logger = LogManager.GetCurrentClassLogger();
+
       private readonly VkPostponeSaveLoader _saveLoader;
       private readonly ShellViewModel _viewModel;
 
@@ -30,6 +33,7 @@ namespace vk.Views {
       protected override void OnClosed(EventArgs e) {
          base.OnClosed(e);
 
+         logger.Debug($"Закрытие программы");
          Application.Current.Shutdown();
       }
 

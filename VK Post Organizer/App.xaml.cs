@@ -2,23 +2,28 @@
 using System.Windows;
 using System.Windows.Threading;
 using Microsoft.Practices.Unity;
+using NLog;
 using Prism.Mvvm;
 
 namespace vk {
    public partial class App : Application {
+      private static readonly ILogger logger = LogManager.GetCurrentClassLogger();
+
       public static IUnityContainer Container { get; private set; }
       public static bool IsInitialized { get; set; }
-
       public static Version Version { get; private set; }
 
       protected override void OnStartup(StartupEventArgs e) {
+         Version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+
+         logger.Debug($"VK Postpone Helper ({Version}) пытается запуститься");
+
          if (SingleInstance.IsOnlyInstance() == false) {
             //SingleInstance.ShowFirstInstance();
+            logger.Debug("Уже обнаружена запущенная версия программы. Завершение текущего экземпляра.");
             Current.Shutdown();
             return;
          }
-
-         Version = new Version(1, 0, 4);
 
          base.OnStartup(e);
 
@@ -31,6 +36,8 @@ namespace vk {
 
          bs.Run();
          Container = bs.Container;
+
+         logger.Debug($"VK Postpone Helper версии {Version} запущен.");
       }
 
       //[System.Runtime.InteropServices.DllImport("wininet.dll", CharSet = System.Runtime.InteropServices.CharSet.Auto, SetLastError = true)]
@@ -58,6 +65,7 @@ namespace vk {
       //}
 
       private void CurrentOnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e) {
+         logger.Fatal(e.Exception, "!!Необработанное исключение!! Завершение программы.");
          MessageBox.Show($"{e.Exception.Message}\n\n See dump at Windows Application Event Log.\nStack Trace:{e.Exception.StackTrace}", 
             e.Exception.ToString(), MessageBoxButton.OK, MessageBoxImage.Error);
 

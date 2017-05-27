@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
@@ -11,6 +10,7 @@ using System.Threading.Tasks;
 using System.Web;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
+using NLog;
 using RateLimiter;
 using vk.Models.VkApi.Entities;
 
@@ -28,7 +28,9 @@ namespace vk.Models.VkApi {
 
    [UsedImplicitly]
    public class VkApi {
-      public const string VERSION = "5.62";
+      private static readonly ILogger logger = LogManager.GetCurrentClassLogger();
+
+      public const string VERSION = "5.64";
 
       private readonly HttpClient _httpClient;
       private readonly AccessToken _token;
@@ -52,11 +54,14 @@ namespace vk.Models.VkApi {
 
       private void checkForErrors(string response) {
          if (string.IsNullOrEmpty(response) || response.Length < 5) {
-            throw new VkException($"Не получен ответ от сервера");
+            var msg = $"Не получен ответ от сервера.";
+            logger.Error(msg);
+            throw new VkException(msg);
          }
 
          if (response.Substring(2, 5) == "error") {
             var error = deserializeError(response);
+            logger.Error($"Vk error code: {error.ErrorCode}. {error.ErrorMessage}");
             throw new VkException($"Код ошибки: {error.ErrorCode}\n{error.ErrorMessage}", error.ErrorCode);
          }
       }
@@ -67,6 +72,9 @@ namespace vk.Models.VkApi {
          }
 
          var uri = buildCompleteUri(method, query);
+         var uriWithoutToken = removeQueryStringByKey(uri, "access_token");
+
+         logger.Debug($"{uriWithoutToken}");
 
          var key = uri.ToString();
 
@@ -76,6 +84,7 @@ namespace vk.Models.VkApi {
             if (_requestLog.TryGetValue(key, out lastLog)) {
                var timeSpan = DateTimeOffset.Now - lastLog;
                if (timeSpan < TimeSpan.FromSeconds(1)) {
+                  logger.Debug($"Запрос \"{uriWithoutToken}\"выполнялся совсем недавно. Инициирована задержка на 1 секунду.");
                   await Task.Delay(TimeSpan.FromSeconds(1), ct);
                }
                else {
@@ -93,6 +102,7 @@ namespace vk.Models.VkApi {
             if (result) {
                var timeSpan = DateTimeOffset.Now - responseInfo.StoredAt;
                if (timeSpan < TimeSpan.FromSeconds(5)) {
+                  logger.Debug($"Ответ на запрос \"{uriWithoutToken}\" будет извлечен из кеша.");
                   return responseInfo.Response;
                }
                else {
@@ -101,9 +111,6 @@ namespace vk.Models.VkApi {
             }
          }
 
-         if (method == "users.get") {
-            Debug.WriteLine($">>>>> GOING TO DOWNLOAD REQUEST - {uri}");
-         }
          return await _rateLimiter.Perform(() => callAsync(uri, ct), ct).ConfigureAwait(false);
       }
 
@@ -113,12 +120,23 @@ namespace vk.Models.VkApi {
          }
 
          var uri = buildCompleteUri(method, query);
+         var uriWithoutToken = removeQueryStringByKey(uri, "access_token");
+
+         logger.Debug($"{uriWithoutToken}");
+
          return await _rateLimiter.Perform(() => callAsync(uri, ct), ct).ConfigureAwait(false);
       }
 
       private async Task<string> callAsync(Uri uri, CancellationToken ct) {
          try {
+            var uriWithoutToken = removeQueryStringByKey(uri, "access_token");
+
+            logger.Debug($"GET {uriWithoutToken}");
+
             var response = await _httpClient.GetAsync(uri, ct).ConfigureAwait(false);
+
+            logger.Trace($"Ответ получен.");
+
             response.EnsureSuccessStatusCode();
 
             var result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -128,26 +146,33 @@ namespace vk.Models.VkApi {
                Uri = uri
             };
 
+            logger.Trace($"Ответ успешно получен и сериализован.");
             OnCallPerformed(vkResponse);
 
             return result;
          }
          catch (HttpRequestException ex) {
+            logger.Error(ex, $"Соединение не удалось. Возможны проблемы с прокси сервером, либо сервер не отвечает.");
             throw new VkException($"Соеденение не удалось.\nПроверьте настройки прокси сервера и перезапустите приложение.\n{ex.Message}", ex);
          }
          catch (WebException ex) {
+            logger.Error(ex, "Получено исключение WebException. Trying to handle it.");
             if (tryToHandleException(ex) == false) {
+               logger.Error(ex, "Attempt to handle exception fails. Rethrowing");
                throw;
             }
          }
          catch (VkException ex) {
+            logger.Debug(ex, "Поймано исключение VkException. Возможно превышено ограничение на количество запросов в секунду, капча или что то еще.");
             if (_tooMuchRequestsOccurrences > 2) {
+               logger.Error(ex, "Количество попыток на повтор запроса иссекли, слишком много запросов в секунду.");
                throw;
             }
 
             _tooMuchRequestsOccurrences++;
             //too much requests per second
             if (ex.ErrorCode == 6) {
+               logger.Debug(ex, $"Слишком много запросов в секунду. После небольшой задержки запрос будет повторен.");
                await Task.Delay(TimeSpan.FromSeconds(1f), ct);
                if (!ct.IsCancellationRequested) {
                   return await callAsync(uri, ct);
@@ -158,11 +183,13 @@ namespace vk.Models.VkApi {
          }
          // Httpclient timeout
          catch (TaskCanceledException ex) {
+            logger.Error(ex, $"Превышен таймаут ожидания ответа, либо операция была отменена.");
             if (ct.IsCancellationRequested) {
                throw;
             }
 
             if (_timeoutRetry > 1) {
+               logger.Error(ex, $"Соединение не удалось. Вызванный url - {uri}");
                throw new VkException($"Соеденение не удалось.\nПроверьте настройки прокси сервера и перезапустите приложение.\n{ex.Message}", ex);
             }
             _timeoutRetry++;
@@ -180,7 +207,23 @@ namespace vk.Models.VkApi {
          return string.Empty;
       }
 
+      private static string removeQueryStringByKey(Uri uri, string key) {
+         // this gets all the query string key value pairs as a collection
+         var newQueryString = HttpUtility.ParseQueryString(uri.Query);
+
+         // this removes the key if exists
+         newQueryString.Remove(key);
+
+         // this gets the page path from root without QueryString
+         string pagePathWithoutQueryString = uri.GetLeftPart(UriPartial.Path);
+
+         return newQueryString.Count > 0
+            ? $"{pagePathWithoutQueryString}?{newQueryString}"
+            : pagePathWithoutQueryString;
+      }
+
       private bool tryToHandleException(WebException ex) {
+         logger.Error(ex, $"Attempt to handle exception {ex}");
          string message;
          var innerException = ex.InnerException; 
 

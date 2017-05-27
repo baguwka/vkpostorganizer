@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using System.Windows;
 using JetBrains.Annotations;
+using NLog;
 using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
@@ -13,6 +14,7 @@ using vk.Views;
 namespace vk.ViewModels {
    [UsedImplicitly]
    public class ShellViewModel : BindableBase {
+      private static readonly ILogger logger = LogManager.GetCurrentClassLogger();
       private readonly IRegionManager _regionManager;
       private readonly IEventAggregator _eventAggregator;
       private readonly VkPostponeSaveLoader _saveLoader;
@@ -42,14 +44,17 @@ namespace vk.ViewModels {
 
       private void onAthorizationCompleted(bool result) {
          if (result) {
+            logger.Debug($"Авторизация завершена успешно");
             _eventAggregator.GetEvent<WallSelectorEvents.FillWallRequest>().Publish();
          }
          else {
+            logger.Debug($"Авторизация завершилась неудачей");
             _regionManager.RequestNavigate(RegionNames.MainRegion, ViewNames.StartPage);
          }
       }
 
       private void onLogOutCompleted() {
+         logger.Debug($"Пользователь вышел");
          _regionManager.RequestNavigate(RegionNames.MainRegion, ViewNames.StartPage);
       }
 
