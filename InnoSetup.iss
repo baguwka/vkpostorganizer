@@ -3,7 +3,7 @@
 
 [Setup]
 AppName={#AppName}
-AppVersion=1.1.6
+AppVersion=1.2.6357.2910
 DefaultDirName={pf}\{#AppName}
 DefaultGroupName={#AppName}
 UninstallDisplayIcon={app}\{#ExeName}
