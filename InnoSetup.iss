@@ -1,15 +1,17 @@
 #define AppName "Vk Postpone Helper"
 #define ExeName "VkPostOrganizer.exe"
+#define Version "1.2.6357.2910"
 
 [Setup]
 AppName={#AppName}
-AppVersion=1.2.6357.2910
+AppVersion={#Version}
 DefaultDirName={pf}\{#AppName}
 DefaultGroupName={#AppName}
 UninstallDisplayIcon={app}\{#ExeName}
 Compression=lzma2
 SolidCompression=yes
 OutputDir=R:\Projects\VK Post Organizer\VK Post Organizer\bin\Setup
+OutputBaseFilename=Setup {#AppName} {#Version}
 
 [Files]
 Source: "VK Post Organizer\bin\Release\Data Persistence Provider.dll"; DestDir: "{app}"      
