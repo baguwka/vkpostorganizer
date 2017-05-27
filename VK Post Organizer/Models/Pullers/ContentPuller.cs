@@ -2,10 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using NLog;
 using vk.Models.VkApi.Entities;
 
 namespace vk.Models.Pullers {
    public sealed class ContentPuller : IContentPuller {
+      private static readonly ILogger logger = LogManager.GetCurrentClassLogger();
+
       private readonly IContentPullerStrategy _contentPullerStrategy;
       private IWallHolder _wallHolder;
 
@@ -33,6 +36,8 @@ namespace vk.Models.Pullers {
       private readonly object _locker = new object();
 
       public async Task PullAsync(PullerSettings settings, CancellationToken ct) {
+         // ReSharper disable once InconsistentlySynchronizedField
+         logger.Debug($"Попытка сделать pull контента из источника");
          OnPullInvoked();
          try {
             Items.Clear();
@@ -40,10 +45,13 @@ namespace vk.Models.Pullers {
             lock (_locker) {
                Items.AddRange(posts);
                LastTimePulled = DateTimeOffset.Now;
+               logger.Debug($"Pull удачный. Получено элементов - {Items?.Count}");
                OnPullCompleted(new ContentPullerEventArgs { Successful = true, Items = Items });
             }
          }
-         catch {
+         catch (Exception ex) {
+            // ReSharper disable once InconsistentlySynchronizedField
+            logger.Debug(ex, "Ошибка при пуллинге контента. Очистка текущих элементов.");
             Items.Clear();
             OnPullCompleted(new ContentPullerEventArgs {Successful = false});
          }
@@ -70,6 +78,7 @@ namespace vk.Models.Pullers {
       }
 
       private void OnWallHolderChanged(IWallHolder e) {
+         logger.Trace($"WallHolder был изменен. Новое Id - {e.ID}, Name - {e.Name}");
          WallHolderChanged?.Invoke(this, e);
       }
    }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Threading;
 using JetBrains.Annotations;
+using NLog;
 using Prism.Events;
 using vk.Events;
 using Timer = System.Timers.Timer;
@@ -13,6 +14,7 @@ using Timer = System.Timers.Timer;
 namespace vk.Models.Pullers {
    [UsedImplicitly]
    public class PullersController {
+      private static readonly ILogger logger = LogManager.GetCurrentClassLogger();
       private readonly IEventAggregator _eventAggregator;
       private readonly Settings _settings;
       private IWallHolder _sharedWallHolder;
@@ -75,15 +77,14 @@ namespace vk.Models.Pullers {
                await History.PullAsync();
             }
             catch (Exception ex) {
-               Debug.WriteLine(ex.ToString());
-               Debug.WriteLine(ex.Message);
-               Debug.WriteLine(ex.StackTrace);
+               logger.Error(ex, "ѕроизошла ошибка во врем€ очередной попытки сделать пулл контента со всех пуллеров");
                //ignore
             }
          });
       }
 
       public async Task SharedPullAsync() {
+         logger.Debug($"«апрос на асинхронный запуск всех пуллеров контента");
          var tasks = new List<Task> {Actual.PullAsync(), Postponed.PullAsync()};
 
          if (_settings.History.Use) {

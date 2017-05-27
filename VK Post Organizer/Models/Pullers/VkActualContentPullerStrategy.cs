@@ -3,12 +3,15 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
+using NLog;
 using vk.Models.VkApi;
 using vk.Models.VkApi.Entities;
 
 namespace vk.Models.Pullers {
    [UsedImplicitly]
    public class VkActualContentPullerStrategy : IContentPullerStrategy {
+      private static readonly ILogger logger = LogManager.GetCurrentClassLogger();
+
       private readonly WallGet _wallGet;
 
       public VkActualContentPullerStrategy(WallGet wallGet) {
@@ -22,10 +25,16 @@ namespace vk.Models.Pullers {
                .Add("offset", offset)
                .Add("count", count);
 
+            logger.Debug($"Получение {count} постов актуальной стены {wallHolderId} со смещением {offset}");
+
             var response = await _wallGet.GetAsync(query, ct);
-            return response.Content.Wall.ToList();
+            var posts = response.Content.Wall.ToList();
+
+            logger.Debug($"Посты актуальной стены #{wallHolderId} успешно получены. Всего их {posts.Count} (ожидалось {count})");
+            return posts;
          }
          catch (VkException ex) {
+            logger.Error(ex, $"Произошла ошибка во время получения постов актуальной стены #{wallHolderId}");
             throw;
          }
       }
