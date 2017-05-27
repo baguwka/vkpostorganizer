@@ -14,7 +14,7 @@ namespace vk {
       public static Version Version { get; private set; }
 
       protected override void OnStartup(StartupEventArgs e) {
-         logger.Debug("VK Postpone Helper пытается запуститься");
+         logger.Debug($"VK Postpone Helper ({Version}) пытается запуститься");
 
          if (SingleInstance.IsOnlyInstance() == false) {
             //SingleInstance.ShowFirstInstance();
