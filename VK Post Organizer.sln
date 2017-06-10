@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.9
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VK Post Organizer", "VK Post Organizer\VK Post Organizer.csproj", "{A3B67CD9-14AE-4D2A-946B-6D36382445AE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{0A00911E-3FB3-40DB-BE93-9EED26722715}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VKPHIntegrationTests", "VKPHIntegrationTests\VKPHIntegrationTests.csproj", "{09F41AD0-97E3-4E2B-994D-43958E2B17CA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{0A00911E-3FB3-40DB-BE93-9EED26722715}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0A00911E-3FB3-40DB-BE93-9EED26722715}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0A00911E-3FB3-40DB-BE93-9EED26722715}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09F41AD0-97E3-4E2B-994D-43958E2B17CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09F41AD0-97E3-4E2B-994D-43958E2B17CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09F41AD0-97E3-4E2B-994D-43958E2B17CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09F41AD0-97E3-4E2B-994D-43958E2B17CA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

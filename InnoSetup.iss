@@ -1,6 +1,6 @@
 #define AppName "Vk Postpone Helper"
 #define ExeName "VkPostOrganizer.exe"
-#define Version "1.2.6357.2910"
+#define Version "1.2.6357.2910"      
 
 [Setup]
 AppName={#AppName}
@@ -45,11 +45,9 @@ Source: "VK Post Organizer\bin\Release\SimpleInjector.dll"; DestDir: "{app}"
 Source: "VK Post Organizer\bin\Release\SimpleInjector.xml"; DestDir: "{app}"
 Source: "VK Post Organizer\bin\Release\System.Net.Http.Formatting.dll"; DestDir: "{app}"
 Source: "VK Post Organizer\bin\Release\System.Net.Http.Formatting.xml"; DestDir: "{app}"
-Source: "VK Post Organizer\bin\Release\System.Windows.Interactivity.dll"; DestDir: "{app}"            
-Source: "VK Post Organizer\bin\Release\VkPostOrganizer.application"; DestDir: "{app}"
+Source: "VK Post Organizer\bin\Release\System.Windows.Interactivity.dll"; DestDir: "{app}"      
 Source: "VK Post Organizer\bin\Release\VkPostOrganizer.exe"; DestDir: "{app}"
 Source: "VK Post Organizer\bin\Release\VkPostOrganizer.exe.config"; DestDir: "{app}"
-Source: "VK Post Organizer\bin\Release\VkPostOrganizer.exe.manifest"; DestDir: "{app}"
 Source: "VK Post Organizer\bin\Release\VkPostOrganizer.pdb"; DestDir: "{app}"
 Source: "VK Post Organizer\bin\Release\Xceed.Wpf.AvalonDock.dll"; DestDir: "{app}"
 Source: "VK Post Organizer\bin\Release\Xceed.Wpf.AvalonDock.Themes.Aero.dll"; DestDir: "{app}"
