@@ -94,7 +94,7 @@
                                             <ColumnDefinition/>
                                             <ColumnDefinition Width="100"/>
                                         </Grid.ColumnDefinitions>
-                                        <Button Grid.Column="0" Height="25" Style="{StaticResource VkMimic}" Command="{Binding OpenPost}"
+                                        <Button Grid.Column="0" Height="25" Style="{StaticResource VkMimic}" Command="{Binding OpenPostCommand}"
                                                 IsEnabled="{Binding PostType, Converter={StaticResource PostTypeToBoolConverter}, UpdateSourceTrigger=PropertyChanged}">
                                             <Label Height="25" Content="{Binding Post.DateString}"></Label>
                                         </Button>

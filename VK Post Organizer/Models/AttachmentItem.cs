@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Windows;
 using System.Windows.Input;
 using Prism.Commands;
 using Prism.Mvvm;
@@ -26,7 +27,13 @@ namespace vk.Models {
       private void openInBrowserExecute() {
          var largestImageUrl = Attachment.Photo?.GetLargest();
          if (!string.IsNullOrEmpty(largestImageUrl)) {
-            Process.Start(largestImageUrl);
+            try {
+               System.Diagnostics.Process.Start(largestImageUrl);
+            }
+            catch {
+               MessageBox.Show("Не удалось открыть пост в браузере. Ссылка на пост скопирована в Ваш буфер обмена");
+               Clipboard.SetText(largestImageUrl);
+            }
          }
       }
 
