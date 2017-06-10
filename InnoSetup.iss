@@ -1,6 +1,6 @@
 #define AppName "Vk Postpone Helper"
 #define ExeName "VkPostOrganizer.exe"
-#define Version "1.2.6357.2910"
+#define Version "1.2.6370.25414"
 
 [Setup]
 AppName={#AppName}
