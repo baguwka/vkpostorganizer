@@ -44,7 +44,7 @@ namespace vk.Models {
       public async Task GetOwnerNamesOfPosts(IEnumerable<VkPostViewModel> posts, CancellationToken ct) {
          var vkPostViewModels = posts as IList<VkPostViewModel> ?? posts.ToList();
 
-         var publisherIds = vkPostViewModels.Select(post => post.GetOwnerIdOfSourcePost()).Distinct().ToList();
+         var publisherIds = vkPostViewModels.Select(post => post.Post.OwnerId).Distinct().ToList();
 
          var userOwners = publisherIds.Where(id => id > 0).ToList();
          var groupOwners = publisherIds.Where(id => id < 0).Select(Math.Abs).ToList();
@@ -55,7 +55,7 @@ namespace vk.Models {
 
             if (users.Content.Any()) {
                foreach (var user in users.Content) {
-                  var ownersPosts = vkPostViewModels.Where(post => post.GetOwnerIdOfSourcePost() == user.ID);
+                  var ownersPosts = vkPostViewModels.Where(post => post.Post.OwnerId == user.ID);
                   foreach (var ownersPost in ownersPosts) {
                      ownersPost.Post.Message = $"{user.Name.Substring(0, user.Name.Length > 20 ? 20 : user.Name.Length)}... {ownersPost.Post.Message}";
                   }
@@ -69,7 +69,7 @@ namespace vk.Models {
 
             if (groups.Content.Any()) {
                foreach (var group in groups.Content) {
-                  var ownersPosts = vkPostViewModels.Where(post => Math.Abs(post.GetOwnerIdOfSourcePost()) == group.ID);
+                  var ownersPosts = vkPostViewModels.Where(post => Math.Abs(post.Post.OwnerId) == group.ID);
                   foreach (var ownersPost in ownersPosts) {
                      ownersPost.Post.Message = $"{group.Name.Substring(0, group.Name.Length > 20 ? 20 : group.Name.Length)}... {ownersPost.Post.Message}";
                   }
