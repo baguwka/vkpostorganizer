@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 using JetBrains.Annotations;
 using Prism.Commands;
@@ -12,15 +13,34 @@ namespace vk.ViewModels {
    [UsedImplicitly]
    public class VkPostViewModel : PostViewModelBase {
       private PostMark _mark;
+
+      /// <summary>
+      /// Пост
+      /// </summary>
       public Post Post { get; private set; }
+
+      /// <summary>
+      /// Оригинальный пост - источник, если текущий пост является репостом
+      /// </summary>
+      [CanBeNull]
+      public Post OriginalPost { get; private set; }
+
+      /// <summary>
+      /// Метод возвращает OwnerId текущего, или оригинального поста (если это репост)
+      /// </summary>
+      /// <returns></returns>
+      public int GetOwnerIdOfSourcePost() {
+         return OriginalPost?.OwnerId ?? Post.OwnerId;
+      }
+
       public event EventHandler UploadRequested;
 
       public PostMark Mark {
-         get { return _mark; }
-         set { SetProperty(ref _mark, value); }
+         get => _mark;
+         set => SetProperty(ref _mark, value);
       }
 
-      public ICommand OpenPost { get; set; }
+      public ICommand OpenPostCommand { get; set; }
       public ICommand UploadAtThisDateCommand { get; set; }
 
       public bool IsExisting { get; set; }
@@ -38,7 +58,7 @@ namespace vk.ViewModels {
       }
 
       private VkPostViewModel() {
-         OpenPost = new DelegateCommand(openPostCommand,
+         OpenPostCommand = new DelegateCommand(openPostCommand,
                () => IsExisting == true && PostType != PostType.Missing)
             .ObservesProperty(() => IsExisting)
             .ObservesProperty(() => PostType);
@@ -57,6 +77,7 @@ namespace vk.ViewModels {
          return postControl.initialize(postReference);
       }
 
+
       private VkPostViewModel initialize([NotNull] IPost postReference) {
          if (postReference == null) {
             throw new ArgumentNullException(nameof(postReference));
@@ -70,8 +91,8 @@ namespace vk.ViewModels {
          Post = vkPost;
 
          //if copy history is null it's not a repost
-         var prev = Post.CopyHistory?.FirstOrDefault();
-         if (prev == null) {
+         var originalPost = Post.CopyHistory?.FirstOrDefault();
+         if (originalPost == null) {
             loadPreviews();
             PostType = PostType.Post;
          }
@@ -80,9 +101,10 @@ namespace vk.ViewModels {
             //var groupName = await GroupNameCache.GetGroupNameAsync(prev.OwnerId);
             PostType = PostType.Repost;
             //Post.Message = $"{groupName.Substring(0, groupName.Length > 10 ? 10 : groupName.Length)}... {prev.Message}";
-            Post.Message = prev.Message;
-            Post.OwnerId = prev.OwnerId;
-            Post.Attachments = prev.Attachments;
+            OriginalPost = originalPost;
+            Post.Message = originalPost.Message;
+            //Post.OwnerId = prev.OwnerId;
+            Post.Attachments = originalPost.Attachments;
 
             loadPreviews();
          }
@@ -94,7 +116,14 @@ namespace vk.ViewModels {
       }
 
       private void openPostCommand() {
-         System.Diagnostics.Process.Start($"https://vk.com/wall{Post.OwnerId}_{Post.ID}");
+         var link = $"https://vk.com/wall{Post.OwnerId}_{Post.ID}";
+         try {
+            System.Diagnostics.Process.Start(link);
+         }
+         catch {
+            MessageBox.Show("Не удалось открыть пост в браузере. Ссылка на пост скопирована в Ваш буфер обмена");
+            Clipboard.SetText(link);
+         }
       }
 
 
