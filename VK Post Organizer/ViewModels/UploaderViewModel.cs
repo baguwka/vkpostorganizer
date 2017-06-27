@@ -240,9 +240,19 @@ namespace vk.ViewModels {
       }
 
       private async void onPostponedPullCompleted(object sender, ContentPullerEventArgs e) {
-         await fillMissing(e.Items);
-         //IsBusy = false;
-         ProgressString = "";
+         if (e.Successful)
+         {
+            await fillMissing(e.Items);
+            //IsBusy = false;
+            ProgressString = "";
+         }
+         else if (e.Error)
+         {
+            var message = e.VkException?.ErrorCode == 10 ? "Внутренняя ошибка VK 10. Попробуйте повторить запрос позже." : "Неизвестная ошибка при пулле постов.";
+
+            MessageBox.Show($"{message}", "Ошибка при пулле отложенных постов", MessageBoxButton.OK,
+               MessageBoxImage.Error);
+         }
       }
 
       private async Task fillMissing(IEnumerable<IPost> posts) {

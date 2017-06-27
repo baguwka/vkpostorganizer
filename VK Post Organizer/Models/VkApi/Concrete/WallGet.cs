@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
@@ -23,7 +24,8 @@ namespace vk.Models.VkApi {
          return await GetAsync(parameters, CancellationToken.None, ignoraCache);
       }
 
-      public async Task<WallGetResponse> GetAsync(QueryParameters parameters, CancellationToken ct, bool ignoraCache = false) {
+      public async Task<WallGetResponse> GetAsync(QueryParameters parameters, CancellationToken ct, bool ignoraCache = false)
+      {
          var response = ignoraCache 
             ? await _api.ExecuteMethodIgnoreCacheAsync("wall.get", parameters, ct).ConfigureAwait(false)
             : await _api.ExecuteMethodAsync("wall.get", parameters, ct).ConfigureAwait(false);
