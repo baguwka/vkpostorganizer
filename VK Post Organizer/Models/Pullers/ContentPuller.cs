@@ -39,17 +39,26 @@ namespace vk.Models.Pullers {
          // ReSharper disable once InconsistentlySynchronizedField
          logger.Debug($"Попытка сделать pull контента из источника");
          OnPullInvoked();
-         try {
+         try
+         {
             Items.Clear();
             var posts = await _contentPullerStrategy.GetAsync(WallHolder, settings, ct);
-            lock (_locker) {
+            lock (_locker)
+            {
                Items.AddRange(posts);
                LastTimePulled = DateTimeOffset.Now;
                logger.Debug($"Pull удачный. Получено элементов - {Items?.Count}");
-               OnPullCompleted(new ContentPullerEventArgs { Successful = true, Items = Items });
+               OnPullCompleted(new ContentPullerEventArgs {Successful = true, Items = Items});
             }
          }
-         catch (Exception ex) {
+         catch (VkException ex)
+         {
+            logger.Debug(ex, "Ошибка при пуллинге контента. Очистка текущих элементов.");
+            Items.Clear();
+            OnPullCompleted(new ContentPullerEventArgs { Successful = false, Error = true, VkException = ex });
+         }
+         catch (Exception ex)
+         {
             // ReSharper disable once InconsistentlySynchronizedField
             logger.Debug(ex, "Ошибка при пуллинге контента. Очистка текущих элементов.");
             Items.Clear();
