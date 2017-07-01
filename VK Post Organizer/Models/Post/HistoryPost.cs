@@ -19,6 +19,7 @@ namespace vk.Models {
       private int _postponedDateUnix;
       private string _message;
       private IEnumerable<string> _attachments;
+      private int _postId;
 
       [JsonProperty(PropertyName = "owner_id")]
       public int OwnerId {
@@ -64,6 +65,13 @@ namespace vk.Models {
       public IEnumerable<string> Attachments {
          get { return _attachments; }
          set { SetProperty(ref _attachments, value); }
+      }
+
+      [JsonProperty(PropertyName = "post_id")]
+      public int PostId
+      {
+         get { return _postId; }
+         set { _postId = value; }
       }
 
       /// <summary>
