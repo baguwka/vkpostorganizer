@@ -36,6 +36,7 @@ namespace vk.Models.History {
                var post = new HistoryPost {
                   OwnerId = userid,
                   WallId = info.OwnerId,
+                  PostId = info.PostId,
                   Message = info.Message,
                   PostponedDateUnix = info.PostponedDate,
                   IsRepost = false,

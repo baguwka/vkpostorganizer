@@ -86,7 +86,10 @@
                                         <ColumnDefinition Width="25"/>
                                     </Grid.ColumnDefinitions>
 
-                                    <Label Grid.Row="0" Grid.Column="0" VerticalAlignment="Top" Height="25" Style="{StaticResource VkLabel}" Content="{Binding Post.PostponedDateString}"/>
+                                    <Button Grid.Column="0" VerticalAlignment="Top" Height="25" Style="{StaticResource VkMimic}" Command="{Binding OpenPostCommand}"
+                                           IsEnabled="{Binding PostType, Converter={StaticResource PostTypeToBoolConverter}, UpdateSourceTrigger=PropertyChanged}">
+                                       <Label Height="25" Style="{StaticResource VkLabel}" Content="{Binding Post.PostponedDateString}"/>
+                                    </Button>
 
                                     <StackPanel Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Grid.ColumnSpan="2" Orientation="Vertical">
                                         <TextBlock Style="{StaticResource VkTextBlock}" Height="50" TextWrapping="Wrap" Text="{Binding Post.Message}"/>

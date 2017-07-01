@@ -19,6 +19,7 @@ namespace vk.Models.VkApi {
       public bool Signed { get; set; }
       public bool FromGroup { get; set; }
       public int PublishingDate { get; set; }
+      public int PostId { get; set; }
    }
 
    public class PhotosGetById {
@@ -68,6 +69,7 @@ namespace vk.Models.VkApi {
          parameters.Append(info.Attachments.GetAsParameters());
 
          var response = await postAsync(parameters, ct);
+         info.PostId = response?.Content?.PostID ?? 0;
          OnPostSuccessful(info);
          return response;
       }
