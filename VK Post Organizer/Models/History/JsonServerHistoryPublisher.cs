@@ -5,11 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
+using NLog;
 using RateLimiter;
 
 namespace vk.Models.History {
    [UsedImplicitly]
    public class JsonServerHistoryPublisher : IHistoryPublisher {
+      private static readonly ILogger logger = LogManager.GetCurrentClassLogger();
+
       private readonly Settings _settings;
       private readonly TimeLimiter _rateLimiter;
       private readonly HttpClient _httpClient;
@@ -44,7 +47,7 @@ namespace vk.Models.History {
             }
          }
          catch (OperationCanceledException) {
-            //ignore
+            logger.Debug($"Операция добавления истории для поста {data.WallId}_{data.PostId} отменена.");
          }
       }
    }

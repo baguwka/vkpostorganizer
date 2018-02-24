@@ -127,9 +127,11 @@ namespace vk.Models.VkApi {
          return await _rateLimiter.Perform(() => callAsync(uri, ct), ct).ConfigureAwait(false);
       }
 
-      private async Task<string> callAsync(Uri uri, CancellationToken ct) {
-         try {
+      private async Task<string> callAsync(Uri uri, CancellationToken ct)
+      {
             var uriWithoutToken = removeQueryStringByKey(uri, "access_token");
+
+            try {
 
             logger.Debug($"GET {uriWithoutToken}");
 
@@ -189,7 +191,7 @@ namespace vk.Models.VkApi {
             }
 
             if (_timeoutRetry > 1) {
-               logger.Error(ex, $"Соединение не удалось. Вызванный url - {uri}");
+               logger.Error(ex, $"Соединение не удалось. Вызванный url - {uriWithoutToken}");
                throw new VkException($"Соеденение не удалось.\nПроверьте настройки прокси сервера и перезапустите приложение.\n{ex.Message}", ex);
             }
             _timeoutRetry++;

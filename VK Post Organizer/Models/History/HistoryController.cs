@@ -1,12 +1,16 @@
 using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
+using NLog;
 using vk.Models.VkApi;
 using vk.Models.VkApi.Entities;
 
 namespace vk.Models.History {
    [UsedImplicitly]
-   public class HistoryController {
+   public class HistoryController
+   {
+      private static readonly ILogger logger = LogManager.GetCurrentClassLogger();
+
       private readonly IHistoryPublisher _historyPublisher;
       private readonly VkApiProvider _api;
 
@@ -46,8 +50,8 @@ namespace vk.Models.History {
 
                await _historyPublisher.LogAsync(post);
             }
-            catch (VkException) {
-               //ignore
+            catch (VkException ex) {
+               logger.Trace(ex, $"Ошибка при добавлении поста истории для поста {info.OwnerId}_{info.PostId}");
             }
          });
       }
