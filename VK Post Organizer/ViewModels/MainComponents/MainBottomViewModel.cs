@@ -13,6 +13,7 @@ namespace vk.ViewModels {
       public ICommand BackCommand { get; }
       public ICommand RefreshCommand { get; }
       public ICommand SettingsCommand { get; }
+      public ICommand OpenLoggingDirectoryCommand { get; }
 
       private bool _isBusy;
       private bool _contentIsBusy;
@@ -45,7 +46,8 @@ namespace vk.ViewModels {
          set { SetProperty(ref _version, value); }
       }
 
-      public MainBottomViewModel(IEventAggregator eventAggregator, BusyObserver busyObserver) {
+
+       public MainBottomViewModel(IEventAggregator eventAggregator, BusyObserver busyObserver) {
          var aggregator = eventAggregator;
          _busyObserver = busyObserver;
          _busyObserver.PropertyChanged += (sender, args) => {
@@ -72,6 +74,11 @@ namespace vk.ViewModels {
 
          SettingsCommand = new DelegateCommand(() => {
             aggregator.GetEvent<MainBottomEvents.Settings>().Publish();
+         });
+        
+         OpenLoggingDirectoryCommand = new DelegateCommand(() =>
+         {
+             aggregator.GetEvent<MainBottomEvents.LoggingDirectory>().Publish();
          });
 
          Version = App.Version.ToString();

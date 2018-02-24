@@ -8,5 +8,6 @@ namespace vk.Events {
       public class Refresh : PubSubEvent { }
       public class Upload : PubSubEvent { }
       public class Settings : PubSubEvent {}
+      public class LoggingDirectory : PubSubEvent { }
    }
 }

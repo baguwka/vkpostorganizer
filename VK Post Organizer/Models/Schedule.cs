@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using JetBrains.Annotations;
 using Prism.Mvvm;
 
@@ -77,26 +78,31 @@ namespace vk.Models {
       public ObservableCollection<ScheduleItem> Items { get; }
 
       public Schedule() {
-         Items = new ObservableCollection<ScheduleItem> {
-            new ScheduleItem(9, 00),
-            new ScheduleItem(9, 05),
-            new ScheduleItem(9, 10),
-            new ScheduleItem(11, 00),
-            new ScheduleItem(11, 05),
-            new ScheduleItem(11, 10),
-            new ScheduleItem(15, 00),
-            new ScheduleItem(15, 05),
-            new ScheduleItem(15, 10),
-            new ScheduleItem(18, 00),
-            new ScheduleItem(18, 05),
-            new ScheduleItem(18, 10),
-            new ScheduleItem(21, 00),
-            new ScheduleItem(21, 05),
-            new ScheduleItem(21, 10)
-         };
+          var schedule = new List<ScheduleItem>();
+
+          for (int hh = 9; hh < 22; hh++)
+          {
+              for (int mm = 0; mm < 59; mm += 10)
+              {
+                  schedule.Add(new ScheduleItem(hh, mm));
+              }
+          }
+          schedule.Add(new ScheduleItem(9, 05));
+          schedule.Add(new ScheduleItem(11, 05));
+          schedule.Add(new ScheduleItem(15, 05));
+          schedule.Add(new ScheduleItem(18, 05));
+          schedule.Add(new ScheduleItem(21, 05));
+
+          schedule = schedule.OrderBy(ToTimeSpan).ToList();
+          Items = new ObservableCollection<ScheduleItem>(schedule);
       }
 
-      public ScheduleSaveData SaveSchedule() {
+        private static TimeSpan ToTimeSpan(ScheduleItem left)
+        {
+            return TimeSpan.FromHours(left.Hour).Add(TimeSpan.FromMinutes(left.Minute));
+        }
+
+        public ScheduleSaveData SaveSchedule() {
          return new ScheduleSaveData(this);
       }
 

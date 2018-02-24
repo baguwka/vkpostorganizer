@@ -1,4 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 using JetBrains.Annotations;
 using NLog;
@@ -36,13 +39,14 @@ namespace vk.ViewModels {
 
          _eventAggregator.GetEvent<MainBottomEvents.Back>().Subscribe(onBackRequested);
          _eventAggregator.GetEvent<MainBottomEvents.Settings>().Subscribe(onSettingsRequested);
+         _eventAggregator.GetEvent<MainBottomEvents.LoggingDirectory>().Subscribe(onLoggingDirectoryRequested);
 
          _eventAggregator.GetEvent<AuthBarEvents.AuthorizationCompleted>().Subscribe(onAthorizationCompleted);
          _eventAggregator.GetEvent<AuthBarEvents.LogOutCompleted>().Subscribe(onLogOutCompleted);
 
       }
 
-      private void onAthorizationCompleted(bool result) {
+       private void onAthorizationCompleted(bool result) {
          if (result) {
             logger.Debug($"Авторизация завершена успешно");
             _eventAggregator.GetEvent<WallSelectorEvents.FillWallRequest>().Publish();
@@ -63,7 +67,23 @@ namespace vk.ViewModels {
          settings.ShowDialog();
       }
 
-      private void onBackRequested() {
+
+       private void onLoggingDirectoryRequested()
+       {
+           try
+           {
+               //TODO убрать хардкод и перенести в настройки
+               var mydocs = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+               var loggingFolder = Path.Combine(mydocs, "Baguwk/Vk Postpone Helper/Logs");
+               Process.Start(loggingFolder);
+           }
+           catch (Exception ex)
+           {
+               logger.Error(ex, "Ошибка во время попытки открыть директорию логгирования");
+           }
+       }
+
+        private void onBackRequested() {
          _regionManager.RequestNavigate(RegionNames.MainRegion, ViewNames.AvailableWalls);
          _eventAggregator.GetEvent<ShellEvents.WallSelectedEvent>().Publish(false);
          _eventAggregator.GetEvent<UploaderEvents.Configure>().Publish(new UploaderViewModelConfiguration {
